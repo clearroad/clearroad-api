@@ -1,0 +1,12 @@
+src/
+.*
+CONTRIBUTING.md
+CHANGELOG.md
+commitlint.config.js
+gulpfile.js
+karma.conf.ts
+tsconfig*
+tslint*
+index.html
+index.js
+deploy.js

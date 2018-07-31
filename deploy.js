@@ -12,6 +12,8 @@ if (!process.env.CI) {
 const azure = require('azure-storage');
 const blobService = azure.createBlobService();
 
+const jsFile = files => files.filter(file => path.extname(file) === '.js');
+
 const createShare = (container) => {
   return new Promise((resolve, reject) => {
     blobService.createContainerIfNotExists(container, {
@@ -42,14 +44,14 @@ const run = async () => {
   try {
     console.log('Uploading src folder...');
     await createShare('api');
-    let directory = './src';
-    let files = fs.readdirSync(path.resolve(directory));
+    let directory = './dist';
+    let files = jsFile(fs.readdirSync(path.resolve(directory)));
     await Promise.all(files.map(file => updloadFile('api', path.resolve(directory, file))));
 
     console.log('Uploading lib folder...');
     await createShare('lib');
     directory = './lib';
-    files = fs.readdirSync(path.resolve(directory));
+    files = jsFile(fs.readdirSync(path.resolve(directory)));
     await Promise.all(files.map(file => updloadFile('lib', path.resolve(directory, file))));
 
     process.exit(0);

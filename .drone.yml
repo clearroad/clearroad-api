@@ -9,6 +9,7 @@ pipeline:
       - AZURE_STORAGE_ACCESS_KEY=$AZURE_STORAGE_ACCESS_KEY
     commands:
       - npm install
+      - npm run build
       - npm run deploy
 
   notify:

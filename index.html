@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Clearroad Demonstrator</title>
+  <meta name="description" content="Clearroad Demonstrator">
+
+  <script src="lib/rsvp.js"></script>
+  <script src="lib/jio.js"></script>
+  <script src="dist/clearroad.js"></script>
+
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+
+  <style>
+    [type="submit"] {
+      font-size: 14px;
+      padding: 5px;
+    }
+  </style>
+</head>
+  <body>
+    <form id="form">
+      <div style="margin: 10px 0">
+        <label for="url">api url:</label>
+        <input type="string" name="url" readonly style="width:400px"
+          value="https://softinst103752.host.vifib.net/erp5/web_site_module/hateoas"
+        />
+      </div>
+      <div style="margin: 10px 0">
+        <p>
+          Login on the <a href="https://softinst103752.host.vifib.net/erp5" target="_blank">ERP5 platform</a>
+          or type in your username and password
+        </p>
+      </div>
+      <div style="margin: 10px 0">
+        <label for="login">login:</label>
+        <input type="string" name="login" placeholder="Login (optional)" />
+        <label for="password">password:</label>
+        <input type="password" name="password" placeholder="Password (optional)" />
+      </div>
+      <div>
+        <textarea name="usercode" rows="20" cols="100" placeholder="paste the code here"></textarea>
+      </div>
+      <input type="submit" value="Submit" />
+      <hr />
+      <p>JS Logs</p>
+      <div id="log"></div>
+      <hr />
+      <p>Results</p>
+      <div id="result"></div>
+    </form>
+
+    <script src="index.js"></script>
+  </body>
+</html>
