@@ -196,7 +196,7 @@ class ClearRoad {
         type: 'query',
         sub_storage: {
           type: 'indexeddb',
-          database: `${database}-signatures`
+          database: `${database}-messages-signatures`
         }
       },
       query: {
@@ -245,7 +245,7 @@ class ClearRoad {
         type: 'query',
         sub_storage: {
           type: 'indexeddb',
-          database: `${database}-signatures`
+          database: `${database}-ingestion-signatures`
         }
       },
       query: {
@@ -258,7 +258,7 @@ class ClearRoad {
       check_local_deletion: false,
       check_remote_modification: false, // there is no modification, only creation of report
       check_remote_creation: true,
-      check_remote_deletion: false,
+      check_remote_deletion: true,
       local_sub_storage: {
         type: 'query',
         sub_storage: {
@@ -291,7 +291,7 @@ class ClearRoad {
         type: 'query',
         sub_storage: {
           type: 'indexeddb',
-          database: `${database}-signatures`
+          database: `${database}-directory-signatures`
         }
       },
       query: {
@@ -337,7 +337,7 @@ class ClearRoad {
         type: 'query',
         sub_storage: {
           type: 'indexeddb',
-          database: `${database}-signatures`
+          database: `${database}-files-signatures`
         }
       },
       query: {
@@ -445,6 +445,6 @@ class ClearRoad {
   }
 
   getAttachment(id: string, name: string, options?: clearroad.IAttachmentOptions): rsvp.IQueue {
-    return this.mainStorage.getAttachment(id, name, options);
+    return this.reportStorage.getAttachment(id, name, options);
   }
 }

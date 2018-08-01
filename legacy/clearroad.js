@@ -98,7 +98,7 @@ function ClearRoad(url, login, password) {
       type: "query",
       sub_storage: {
         type: "indexeddb",
-        database: DATABASE + "-signatures"
+        database: DATABASE + "-messages-signatures"
       }
     },
     query: {
@@ -143,7 +143,7 @@ function ClearRoad(url, login, password) {
       type: "query",
       sub_storage: {
         type: "indexeddb",
-        database: DATABASE + "-signatures"
+        database: DATABASE + "-ingestion-signatures"
       }
     },
     query: {
@@ -156,7 +156,7 @@ function ClearRoad(url, login, password) {
     check_local_deletion: false,
     check_remote_modification: false, // there is no modification, only creation of report
     check_remote_creation: true,
-    check_remote_deletion: false,
+    check_remote_deletion: true,
     local_sub_storage: {
       type: "query",
       sub_storage: {
@@ -176,29 +176,29 @@ function ClearRoad(url, login, password) {
       }
     }
   });
-  var directory_query = 'portal_type:("Road Account")';
+  var directory_query = 'portal_type:("Road Account" OR "Road Event" OR "Road Transaction")';
   this.directory_jio = jIO.createJIO({
     type: "replicate",
     parallel_operation_amount: 1,
     use_remote_post: false,
     conflict_handling: 1,
-    signature_hash_key: 'reference',
+    signature_hash_key: 'source_reference',
     signature_sub_storage: {
       type: "query",
       sub_storage: {
         type: "indexeddb",
-        database: DATABASE + "-signatures"
+        database: DATABASE + "-directory-signatures"
       }
     },
     query: {
       query: directory_query,
       sort_on: [['modification_date', 'descending']],
-      limit: [0, 1234567890]
+      limit: [0, 200]
     },
     check_local_modification: false, // local modification will always be erased
     check_local_creation: false,
     check_local_deletion: false,
-    check_remote_modification: true,
+    check_remote_modification: false,
     check_remote_creation: true,
     check_remote_deletion: true,
     local_sub_storage: {
@@ -210,7 +210,7 @@ function ClearRoad(url, login, password) {
     },
     remote_sub_storage: {
       type: "mapping",
-      id: ["equalSubProperty", "reference"],
+      id: ["equalSubProperty", "source_reference"],
       sub_storage: {
         type: "erp5",
         url: url,
@@ -231,7 +231,7 @@ function ClearRoad(url, login, password) {
       type: "query",
       sub_storage: {
         type: "indexeddb",
-        database: DATABASE + "-signatures"
+        database: DATABASE + "-file-signatures"
       }
     },
     query: {
@@ -246,7 +246,7 @@ function ClearRoad(url, login, password) {
     check_remote_creation: true,
     check_remote_deletion: true,
     check_remote_attachment_creation: true,
-    check_remote_attachment_modification: true,
+    check_remote_attachment_modification: false,
     check_remote_attachment_deletion: true,
     check_local_attachment_creation: false,
     check_local_attachment_modification: false,
@@ -329,5 +329,5 @@ ClearRoad.prototype.allDocs = function () {
   return this.jio.allDocs.apply(this.jio, arguments);
 };
 ClearRoad.prototype.getAttachment = function () {
-  return this.jio.getAttachment.apply(this.jio, arguments);
+  return this.report_jio.getAttachment.apply(this.report_jio, arguments);
 };
