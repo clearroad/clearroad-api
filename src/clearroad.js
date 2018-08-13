@@ -1,87 +1,9 @@
-declare var jIO: any;
-declare var RSVP: any;
-declare var Rusha: any;
-
-namespace rsvp {
-  export interface IQueue {
-    push: (onFullfilled?: Function, onRejected?: Function) => IQueue;
-  }
-}
-
-namespace clearroad {
-  export interface IAttachmentOptions {
-    format: 'text' | 'json' | 'blob' | 'data_url' | 'array_buffer';
-  }
-
-  export interface IQueryOptions {
-    query: string;
-    limit?: [number, number];
-    sort_on?: Array<[string, 'ascending' | 'descending']>;
-    select_list?: string[];
-    include_docs?: boolean;
-  }
-
-  type portalType = 'Road Account Message' |
-    'Billing Period Message' |
-    'Road Message' |
-    'Road Report Request' |
-    'Road Event Message';
-
-  interface IPostData {
-    portal_type: portalType;
-  }
-
-  interface IPostRoadAccountMessage extends IPostData {
-    portal_type: 'Road Account Message';
-    account_manager: string;
-    data_collector: string;
-    condition: string;
-    cert_id: string;
-    account_reference: string;
-    effective_date: string;
-    expiration_date: string;
-    fuel_consumption: string;
-    fuel_taxable: string;
-    obu_reference: string;
-    vehicle_reference: string;
-    product_line: string;
-  }
-
-  interface IPostBillingPeriodMessage extends IPostData {
-    portal_type: 'Billing Period Message';
-    reference: string;
-    start_date: string;
-    stop_date: string;
-  }
-
-  interface IPostRoadReportRequest extends IPostData {
-    portal_type: 'Road Report Request';
-    report_type: string;
-    billing_period_reference: string;
-    request_date: string;
-    request: string;
-  }
-
-  interface IPostRoadEventMessage extends IPostData {
-    portal_type: 'Road Event Message';
-    request: string;
-  }
-
-  interface IPostRoadMessage extends IPostData {
-    portal_type: 'Road Message';
-    request: string;
-  }
-
-  export type postData = IPostRoadAccountMessage |
-    IPostBillingPeriodMessage |
-    IPostRoadReportRequest |
-    IPostRoadEventMessage |
-    IPostRoadMessage;
-}
+import RSVP from 'rsvp';
+import { jIO } from 'jio';
 
 const database = 'clearroad';
 
-const concatStringNTimes = (val: string, iteration: number) => {
+const concatStringNTimes = (val, iteration) => {
   let res = '';
   while (--iteration >= 0) {
     res += val;
@@ -90,8 +12,8 @@ const concatStringNTimes = (val: string, iteration: number) => {
 };
 
 const jsonIdRec = (
-  indent: string, replacer: string|string[]|Function, keyValueSpace: string,
-  key: string|number, value: any, deep = 0
+  indent, replacer, keyValueSpace,
+  key, value, deep = 0
 ) => {
   let res;
   let mySpace;
@@ -123,7 +45,7 @@ const jsonIdRec = (
   }
   if (typeof value === 'object' && value !== null) {
     if (Array.isArray(replacer)) {
-      res = replacer.reduce((p: string[], c: string) => {
+      res = replacer.reduce((p, c) => {
         p.push(c);
         return p;
       }, []);
@@ -156,7 +78,7 @@ const jsonIdRec = (
   return JSON.stringify(value);
 };
 
-const jsonId = (value: any, replacer: string|string[]|Function, space: string|number) => {
+const jsonId = (value, replacer, space) => {
   let indent;
   let keyValueSpace = '';
   if (typeof space === 'string') {
@@ -174,13 +96,8 @@ const jsonId = (value: any, replacer: string|string[]|Function, space: string|nu
   return jsonIdRec(indent, replacer, keyValueSpace, '', value);
 };
 
-class ClearRoad {
-  private mainStorage: any;
-  private ingestionReportStorage: any;
-  private directoryStorage: any;
-  private reportStorage: any;
-
-  constructor(url: string, login?: string, password?: string) {
+export class ClearRoad {
+  constructor(url, login, password) {
     let query = 'portal_type:(' +
       '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
       ' OR "Billing Period Message" OR "Road Report Request")' +
@@ -389,8 +306,8 @@ class ClearRoad {
     });
   }
 
-  post(data: clearroad.postData): rsvp.IQueue {
-    const options: any = data;
+  post(data) {
+    const options = data;
 
     switch (data.portal_type) {
       case 'Road Account Message':
@@ -417,14 +334,14 @@ class ClearRoad {
     options.source_reference = reference;
     options.destination_reference = reference;
 
-    const queue: rsvp.IQueue = new RSVP.Queue();
+    const queue = new RSVP.Queue();
     return queue.push(() => {
       return this.mainStorage.put(options.source_reference, options);
     });
   }
 
-  sync(): rsvp.IQueue {
-    const queue: rsvp.IQueue = new RSVP.Queue();
+  sync() {
+    const queue = new RSVP.Queue();
     return queue
       .push(() => {
         return this.mainStorage.repair();
@@ -440,11 +357,11 @@ class ClearRoad {
       });
   }
 
-  allDocs(options: clearroad.IQueryOptions): rsvp.IQueue {
+  allDocs(options) {
     return this.mainStorage.allDocs(options);
   }
 
-  getAttachment(id: string, name: string, options?: clearroad.IAttachmentOptions): rsvp.IQueue {
+  getAttachment(id, name, options) {
     return this.reportStorage.getAttachment(id, name, options);
   }
 }
