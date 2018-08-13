@@ -1,4 +1,5 @@
 src/
+legacy/
 .*
 CONTRIBUTING.md
 CHANGELOG.md
