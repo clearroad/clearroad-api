@@ -1,11 +1,5 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var RSVP = _interopDefault(require('rsvp'));
-var jio = require('jio');
+import RSVP from 'rsvp';
+import { jIO } from './lib/jio';
 
 const database = 'clearroad';
 
@@ -102,14 +96,14 @@ const jsonId = (value, replacer, space) => {
   return jsonIdRec(indent, replacer, keyValueSpace, '', value);
 };
 
-class ClearRoad {
+export class ClearRoad {
   constructor(url, login, password) {
     let query = 'portal_type:(' +
       '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
       ' OR "Billing Period Message" OR "Road Report Request")' +
       ' AND grouping_reference:"data"';
 
-    this.mainStorage = jio.jIO.createJIO({
+    this.mainStorage = jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -158,7 +152,7 @@ class ClearRoad {
       'OR "Billing Period Message" OR "Road Report Request")' +
       ' AND validation_state:("processed" OR "rejected")';
 
-    this.ingestionReportStorage = jio.jIO.createJIO({
+    this.ingestionReportStorage = jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -204,7 +198,7 @@ class ClearRoad {
 
     query = 'portal_type:("Road Account" OR "Road Event" OR "Road Transaction")';
 
-    this.directoryStorage = jio.jIO.createJIO({
+    this.directoryStorage = jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -250,7 +244,7 @@ class ClearRoad {
 
     query = 'portal_type:("File")';
 
-    this.reportStorage = jio.jIO.createJIO({
+    this.reportStorage = jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -371,5 +365,3 @@ class ClearRoad {
     return this.reportStorage.getAttachment(id, name, options);
   }
 }
-
-exports.ClearRoad = ClearRoad;

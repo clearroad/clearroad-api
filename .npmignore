@@ -1,14 +1,11 @@
 dist/
 legacy/
-lib/
-src/
+lib/rsvp.js
 .*
 CHANGELOG.md
 commitlint.config.js
 CONTRIBUTING.md
 deploy.js
-index.html
-index.js
 rollup.config.js
 tsconfig*
 tslint*

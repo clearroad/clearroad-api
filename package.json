@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "main": "clearroad.js",
+  "module": "clearroad.module.js",
   "typings": "clearroad.d.ts",
   "scripts": {
     "build": "rimraf dist && rollup -c",
@@ -10,7 +11,7 @@
     "lint:fix": "tslint --fix \"src/**/*.ts\"",
     "deploy": "node deploy.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "http-server",
+    "start": "http-server sample.html -o --cors",
     "release": "standard-version",
     "postrelease": "git push origin master --follow-tags",
     "commitmsg": "commitlint -e $GIT_PARAMS"
@@ -22,7 +23,6 @@
   "author": "Guillaume Royer <guillaumeroyer@gmail.com>",
   "license": "none",
   "dependencies": {
-    "jio": "git+https://lab.nexedi.com/mebibou/jio.git#feat/es6",
     "rsvp": "git+https://lab.nexedi.com/nexedi/rsvp.js.git"
   },
   "devDependencies": {

@@ -1,5 +1,11 @@
-import RSVP from 'rsvp';
-import { jIO } from 'jio';
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var RSVP = _interopDefault(require('rsvp'));
+var jio_js = require('./lib/jio.js');
 
 const database = 'clearroad';
 
@@ -96,14 +102,14 @@ const jsonId = (value, replacer, space) => {
   return jsonIdRec(indent, replacer, keyValueSpace, '', value);
 };
 
-export class ClearRoad {
+class ClearRoad {
   constructor(url, login, password) {
     let query = 'portal_type:(' +
       '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
       ' OR "Billing Period Message" OR "Road Report Request")' +
       ' AND grouping_reference:"data"';
 
-    this.mainStorage = jIO.createJIO({
+    this.mainStorage = jio_js.jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -152,7 +158,7 @@ export class ClearRoad {
       'OR "Billing Period Message" OR "Road Report Request")' +
       ' AND validation_state:("processed" OR "rejected")';
 
-    this.ingestionReportStorage = jIO.createJIO({
+    this.ingestionReportStorage = jio_js.jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -198,7 +204,7 @@ export class ClearRoad {
 
     query = 'portal_type:("Road Account" OR "Road Event" OR "Road Transaction")';
 
-    this.directoryStorage = jIO.createJIO({
+    this.directoryStorage = jio_js.jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -244,7 +250,7 @@ export class ClearRoad {
 
     query = 'portal_type:("File")';
 
-    this.reportStorage = jIO.createJIO({
+    this.reportStorage = jio_js.jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -365,3 +371,5 @@ export class ClearRoad {
     return this.reportStorage.getAttachment(id, name, options);
   }
 }
+
+exports.ClearRoad = ClearRoad;

@@ -1,3 +1,4 @@
+import path from 'path';
 import resolve from 'rollup-plugin-node-resolve';
 import commonJS from 'rollup-plugin-commonjs';
 import builtins from 'rollup-plugin-node-builtins';
@@ -6,26 +7,34 @@ import buble from 'rollup-plugin-buble';
 import { uglify } from 'rollup-plugin-uglify';
 const cloneDeep = require('lodash.clonedeep');
 
+const jio = path.resolve(__dirname, 'lib/jio.js');
+
 const cjs = {
   external: [
     'rsvp',
-    'jio'
+    jio
   ],
-  input: 'src/clearroad.js',
+  input: 'clearroad.js',
   output: {
-    file: 'clearroad.js',
+    file: 'clearroad.module.js',
     format: 'cjs'
   },
   plugins: [
     builtins(),
     commonJS({
-      include: 'node_modules/**'
+      include: [
+        'node_modules/**',
+        'lib/**'
+      ]
     })
   ]
 };
 
 const iife = {
-  input: 'src/clearroad.js',
+  external: [
+    jio
+  ],
+  input: 'clearroad.js',
   output: [{
     file: 'dist/clearroad.js',
     format: 'iife',
@@ -43,13 +52,19 @@ const iife = {
     `,
     globals: {
       rsvp: 'RSVP',
-      jio: 'jIO'
+      [jio]: 'jIO'
     }
   }],
   plugins: [
     hypothetical({
       allowFallthrough: true,
       files: {
+        './lib/jio': `
+export { jIO };
+        `,
+        'lib/jio': `
+export { jIO };
+        `,
         jio: `
 export { jIO };
         `,
