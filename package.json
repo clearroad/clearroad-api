@@ -1,5 +1,5 @@
 {
-  "name": "clearroad-api",
+  "name": "@clearroad/api",
   "version": "0.0.1",
   "description": "",
   "main": "clearroad.js",
