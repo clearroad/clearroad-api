@@ -16,6 +16,11 @@
     "postrelease": "git push origin master --follow-tags",
     "commitmsg": "commitlint -e $GIT_PARAMS"
   },
+  "keywords": [
+    "clearroad",
+    "api",
+    "node"
+  ],
   "repository": {
     "type": "git",
     "url": "ssh://git@clearroad-bitbucket.westeurope.cloudapp.azure.com:7999/labs/clearroadlab-api.git"
