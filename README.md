@@ -14,10 +14,12 @@ $ npm install clearroad-api
 
 ```
 import { ClearRoad } from 'clearroad-api';
+const cr = new ClearRoad('apiUrl', 'login', 'password');
 ```
 
 ### Using with CommonJS
 
 ```
 const ClearRoad = require('clearroad-api').ClearRoad;
+const cr = new ClearRoad('apiUrl', 'login', 'password');
 ```
