@@ -10,6 +10,13 @@ $ npm install clearroad-api
 
 ## <a name="usage"></a> Usage
 
+If you want to include the files directly in your page, you can include via our CDN:
+```html
+<script src="https://clearroadlab.azureedge.net/lib/rsvp.js"></script>
+<script src="https://clearroadlab.azureedge.net/lib/jio.js"></script>
+<script src="https://clearroadlab.azureedge.net/api/clearroad.js"></script>
+```
+
 ### Using with es6
 
 ```javascript
