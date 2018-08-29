@@ -30,6 +30,28 @@ const cjs = {
   ]
 };
 
+const node = {
+  external: [
+    'rsvp',
+    jio
+  ],
+  input: 'clearroad.js',
+  output: {
+    file: 'node/index.js',
+    format: 'cjs'
+  },
+  plugins: [
+    builtins(),
+    commonJS({
+      include: [
+        'node_modules/**',
+        'lib/**'
+      ]
+    }),
+    buble()
+  ]
+};
+
 const iife = {
   external: [
     jio
@@ -87,6 +109,7 @@ iifeMinified.plugins.push(uglify());
 
 export default [
   cjs,
+  node,
   iife,
   iifeMinified
 ];

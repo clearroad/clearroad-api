@@ -102,12 +102,36 @@ const jsonId = (value, replacer, space) => {
   return jsonIdRec(indent, replacer, keyValueSpace, '', value);
 };
 
+const merge = (obj1, obj2) => {
+  var obj3 = {};
+  for (var attrname in obj1) {
+    obj3[attrname] = obj1[attrname];
+  }
+  for (var attrname in obj2) {
+    obj3[attrname] = obj2[attrname];
+  }
+  return obj3;
+};
+
 class ClearRoad {
-  constructor(url, login, password) {
+  constructor(url, login, password, localStorageOptions = {}) {
     let query = 'portal_type:(' +
       '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
       ' OR "Billing Period Message" OR "Road Report Request")' +
       ' AND grouping_reference:"data"';
+
+    if (localStorageOptions.type === 'dropbox' || localStorageOptions.type === 'gdrive') {
+      localStorageOptions = {
+        type: 'drivetojiomapping',
+        sub_storage: {
+          type: localStorageOptions.type,
+          access_token: localStorageOptions.accessToken
+        }
+      };
+    }
+    else if (!localStorageOptions.type) {
+      localStorageOptions.type = 'indexeddb';
+    }
 
     this.mainStorage = jio_js.jIO.createJIO({
       type: 'replicate',
@@ -117,10 +141,9 @@ class ClearRoad {
       signature_hash_key: 'source_reference',
       signature_sub_storage: {
         type: 'query',
-        sub_storage: {
-          type: 'indexeddb',
+        sub_storage: merge({
           database: `${database}-messages-signatures`
-        }
+        }, localStorageOptions)
       },
       query: {
         query,
@@ -135,10 +158,9 @@ class ClearRoad {
       check_remote_deletion: false, // ERP5 does not delete message
       local_sub_storage: {
         type: 'query',
-        sub_storage: {
-          type: 'indexeddb',
+        sub_storage: merge({
           database
-        }
+        }, localStorageOptions)
       },
       remote_sub_storage: {
         type: 'mapping',
@@ -166,10 +188,9 @@ class ClearRoad {
       signature_hash_key: 'destination_reference',
       signature_sub_storage: {
         type: 'query',
-        sub_storage: {
-          type: 'indexeddb',
+        sub_storage: merge({
           database: `${database}-ingestion-signatures`
-        }
+        }, localStorageOptions)
       },
       query: {
         query,
@@ -184,10 +205,9 @@ class ClearRoad {
       check_remote_deletion: true,
       local_sub_storage: {
         type: 'query',
-        sub_storage: {
-          type: 'indexeddb',
+        sub_storage: merge({
           database
-        }
+        }, localStorageOptions)
       },
       remote_sub_storage: {
         type: 'mapping',
@@ -212,10 +232,9 @@ class ClearRoad {
       signature_hash_key: 'source_reference',
       signature_sub_storage: {
         type: 'query',
-        sub_storage: {
-          type: 'indexeddb',
+        sub_storage: merge({
           database: `${database}-directory-signatures`
-        }
+        }, localStorageOptions)
       },
       query: {
         query,
@@ -230,10 +249,9 @@ class ClearRoad {
       check_remote_deletion: true,
       local_sub_storage: {
         type: 'query',
-        sub_storage: {
-          type: 'indexeddb',
+        sub_storage: merge({
           database
-        }
+        }, localStorageOptions)
       },
       remote_sub_storage: {
         type: 'mapping',
@@ -258,10 +276,9 @@ class ClearRoad {
       signature_hash_key: 'reference',
       signature_sub_storage: {
         type: 'query',
-        sub_storage: {
-          type: 'indexeddb',
+        sub_storage: merge({
           database: `${database}-files-signatures`
-        }
+        }, localStorageOptions)
       },
       query: {
         query,
@@ -282,10 +299,9 @@ class ClearRoad {
       check_local_attachment_deletion: false,
       local_sub_storage: {
         type: 'query',
-        sub_storage: {
-          type: 'indexeddb',
+        sub_storage: merge({
           database
-        }
+        }, localStorageOptions)
       },
       remote_sub_storage: {
         type: 'mapping',

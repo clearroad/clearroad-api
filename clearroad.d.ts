@@ -55,6 +55,11 @@ declare namespace clearroad {
     portal_type: 'Road Message';
     request: string;
   }
+  type storageType = 'indexeddb'|'dropbox'|'gdrive';
+  interface IStorageOptions {
+    type: storageType;
+    accessToken?: string;
+  }
   type postData = IPostRoadAccountMessage | IPostBillingPeriodMessage | IPostRoadReportRequest | IPostRoadEventMessage | IPostRoadMessage;
 }
 
@@ -63,7 +68,7 @@ declare class ClearRoad {
   private ingestionReportStorage;
   private directoryStorage;
   private reportStorage;
-  constructor(url: string, login?: string, password?: string);
+  constructor(url: string, login?: string, password?: string, localStorageOptions?: clearroad.IStorageOptions);
   post(data: clearroad.postData): rsvp.IQueue;
   sync(): rsvp.IQueue;
   allDocs(options: clearroad.IQueryOptions): rsvp.IQueue;
