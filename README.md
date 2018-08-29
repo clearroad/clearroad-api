@@ -4,8 +4,8 @@
 
 ## <a name="install"></a> Install
 
-```javascript
-$ npm install clearroad-api
+```sh
+$ npm install @clearroad/api
 ```
 
 ## <a name="usage"></a> Usage
@@ -20,21 +20,21 @@ If you want to include the files directly in your page, you can include via our 
 ### Using with es6
 
 ```javascript
-import { ClearRoad } from 'clearroad-api';
+import { ClearRoad } from '@clearroad/api';
 const cr = new ClearRoad('apiUrl', 'login', 'password');
 ```
 
 ### Using with CommonJS
 
 ```javascript
-const ClearRoad = require('clearroad-api').ClearRoad;
+const ClearRoad = require('@clearroad/api').ClearRoad;
 const cr = new ClearRoad('apiUrl', 'login', 'password');
 ```
 
 ### Using with Node
 
 ```javascript
-const ClearRoad = require('clearroad-api/node').ClearRoad;
+const ClearRoad = require('@clearroad/api/node').ClearRoad;
 const cr = new ClearRoad('apiUrl', 'login', 'password');
 ```
 
