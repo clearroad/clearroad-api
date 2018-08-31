@@ -42,9 +42,9 @@ const updloadFile = (container, file) => {
 
 const run = async () => {
   try {
-    console.log('Uploading src folder...');
+    console.log('Uploading dist folder...');
     await createShare('api');
-    let directory = './dist';
+    let directory = './dist/iife';
     let files = jsFile(fs.readdirSync(path.resolve(directory)));
     await Promise.all(files.map(file => updloadFile('api', path.resolve(directory, file))));
 

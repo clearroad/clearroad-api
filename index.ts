@@ -1,11 +1,79 @@
-'use strict';
+import RSVP from 'rsvp';
+import Rusha from 'rusha';
+const { jIO } = require('./lib/jio.js');
 
-Object.defineProperty(exports, '__esModule', { value: true });
+export interface IQueue {
+  push: (onFullfilled?: Function, onRejected?: Function) => IQueue;
+}
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+export type Queue = () => IQueue;
 
-var RSVP = _interopDefault(require('rsvp'));
-var jio_js = require('./lib/jio.js');
+export type storageName = 'messages'|'ingestion-reports'|'directories'|'reports';
+
+export type localStorageType = 'indexeddb'|'dropbox'|'gdrive';
+export interface ILocalStorageOptions {
+  type: localStorageType;
+  accessToken?: string;
+}
+
+export interface IAttachmentOptions {
+  format: 'text' | 'json' | 'blob' | 'data_url' | 'array_buffer';
+}
+
+export interface IQueryOptions {
+  query: string;
+  limit?: [number, number];
+  sort_on?: Array<[string, 'ascending' | 'descending']>;
+  select_list?: string[];
+  include_docs?: boolean;
+}
+
+export type syncProgressCallback = (type: storageName) => void;
+
+export type portalType = 'Road Account Message' | 'Billing Period Message' |
+  'Road Message' | 'Road Report Request' | 'Road Event Message';
+
+export interface IPostData {
+  portal_type: portalType;
+}
+export interface IPostRoadAccountMessage extends IPostData {
+  portal_type: 'Road Account Message';
+  account_manager: string;
+  data_collector: string;
+  condition: string;
+  cert_id: string;
+  account_reference: string;
+  effective_date: string;
+  expiration_date: string;
+  fuel_consumption: string;
+  fuel_taxable: string;
+  obu_reference: string;
+  vehicle_reference: string;
+  product_line: string;
+}
+export interface IPostBillingPeriodMessage extends IPostData {
+  portal_type: 'Billing Period Message';
+  reference: string;
+  start_date: string;
+  stop_date: string;
+}
+export interface IPostRoadReportRequest extends IPostData {
+  portal_type: 'Road Report Request';
+  report_type: string;
+  billing_period_reference: string;
+  request_date: string;
+  request: string;
+}
+export interface IPostRoadEventMessage extends IPostData {
+  portal_type: 'Road Event Message';
+  request: string;
+}
+export interface IPostRoadMessage extends IPostData {
+  portal_type: 'Road Message';
+  request: string;
+}
+export type postData = IPostRoadAccountMessage | IPostBillingPeriodMessage | IPostRoadReportRequest |
+  IPostRoadEventMessage | IPostRoadMessage;
 
 const database = 'clearroad';
 
@@ -103,26 +171,47 @@ const jsonId = (value, replacer, space) => {
 };
 
 const merge = (obj1, obj2) => {
-  var obj3 = {};
-  for (var attrname in obj1) {
-    obj3[attrname] = obj1[attrname];
+  const obj3 = {};
+  for (const attrname in obj1) {
+    if (obj1.hasOwnProperty(attrname)) {
+      obj3[attrname] = obj1[attrname];
+    }
   }
-  for (var attrname in obj2) {
-    obj3[attrname] = obj2[attrname];
+  for (const attrname in obj2) {
+    if (obj2.hasOwnProperty(attrname)) {
+      obj3[attrname] = obj2[attrname];
+    }
   }
   return obj3;
 };
 
-class ClearRoad {
-  constructor(url, login, password, localStorageOptions = {}) {
+export class ClearRoad {
+  private messagesStorage: any;
+  private ingestionReportStorage: any;
+  private directoryStorage: any;
+  private reportStorage: any;
+
+  /**
+   * Instantiate a ClearRoad api instance.
+   * @param url ClearRoad API url
+   * @param login ClearRoad API login (required when using Node)
+   * @param password ClearRoad API password (required when using Node)
+   * @param localStorageOptions Override default options
+   */
+  constructor(
+    url: string, login: string, password: string,
+    localStorageOptions: ILocalStorageOptions = {
+      type: 'indexeddb'
+    }
+  ) {
     if (localStorageOptions.type === 'dropbox' || localStorageOptions.type === 'gdrive') {
       localStorageOptions = {
         type: 'drivetojiomapping',
         sub_storage: {
           type: localStorageOptions.type,
           access_token: localStorageOptions.accessToken
-        }
-      };
+        } as ILocalStorageOptions
+      } as any;
     }
     else if (!localStorageOptions.type) {
       localStorageOptions.type = 'indexeddb';
@@ -133,7 +222,7 @@ class ClearRoad {
       ' OR "Billing Period Message" OR "Road Report Request")' +
       ' AND grouping_reference:"data"';
 
-    this.messagesStorage = jio_js.jIO.createJIO({
+    this.messagesStorage = jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -180,7 +269,7 @@ class ClearRoad {
       'OR "Billing Period Message" OR "Road Report Request")' +
       ' AND validation_state:("processed" OR "rejected")';
 
-    this.ingestionReportStorage = jio_js.jIO.createJIO({
+    this.ingestionReportStorage = jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -224,7 +313,7 @@ class ClearRoad {
 
     query = 'portal_type:("Road Account" OR "Road Event" OR "Road Transaction")';
 
-    this.directoryStorage = jio_js.jIO.createJIO({
+    this.directoryStorage = jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -268,7 +357,7 @@ class ClearRoad {
 
     query = 'portal_type:("File")';
 
-    this.reportStorage = jio_js.jIO.createJIO({
+    this.reportStorage = jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -328,8 +417,13 @@ class ClearRoad {
     });
   }
 
-  post(data) {
-    const options = data;
+  /**
+   * Post a message to the ClearRoad API.
+   * If not currently connected, messages will be put in the local storage and sent later when using `.sync()`
+   * @param data The message
+   */
+  post(data: postData): IQueue {
+    const options: any = data;
 
     switch (data.portal_type) {
       case 'Road Account Message':
@@ -356,14 +450,20 @@ class ClearRoad {
     options.source_reference = reference;
     options.destination_reference = reference;
 
-    const queue = new RSVP.Queue();
+    const queue = new (RSVP as any).Queue() as IQueue;
     return queue.push(() => {
       return this.messagesStorage.put(options.source_reference, options);
     });
   }
 
-  sync(progress = () => {}) {
-    const queue = new RSVP.Queue();
+  /**
+   * Synchronize local data and API data:
+   *  - send local data to API if not present yet
+   *  - retrieve API data in your local storage
+   * @param progress Function to get notified of progress. There are 4 storages to sync.
+   */
+  sync(progress: syncProgressCallback = () => {}): IQueue {
+    const queue = new (RSVP as any).Queue() as IQueue;
     return queue
       .push(() => {
         return this.messagesStorage.repair();
@@ -385,13 +485,21 @@ class ClearRoad {
       });
   }
 
-  allDocs(options) {
+  /**
+   * Query for documents in the local storage. Make sure `.sync()` is called before.
+   * @param options Query options. If none set, return all documents.
+   */
+  allDocs(options?: IQueryOptions): IQueue {
     return this.messagesStorage.allDocs(options);
   }
 
-  getAttachment(id, name, options) {
+  /**
+   * Get an attachment from the API.
+   * @param id The id of the attachment
+   * @param name The name of the attachment
+   * @param options Attachment options.
+   */
+  getAttachment(id: string, name: string, options?: IAttachmentOptions): IQueue {
     return this.reportStorage.getAttachment(id, name, options);
   }
 }
-
-exports.ClearRoad = ClearRoad;

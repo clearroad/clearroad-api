@@ -1,25 +1,17 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var RSVP = _interopDefault(require('rsvp'));
-var Rusha = _interopDefault(require('rusha'));
-
-var jIO = require('./lib/jio.js').jIO;
-var database = 'clearroad';
-var concatStringNTimes = function (val, iteration) {
-    var res = '';
+import RSVP from 'rsvp';
+import Rusha from 'rusha';
+const { jIO } = require('./lib/jio.js');
+const database = 'clearroad';
+const concatStringNTimes = (val, iteration) => {
+    let res = '';
     while (--iteration >= 0) {
         res += val;
     }
     return res;
 };
-var jsonIdRec = function (indent, replacer, keyValueSpace, key, value, deep) {
-    if (deep === void 0) { deep = 0; }
-    var res;
-    var mySpace;
+const jsonIdRec = (indent, replacer, keyValueSpace, key, value, deep = 0) => {
+    let res;
+    let mySpace;
     if (value && typeof value.toJSON === 'function') {
         value = value.toJSON();
     }
@@ -31,7 +23,7 @@ var jsonIdRec = function (indent, replacer, keyValueSpace, key, value, deep) {
     }
     if (Array.isArray(value)) {
         res = [];
-        for (var i = 0; i < value.length; i += 1) {
+        for (let i = 0; i < value.length; i += 1) {
             res[res.length] = jsonIdRec(indent, replacer, keyValueSpace, i, value[i], deep + 1);
             if (res[res.length - 1] === undefined) {
                 res[res.length - 1] = 'null';
@@ -45,11 +37,11 @@ var jsonIdRec = function (indent, replacer, keyValueSpace, key, value, deep) {
                 res.join(',\n' + mySpace + indent) +
                 '\n' + mySpace + ']';
         }
-        return "[" + res.join(', ') + "]";
+        return `[${res.join(', ')}]`;
     }
     if (typeof value === 'object' && value !== null) {
         if (Array.isArray(replacer)) {
-            res = replacer.reduce(function (p, c) {
+            res = replacer.reduce((p, c) => {
                 p.push(c);
                 return p;
             }, []);
@@ -58,11 +50,11 @@ var jsonIdRec = function (indent, replacer, keyValueSpace, key, value, deep) {
             res = Object.keys(value);
         }
         res.sort();
-        for (var i = 0, l = res.length; i < l; i += 1) {
+        for (let i = 0, l = res.length; i < l; i += 1) {
             key = res[i];
             res[i] = jsonIdRec(indent, replacer, keyValueSpace, key, value[key], deep + 1);
             if (res[i] !== undefined) {
-                res[i] = JSON.stringify(key) + ": " + keyValueSpace + res[i];
+                res[i] = `${JSON.stringify(key)}: ${keyValueSpace}${res[i]}`;
             }
             else {
                 res.splice(i, 1);
@@ -78,13 +70,13 @@ var jsonIdRec = function (indent, replacer, keyValueSpace, key, value, deep) {
                 res.join(',\n' + mySpace + indent) +
                 '\n' + mySpace + '}';
         }
-        return "{" + res.join(', ');
+        return `{${res.join(', ')}`;
     }
     return JSON.stringify(value);
 };
-var jsonId = function (value, replacer, space) {
-    var indent;
-    var keyValueSpace = '';
+const jsonId = (value, replacer, space) => {
+    let indent;
+    let keyValueSpace = '';
     if (typeof space === 'string') {
         if (space !== '') {
             indent = space;
@@ -99,21 +91,21 @@ var jsonId = function (value, replacer, space) {
     }
     return jsonIdRec(indent, replacer, keyValueSpace, '', value);
 };
-var merge = function (obj1, obj2) {
-    var obj3 = {};
-    for (var attrname in obj1) {
+const merge = (obj1, obj2) => {
+    const obj3 = {};
+    for (const attrname in obj1) {
         if (obj1.hasOwnProperty(attrname)) {
             obj3[attrname] = obj1[attrname];
         }
     }
-    for (var attrname in obj2) {
+    for (const attrname in obj2) {
         if (obj2.hasOwnProperty(attrname)) {
             obj3[attrname] = obj2[attrname];
         }
     }
     return obj3;
 };
-var ClearRoad = /** @class */ (function () {
+export class ClearRoad {
     /**
      * Instantiate a ClearRoad api instance.
      * @param url ClearRoad API url
@@ -121,10 +113,9 @@ var ClearRoad = /** @class */ (function () {
      * @param password ClearRoad API password (required when using Node)
      * @param localStorageOptions Override default options
      */
-    function ClearRoad(url, login, password, localStorageOptions) {
-        if (localStorageOptions === void 0) { localStorageOptions = {
-            type: 'indexeddb'
-        }; }
+    constructor(url, login, password, localStorageOptions = {
+        type: 'indexeddb'
+    }) {
         if (localStorageOptions.type === 'dropbox' || localStorageOptions.type === 'gdrive') {
             localStorageOptions = {
                 type: 'drivetojiomapping',
@@ -137,7 +128,7 @@ var ClearRoad = /** @class */ (function () {
         else if (!localStorageOptions.type) {
             localStorageOptions.type = 'indexeddb';
         }
-        var query = 'portal_type:(' +
+        let query = 'portal_type:(' +
             '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
             ' OR "Billing Period Message" OR "Road Report Request")' +
             ' AND grouping_reference:"data"';
@@ -150,11 +141,11 @@ var ClearRoad = /** @class */ (function () {
             signature_sub_storage: {
                 type: 'query',
                 sub_storage: merge({
-                    database: database + "-messages-signatures"
+                    database: `${database}-messages-signatures`
                 }, localStorageOptions)
             },
             query: {
-                query: query,
+                query,
                 sort_on: [['modification_date', 'descending']],
                 limit: [0, 1234567890]
             },
@@ -167,7 +158,7 @@ var ClearRoad = /** @class */ (function () {
             local_sub_storage: {
                 type: 'query',
                 sub_storage: merge({
-                    database: database
+                    database
                 }, localStorageOptions)
             },
             remote_sub_storage: {
@@ -175,10 +166,10 @@ var ClearRoad = /** @class */ (function () {
                 id: ['equalSubProperty', 'source_reference'],
                 sub_storage: {
                     type: 'erp5',
-                    url: url,
+                    url,
                     default_view_reference: 'jio_view',
-                    login: login,
-                    password: password
+                    login,
+                    password
                 }
             }
         });
@@ -195,11 +186,11 @@ var ClearRoad = /** @class */ (function () {
             signature_sub_storage: {
                 type: 'query',
                 sub_storage: merge({
-                    database: database + "-ingestion-signatures"
+                    database: `${database}-ingestion-signatures`
                 }, localStorageOptions)
             },
             query: {
-                query: query,
+                query,
                 sort_on: [['modification_date', 'descending']],
                 limit: [0, 1234567890]
             },
@@ -212,7 +203,7 @@ var ClearRoad = /** @class */ (function () {
             local_sub_storage: {
                 type: 'query',
                 sub_storage: merge({
-                    database: database
+                    database
                 }, localStorageOptions)
             },
             remote_sub_storage: {
@@ -220,10 +211,10 @@ var ClearRoad = /** @class */ (function () {
                 id: ['equalSubProperty', 'destination_reference'],
                 sub_storage: {
                     type: 'erp5',
-                    url: url,
+                    url,
                     default_view_reference: 'jio_ingestion_report_view',
-                    login: login,
-                    password: password
+                    login,
+                    password
                 }
             }
         });
@@ -237,11 +228,11 @@ var ClearRoad = /** @class */ (function () {
             signature_sub_storage: {
                 type: 'query',
                 sub_storage: merge({
-                    database: database + "-directory-signatures"
+                    database: `${database}-directory-signatures`
                 }, localStorageOptions)
             },
             query: {
-                query: query,
+                query,
                 sort_on: [['modification_date', 'descending']],
                 limit: [0, 200]
             },
@@ -254,7 +245,7 @@ var ClearRoad = /** @class */ (function () {
             local_sub_storage: {
                 type: 'query',
                 sub_storage: merge({
-                    database: database
+                    database
                 }, localStorageOptions)
             },
             remote_sub_storage: {
@@ -262,10 +253,10 @@ var ClearRoad = /** @class */ (function () {
                 id: ['equalSubProperty', 'source_reference'],
                 sub_storage: {
                     type: 'erp5',
-                    url: url,
+                    url,
                     default_view_reference: 'jio_directory_view',
-                    login: login,
-                    password: password
+                    login,
+                    password
                 }
             }
         });
@@ -279,11 +270,11 @@ var ClearRoad = /** @class */ (function () {
             signature_sub_storage: {
                 type: 'query',
                 sub_storage: merge({
-                    database: database + "-files-signatures"
+                    database: `${database}-files-signatures`
                 }, localStorageOptions)
             },
             query: {
-                query: query,
+                query,
                 sort_on: [['modification_date', 'descending']],
                 limit: [0, 1234567890]
             },
@@ -302,7 +293,7 @@ var ClearRoad = /** @class */ (function () {
             local_sub_storage: {
                 type: 'query',
                 sub_storage: merge({
-                    database: database
+                    database
                 }, localStorageOptions)
             },
             remote_sub_storage: {
@@ -312,19 +303,19 @@ var ClearRoad = /** @class */ (function () {
                 attachment: {
                     data: {
                         get: {
-                            uri_template: url + "/{id}/Base_downloadWithCors"
+                            uri_template: `${url}/{id}/Base_downloadWithCors`
                         },
                         put: {
-                            erp5_put_template: url + "/{+id}/Base_edit"
+                            erp5_put_template: `${url}/{+id}/Base_edit`
                         }
                     }
                 },
                 sub_storage: {
                     type: 'erp5',
-                    url: url,
+                    url,
                     default_view_reference: 'jio_report_view',
-                    login: login,
-                    password: password
+                    login,
+                    password
                 }
             }
         });
@@ -334,9 +325,8 @@ var ClearRoad = /** @class */ (function () {
      * If not currently connected, messages will be put in the local storage and sent later when using `.sync()`
      * @param data The message
      */
-    ClearRoad.prototype.post = function (data) {
-        var _this = this;
-        var options = data;
+    post(data) {
+        const options = data;
         switch (data.portal_type) {
             case 'Road Account Message':
                 options.parent_relative_url = 'road_account_message_module';
@@ -355,63 +345,59 @@ var ClearRoad = /** @class */ (function () {
                 break;
         }
         options.grouping_reference = 'data';
-        var dataAsString = jsonId(options, '', ''); // jio.util.stringify
-        var rusha = new Rusha();
-        var reference = rusha.digestFromString(dataAsString);
+        const dataAsString = jsonId(options, '', ''); // jio.util.stringify
+        const rusha = new Rusha();
+        const reference = rusha.digestFromString(dataAsString);
         options.source_reference = reference;
         options.destination_reference = reference;
-        var queue = new RSVP.Queue();
-        return queue.push(function () {
-            return _this.messagesStorage.put(options.source_reference, options);
+        const queue = new RSVP.Queue();
+        return queue.push(() => {
+            return this.messagesStorage.put(options.source_reference, options);
         });
-    };
+    }
     /**
      * Synchronize local data and API data:
      *  - send local data to API if not present yet
      *  - retrieve API data in your local storage
      * @param progress Function to get notified of progress. There are 4 storages to sync.
      */
-    ClearRoad.prototype.sync = function (progress) {
-        var _this = this;
-        if (progress === void 0) { progress = function () { }; }
-        var queue = new RSVP.Queue();
+    sync(progress = () => { }) {
+        const queue = new RSVP.Queue();
         return queue
-            .push(function () {
-            return _this.messagesStorage.repair();
+            .push(() => {
+            return this.messagesStorage.repair();
         })
-            .push(function () {
+            .push(() => {
             progress('messages');
-            return _this.ingestionReportStorage.repair();
+            return this.ingestionReportStorage.repair();
         })
-            .push(function () {
+            .push(() => {
             progress('ingestion-reports');
-            return _this.directoryStorage.repair();
+            return this.directoryStorage.repair();
         })
-            .push(function () {
+            .push(() => {
             progress('directories');
-            return _this.reportStorage.repair();
+            return this.reportStorage.repair();
         })
-            .push(function () {
+            .push(() => {
             progress('reports');
         });
-    };
+    }
     /**
      * Query for documents in the local storage. Make sure `.sync()` is called before.
      * @param options Query options. If none set, return all documents.
      */
-    ClearRoad.prototype.allDocs = function (options) {
+    allDocs(options) {
         return this.messagesStorage.allDocs(options);
-    };
+    }
     /**
      * Get an attachment from the API.
      * @param id The id of the attachment
      * @param name The name of the attachment
      * @param options Attachment options.
      */
-    ClearRoad.prototype.getAttachment = function (id, name, options) {
+    getAttachment(id, name, options) {
         return this.reportStorage.getAttachment(id, name, options);
-    };
-    return ClearRoad;
-}());
-
-exports.ClearRoad = ClearRoad;
+    }
+}
+//# sourceMappingURL=index.js.map

@@ -1,5 +1,7 @@
 import path from 'path';
+import typescript from 'rollup-plugin-typescript';
 import resolve from 'rollup-plugin-node-resolve';
+import replace from 'rollup-plugin-replace';
 import commonJS from 'rollup-plugin-commonjs';
 import builtins from 'rollup-plugin-node-builtins';
 import hypothetical from 'rollup-plugin-hypothetical';
@@ -7,25 +9,37 @@ import buble from 'rollup-plugin-buble';
 import { uglify } from 'rollup-plugin-uglify';
 const cloneDeep = require('lodash.clonedeep');
 
+const main = 'index.ts';
+const typescriptOptions = {
+  typescript: require('typescript')
+};
 const jio = path.resolve(__dirname, 'lib/jio.js');
 
 const cjs = {
   external: [
     'rsvp',
+    'rusha',
     jio
   ],
-  input: 'clearroad.js',
+  input: main,
   output: {
-    file: 'clearroad.module.js',
+    file: 'dist/commonjs/clearroad.js',
     format: 'cjs'
   },
   plugins: [
+    typescript(typescriptOptions),
     builtins(),
     commonJS({
       include: [
         'node_modules/**',
         'lib/**'
       ]
+    }),
+    replace({
+      delimiters: ['',''],
+      values: {
+        './lib/jio.js': '../../lib/jio.js'
+      }
     })
   ]
 };
@@ -33,14 +47,16 @@ const cjs = {
 const node = {
   external: [
     'rsvp',
+    'rusha',
     jio
   ],
-  input: 'clearroad.js',
+  input: 'index.ts',
   output: {
     file: 'node/index.js',
     format: 'cjs'
   },
   plugins: [
+    typescript(typescriptOptions),
     builtins(),
     commonJS({
       include: [
@@ -53,12 +69,9 @@ const node = {
 };
 
 const iife = {
-  external: [
-    jio
-  ],
-  input: 'clearroad.js',
+  input: main,
   output: [{
-    file: 'dist/clearroad.js',
+    file: 'dist/iife/clearroad.js',
     format: 'iife',
     name: 'bundle',
     banner: `
@@ -74,24 +87,19 @@ const iife = {
     `,
     globals: {
       rsvp: 'RSVP',
-      [jio]: 'jIO'
+      rusha: 'Rusha'
     }
   }],
   plugins: [
+    typescript(typescriptOptions),
     hypothetical({
       allowFallthrough: true,
       files: {
-        './lib/jio': `
-export { jIO };
-        `,
-        'lib/jio': `
-export { jIO };
-        `,
-        jio: `
-export { jIO };
-        `,
         rsvp: `
 export default window.RSVP;
+        `,
+        rusha: `
+export default window.Rusha;
         `
       }
     }),
@@ -99,12 +107,18 @@ export default window.RSVP;
     commonJS({
       include: 'node_modules/**'
     }),
+    replace({
+      delimiters: ['',''],
+      values: {
+        "var jIO = require('./lib/jio.js').jIO;": ''
+      }
+    }),
     buble()
   ]
 };
 
 const iifeMinified = cloneDeep(iife);
-iifeMinified.output[0].file = 'dist/clearroad.min.js';
+iifeMinified.output[0].file = 'dist/iife/clearroad.min.js';
 iifeMinified.plugins.push(uglify());
 
 export default [

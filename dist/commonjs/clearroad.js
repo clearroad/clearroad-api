@@ -7,7 +7,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var RSVP = _interopDefault(require('rsvp'));
 var Rusha = _interopDefault(require('rusha'));
 
-var jIO = require('./lib/jio.js').jIO;
+var jIO = require('../../lib/jio.js').jIO;
 var database = 'clearroad';
 var concatStringNTimes = function (val, iteration) {
     var res = '';
