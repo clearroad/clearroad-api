@@ -118,11 +118,6 @@ var merge = function (obj1, obj2) {
 var ClearRoad = function ClearRoad(url, login, password, localStorageOptions) {
   if ( localStorageOptions === void 0 ) localStorageOptions = {};
 
-  var query = 'portal_type:(' +
-    '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
-    ' OR "Billing Period Message" OR "Road Report Request")' +
-    ' AND grouping_reference:"data"';
-
   if (localStorageOptions.type === 'dropbox' || localStorageOptions.type === 'gdrive') {
     localStorageOptions = {
       type: 'drivetojiomapping',
@@ -136,7 +131,12 @@ var ClearRoad = function ClearRoad(url, login, password, localStorageOptions) {
     localStorageOptions.type = 'indexeddb';
   }
 
-  this.mainStorage = jio_js.jIO.createJIO({
+  var query = 'portal_type:(' +
+    '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
+    ' OR "Billing Period Message" OR "Road Report Request")' +
+    ' AND grouping_reference:"data"';
+
+  this.messagesStorage = jio_js.jIO.createJIO({
     type: 'replicate',
     parallel_operation_amount: 1,
     use_remote_post: false,
@@ -363,31 +363,38 @@ ClearRoad.prototype.post = function post (data) {
 
   var queue = new RSVP.Queue();
   return queue.push(function () {
-    return this$1.mainStorage.put(options.source_reference, options);
+    return this$1.messagesStorage.put(options.source_reference, options);
   });
 };
 
-ClearRoad.prototype.sync = function sync () {
+ClearRoad.prototype.sync = function sync (progress) {
     var this$1 = this;
+    if ( progress === void 0 ) progress = function () {};
 
   var queue = new RSVP.Queue();
   return queue
     .push(function () {
-      return this$1.mainStorage.repair();
+      return this$1.messagesStorage.repair();
     })
     .push(function () {
+      progress('messages');
       return this$1.ingestionReportStorage.repair();
     })
     .push(function () {
+      progress('ingestion-reports');
       return this$1.directoryStorage.repair();
     })
     .push(function () {
+      progress('directories');
       return this$1.reportStorage.repair();
+    })
+    .push(function () {
+      progress('reports');
     });
 };
 
 ClearRoad.prototype.allDocs = function allDocs (options) {
-  return this.mainStorage.allDocs(options);
+  return this.messagesStorage.allDocs(options);
 };
 
 ClearRoad.prototype.getAttachment = function getAttachment (id, name, options) {

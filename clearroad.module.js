@@ -115,11 +115,6 @@ const merge = (obj1, obj2) => {
 
 class ClearRoad {
   constructor(url, login, password, localStorageOptions = {}) {
-    let query = 'portal_type:(' +
-      '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
-      ' OR "Billing Period Message" OR "Road Report Request")' +
-      ' AND grouping_reference:"data"';
-
     if (localStorageOptions.type === 'dropbox' || localStorageOptions.type === 'gdrive') {
       localStorageOptions = {
         type: 'drivetojiomapping',
@@ -133,7 +128,12 @@ class ClearRoad {
       localStorageOptions.type = 'indexeddb';
     }
 
-    this.mainStorage = jio_js.jIO.createJIO({
+    let query = 'portal_type:(' +
+      '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
+      ' OR "Billing Period Message" OR "Road Report Request")' +
+      ' AND grouping_reference:"data"';
+
+    this.messagesStorage = jio_js.jIO.createJIO({
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -358,29 +358,35 @@ class ClearRoad {
 
     const queue = new RSVP.Queue();
     return queue.push(() => {
-      return this.mainStorage.put(options.source_reference, options);
+      return this.messagesStorage.put(options.source_reference, options);
     });
   }
 
-  sync() {
+  sync(progress = () => {}) {
     const queue = new RSVP.Queue();
     return queue
       .push(() => {
-        return this.mainStorage.repair();
+        return this.messagesStorage.repair();
       })
       .push(() => {
+        progress('messages');
         return this.ingestionReportStorage.repair();
       })
       .push(() => {
+        progress('ingestion-reports');
         return this.directoryStorage.repair();
       })
       .push(() => {
+        progress('directories');
         return this.reportStorage.repair();
+      })
+      .push(() => {
+        progress('reports');
       });
   }
 
   allDocs(options) {
-    return this.mainStorage.allDocs(options);
+    return this.messagesStorage.allDocs(options);
   }
 
   getAttachment(id, name, options) {

@@ -4,7 +4,7 @@
   "description": "",
   "main": "clearroad.js",
   "module": "clearroad.module.js",
-  "typings": "clearroad.d.ts",
+  "typings": "index.d.ts",
   "scripts": {
     "build": "rimraf dist && rollup -c",
     "lint": "tslint \"src/**/*.ts\"",
