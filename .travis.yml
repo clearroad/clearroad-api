@@ -10,6 +10,4 @@ node_js:
 before_script:
   - npm run build
 
-script: npm run coveralls
-
 after_script: "npm install coveralls && cat ./coverage/node/lcov.info ./coverage/web/lcov.info | coveralls"

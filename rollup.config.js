@@ -9,7 +9,7 @@ import buble from 'rollup-plugin-buble';
 import { uglify } from 'rollup-plugin-uglify';
 const cloneDeep = require('lodash.clonedeep');
 
-const main = 'index.ts';
+const main = 'src/clearroad.ts';
 const typescriptOptions = {
   typescript: require('typescript')
 };
@@ -38,7 +38,7 @@ const cjs = {
     replace({
       delimiters: ['',''],
       values: {
-        "require('./lib/jio.js');": "var jIO = require('../../lib/jio.js').jIO;"
+        "require('../lib/jio.js');": "var jIO = require('../../lib/jio.js').jIO;"
       }
     })
   ]
@@ -50,7 +50,7 @@ const node = {
     'rusha',
     jio
   ],
-  input: 'index.ts',
+  input: main,
   output: {
     file: 'node/index.js',
     format: 'cjs'
@@ -67,7 +67,7 @@ const node = {
     replace({
       delimiters: ['',''],
       values: {
-        "require('./lib/jio.js');": "var jIO = require('./lib/jio.js').jIO;"
+        "require('../lib/jio.js');": "var jIO = require('./lib/jio.js').jIO;"
       }
     }),
     buble()
@@ -116,7 +116,7 @@ export default window.Rusha;
     replace({
       delimiters: ['',''],
       values: {
-        "require('./lib/jio.js');": ''
+        "require('../lib/jio.js');": ''
       }
     }),
     buble()

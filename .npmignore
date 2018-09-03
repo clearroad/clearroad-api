@@ -1,11 +1,11 @@
-dist/
+dist/iife/
 legacy/
-lib/rsvp.js
 .*
 CHANGELOG.md
 commitlint.config.js
 CONTRIBUTING.md
 deploy.js
+karma.conf.*
 rollup.config.js
 tsconfig*
 tslint*

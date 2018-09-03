@@ -1,6 +1,6 @@
 import RSVP from 'rsvp';
 import Rusha from 'rusha';
-require('./lib/jio.js');
+require('../lib/jio.js');
 const database = 'clearroad';
 const jsonIdRec = (keyValueSpace, key, value, deep = 0) => {
     let res;
@@ -354,4 +354,4 @@ export class ClearRoad {
         return this.reportStorage.getAttachment(id, name, options);
     }
 }
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=clearroad.js.map

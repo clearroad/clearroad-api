@@ -1,6 +1,6 @@
 import RSVP from 'rsvp';
 import Rusha from 'rusha';
-require('./lib/jio.js');
+require('../lib/jio.js');
 
 declare var jIO;
 

@@ -17,12 +17,11 @@ module.exports = (config) => {
     files: [
       'lib/rsvp.js',
       'lib/jio.js',
-      'index.ts',
-      'test/**/*.spec.ts'
+      'src/**/*.ts'
     ],
     preprocessors: {
-      'index.ts': ['karma-typescript', 'coverage'],
-      'test/**/*.spec.ts': ['karma-typescript']
+      'src/**/!(*spec|*.d).ts': ['karma-typescript', 'coverage'],
+      'src/**/*spec.ts': ['karma-typescript']
     },
     karmaTypescriptConfig: {
       tsconfig: './tsconfig.test.json',

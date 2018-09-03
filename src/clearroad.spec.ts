@@ -3,7 +3,7 @@ require('../lib/jio.js');
 
 declare var jIO;
 
-import { ClearRoad } from '../index';
+import { ClearRoad } from './clearroad';
 
 const url = '//fake-url';
 
