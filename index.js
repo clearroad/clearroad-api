@@ -1,6 +1,6 @@
 import RSVP from 'rsvp';
 import Rusha from 'rusha';
-const { jIO } = require('./lib/jio.js');
+require('./lib/jio.js');
 const database = 'clearroad';
 const jsonIdRec = (keyValueSpace, key, value, deep = 0) => {
     let res;

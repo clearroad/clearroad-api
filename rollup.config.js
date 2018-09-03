@@ -38,7 +38,7 @@ const cjs = {
     replace({
       delimiters: ['',''],
       values: {
-        './lib/jio.js': '../../lib/jio.js'
+        "require('./lib/jio.js');": "var jIO = require('../../lib/jio.js').jIO;"
       }
     })
   ]
@@ -63,6 +63,12 @@ const node = {
         'node_modules/**',
         'lib/**'
       ]
+    }),
+    replace({
+      delimiters: ['',''],
+      values: {
+        "require('./lib/jio.js');": "var jIO = require('./lib/jio.js').jIO;"
+      }
     }),
     buble()
   ]
@@ -110,7 +116,7 @@ export default window.Rusha;
     replace({
       delimiters: ['',''],
       values: {
-        "var jIO = require('./lib/jio.js').jIO;": ''
+        "require('./lib/jio.js');": ''
       }
     }),
     buble()

@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": false,
+    "lib": ["es2015", "dom"],
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "removeComments": false,
+    "skipLibCheck": true,
+    "strict": false,
+    "target": "es5"
+  },
+  "include": [
+    "./index.ts",
+    "./test/**/*.spec.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "lib"
+  ],
+  "atom": {
+    "rewriteTsconfig": false
+  }
+}

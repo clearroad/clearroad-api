@@ -1,6 +1,8 @@
 import RSVP from 'rsvp';
 import Rusha from 'rusha';
-const { jIO } = require('./lib/jio.js');
+require('./lib/jio.js');
+
+declare var jIO;
 
 export interface IQueue {
   push: (onFullfilled?: Function, onRejected?: Function) => IQueue;
