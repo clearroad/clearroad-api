@@ -9,30 +9,16 @@ var Rusha = _interopDefault(require('rusha'));
 
 var jIO = require('../../lib/jio.js').jIO;
 var database = 'clearroad';
-var concatStringNTimes = function (val, iteration) {
-    var res = '';
-    while (--iteration >= 0) {
-        res += val;
-    }
-    return res;
-};
-var jsonIdRec = function (indent, replacer, keyValueSpace, key, value, deep) {
+var jsonIdRec = function (keyValueSpace, key, value, deep) {
     if (deep === void 0) { deep = 0; }
     var res;
-    var mySpace;
     if (value && typeof value.toJSON === 'function') {
         value = value.toJSON();
-    }
-    if (typeof replacer === 'function') {
-        value = replacer(key, value);
-    }
-    if (indent) {
-        mySpace = concatStringNTimes(indent, deep);
     }
     if (Array.isArray(value)) {
         res = [];
         for (var i = 0; i < value.length; i += 1) {
-            res[res.length] = jsonIdRec(indent, replacer, keyValueSpace, i, value[i], deep + 1);
+            res[res.length] = jsonIdRec(keyValueSpace, i, value[i], deep + 1);
             if (res[res.length - 1] === undefined) {
                 res[res.length - 1] = 'null';
             }
@@ -40,27 +26,14 @@ var jsonIdRec = function (indent, replacer, keyValueSpace, key, value, deep) {
         if (res.length === 0) {
             return '[]';
         }
-        if (indent) {
-            return '[\n' + mySpace + indent +
-                res.join(',\n' + mySpace + indent) +
-                '\n' + mySpace + ']';
-        }
         return "[" + res.join(', ') + "]";
     }
     if (typeof value === 'object' && value !== null) {
-        if (Array.isArray(replacer)) {
-            res = replacer.reduce(function (p, c) {
-                p.push(c);
-                return p;
-            }, []);
-        }
-        else {
-            res = Object.keys(value);
-        }
+        res = Object.keys(value);
         res.sort();
         for (var i = 0, l = res.length; i < l; i += 1) {
             key = res[i];
-            res[i] = jsonIdRec(indent, replacer, keyValueSpace, key, value[key], deep + 1);
+            res[i] = jsonIdRec(keyValueSpace, key, value[key], deep + 1);
             if (res[i] !== undefined) {
                 res[i] = JSON.stringify(key) + ": " + keyValueSpace + res[i];
             }
@@ -73,31 +46,12 @@ var jsonIdRec = function (indent, replacer, keyValueSpace, key, value, deep) {
         if (res.length === 0) {
             return '{}';
         }
-        if (indent) {
-            return '{\n' + mySpace + indent +
-                res.join(',\n' + mySpace + indent) +
-                '\n' + mySpace + '}';
-        }
         return "{" + res.join(', ');
     }
     return JSON.stringify(value);
 };
-var jsonId = function (value, replacer, space) {
-    var indent;
-    var keyValueSpace = '';
-    if (typeof space === 'string') {
-        if (space !== '') {
-            indent = space;
-            keyValueSpace = ' ';
-        }
-    }
-    else if (typeof space === 'number') {
-        if (isFinite(space) && space > 0) {
-            indent = concatStringNTimes(' ', space);
-            keyValueSpace = ' ';
-        }
-    }
-    return jsonIdRec(indent, replacer, keyValueSpace, '', value);
+var jsonId = function (value) {
+    return jsonIdRec('', '', value);
 };
 var merge = function (obj1, obj2) {
     var obj3 = {};
@@ -336,7 +290,7 @@ var ClearRoad = /** @class */ (function () {
      */
     ClearRoad.prototype.post = function (data) {
         var _this = this;
-        var options = data;
+        var options = merge({}, data);
         switch (data.portal_type) {
             case 'Road Account Message':
                 options.parent_relative_url = 'road_account_message_module';
@@ -355,7 +309,7 @@ var ClearRoad = /** @class */ (function () {
                 break;
         }
         options.grouping_reference = 'data';
-        var dataAsString = jsonId(options, '', ''); // jio.util.stringify
+        var dataAsString = jsonId(options);
         var rusha = new Rusha();
         var reference = rusha.digestFromString(dataAsString);
         options.source_reference = reference;

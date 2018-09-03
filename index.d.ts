@@ -72,7 +72,7 @@ export declare class ClearRoad {
      * @param password ClearRoad API password (required when using Node)
      * @param localStorageOptions Override default options
      */
-    constructor(url: string, login: string, password: string, localStorageOptions?: ILocalStorageOptions);
+    constructor(url: string, login?: string, password?: string, localStorageOptions?: ILocalStorageOptions);
     /**
      * Post a message to the ClearRoad API.
      * If not currently connected, messages will be put in the local storage and sent later when using `.sync()`

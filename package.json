@@ -10,11 +10,38 @@
     "lint": "tslint \"index.ts\"",
     "lint:fix": "tslint --fix \"index.ts\"",
     "deploy": "node deploy.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "nyc mocha",
     "start": "http-server -o --cors",
     "release": "standard-version",
     "postrelease": "git push origin master --follow-tags",
     "commitmsg": "commitlint -e $GIT_PARAMS"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "per-file": true,
+    "statements": 75,
+    "branches": 65,
+    "functions": 75,
+    "lines": 75,
+    "include": [
+      "node/**/*.js"
+    ],
+    "exclude": [
+      "node/lib/*.js",
+      "node/**/*.spec.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "sourceMap": true,
+    "instrument": true
   },
   "keywords": [
     "clearroad",
@@ -29,7 +56,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "form-data": "^2.3.2",
-    "moment": "2.21.0",
+    "moment": "^2.21.0",
     "rsvp": "git+https://lab.nexedi.com/nexedi/rsvp.js.git",
     "rusha": "0.8.2",
     "urijs": "^1.19.1",
@@ -39,11 +66,17 @@
   "devDependencies": {
     "@commitlint/cli": "^7.0.0",
     "@commitlint/config-conventional": "^7.0.1",
+    "@types/chai": "^4.1.4",
+    "@types/mocha": "^5.2.5",
     "@types/rsvp": "^4.0.2",
+    "@types/sinon": "^5.0.2",
     "azure-storage": "^2.10.0",
+    "chai": "^4.1.2",
     "dotenv": "^6.0.0",
     "http-server": "^0.11.1",
     "lodash.clonedeep": "^4.5.0",
+    "mocha": "^5.2.0",
+    "nyc": "^12.0.2",
     "rimraf": "^2.6.2",
     "rollup": "^0.64.1",
     "rollup-plugin-buble": "^0.19.2",
@@ -54,8 +87,11 @@
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-typescript": "^0.8.1",
     "rollup-plugin-uglify": "^4.0.0",
+    "sinon": "^6.1.5",
+    "source-map-support": "^0.5.9",
     "standard-version": "^4.4.0",
+    "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
-    "typescript": "^2.9.2"
+    "typescript": "^3.0.1"
   }
 }

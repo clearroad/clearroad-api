@@ -2,29 +2,15 @@ import RSVP from 'rsvp';
 import Rusha from 'rusha';
 const { jIO } = require('./lib/jio.js');
 const database = 'clearroad';
-const concatStringNTimes = (val, iteration) => {
-    let res = '';
-    while (--iteration >= 0) {
-        res += val;
-    }
-    return res;
-};
-const jsonIdRec = (indent, replacer, keyValueSpace, key, value, deep = 0) => {
+const jsonIdRec = (keyValueSpace, key, value, deep = 0) => {
     let res;
-    let mySpace;
     if (value && typeof value.toJSON === 'function') {
         value = value.toJSON();
-    }
-    if (typeof replacer === 'function') {
-        value = replacer(key, value);
-    }
-    if (indent) {
-        mySpace = concatStringNTimes(indent, deep);
     }
     if (Array.isArray(value)) {
         res = [];
         for (let i = 0; i < value.length; i += 1) {
-            res[res.length] = jsonIdRec(indent, replacer, keyValueSpace, i, value[i], deep + 1);
+            res[res.length] = jsonIdRec(keyValueSpace, i, value[i], deep + 1);
             if (res[res.length - 1] === undefined) {
                 res[res.length - 1] = 'null';
             }
@@ -32,27 +18,14 @@ const jsonIdRec = (indent, replacer, keyValueSpace, key, value, deep = 0) => {
         if (res.length === 0) {
             return '[]';
         }
-        if (indent) {
-            return '[\n' + mySpace + indent +
-                res.join(',\n' + mySpace + indent) +
-                '\n' + mySpace + ']';
-        }
         return `[${res.join(', ')}]`;
     }
     if (typeof value === 'object' && value !== null) {
-        if (Array.isArray(replacer)) {
-            res = replacer.reduce((p, c) => {
-                p.push(c);
-                return p;
-            }, []);
-        }
-        else {
-            res = Object.keys(value);
-        }
+        res = Object.keys(value);
         res.sort();
         for (let i = 0, l = res.length; i < l; i += 1) {
             key = res[i];
-            res[i] = jsonIdRec(indent, replacer, keyValueSpace, key, value[key], deep + 1);
+            res[i] = jsonIdRec(keyValueSpace, key, value[key], deep + 1);
             if (res[i] !== undefined) {
                 res[i] = `${JSON.stringify(key)}: ${keyValueSpace}${res[i]}`;
             }
@@ -65,31 +38,12 @@ const jsonIdRec = (indent, replacer, keyValueSpace, key, value, deep = 0) => {
         if (res.length === 0) {
             return '{}';
         }
-        if (indent) {
-            return '{\n' + mySpace + indent +
-                res.join(',\n' + mySpace + indent) +
-                '\n' + mySpace + '}';
-        }
         return `{${res.join(', ')}`;
     }
     return JSON.stringify(value);
 };
-const jsonId = (value, replacer, space) => {
-    let indent;
-    let keyValueSpace = '';
-    if (typeof space === 'string') {
-        if (space !== '') {
-            indent = space;
-            keyValueSpace = ' ';
-        }
-    }
-    else if (typeof space === 'number') {
-        if (isFinite(space) && space > 0) {
-            indent = concatStringNTimes(' ', space);
-            keyValueSpace = ' ';
-        }
-    }
-    return jsonIdRec(indent, replacer, keyValueSpace, '', value);
+const jsonId = (value) => {
+    return jsonIdRec('', '', value);
 };
 const merge = (obj1, obj2) => {
     const obj3 = {};
@@ -326,7 +280,7 @@ export class ClearRoad {
      * @param data The message
      */
     post(data) {
-        const options = data;
+        const options = merge({}, data);
         switch (data.portal_type) {
             case 'Road Account Message':
                 options.parent_relative_url = 'road_account_message_module';
@@ -345,7 +299,7 @@ export class ClearRoad {
                 break;
         }
         options.grouping_reference = 'data';
-        const dataAsString = jsonId(options, '', ''); // jio.util.stringify
+        const dataAsString = jsonId(options);
         const rusha = new Rusha();
         const reference = rusha.digestFromString(dataAsString);
         options.source_reference = reference;

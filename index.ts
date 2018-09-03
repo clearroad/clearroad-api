@@ -77,63 +77,35 @@ export type postData = IPostRoadAccountMessage | IPostBillingPeriodMessage | IPo
 
 const database = 'clearroad';
 
-const concatStringNTimes = (val, iteration) => {
-  let res = '';
-  while (--iteration >= 0) {
-    res += val;
-  }
-  return res;
-};
-
-const jsonIdRec = (
-  indent, replacer, keyValueSpace,
-  key, value, deep = 0
-) => {
+const jsonIdRec = (keyValueSpace: string, key: string|number, value: any, deep = 0) => {
   let res;
-  let mySpace;
   if (value && typeof value.toJSON === 'function') {
     value = value.toJSON();
   }
-  if (typeof replacer === 'function') {
-    value = replacer(key, value);
-  }
 
-  if (indent) {
-    mySpace = concatStringNTimes(indent, deep);
-  }
   if (Array.isArray(value)) {
     res = [];
     for (let i = 0; i < value.length; i += 1) {
-      res[res.length] = jsonIdRec(indent, replacer, keyValueSpace, i, value[i], deep + 1);
+      res[res.length] = jsonIdRec(keyValueSpace, i, value[i], deep + 1);
       if (res[res.length - 1] === undefined) {
         res[res.length - 1] = 'null';
       }
     }
-    if (res.length === 0) { return '[]'; }
-    if (indent) {
-      return '[\n' + mySpace + indent +
-        res.join(',\n' + mySpace + indent) +
-        '\n' + mySpace + ']';
+    if (res.length === 0) {
+      return '[]';
     }
     return `[${res.join(', ')}]`;
   }
   if (typeof value === 'object' && value !== null) {
-    if (Array.isArray(replacer)) {
-      res = replacer.reduce((p, c) => {
-        p.push(c);
-        return p;
-      }, []);
-    }
-    else {
-      res = Object.keys(value);
-    }
+    res = Object.keys(value);
     res.sort();
     for (let i = 0, l = res.length; i < l; i += 1) {
       key = res[i];
-      res[i] = jsonIdRec(indent, replacer, keyValueSpace, key, value[key], deep + 1);
+      res[i] = jsonIdRec(keyValueSpace, key, value[key], deep + 1);
       if (res[i] !== undefined) {
         res[i] = `${JSON.stringify(key)}: ${keyValueSpace}${res[i]}`;
-      } else {
+      }
+      else {
         res.splice(i, 1);
         l -= 1;
         i -= 1;
@@ -142,32 +114,13 @@ const jsonIdRec = (
     if (res.length === 0) {
       return '{}';
     }
-    if (indent) {
-      return '{\n' + mySpace + indent +
-        res.join(',\n' + mySpace + indent) +
-        '\n' + mySpace + '}';
-    }
     return `{${res.join(', ')}`;
   }
   return JSON.stringify(value);
 };
 
-const jsonId = (value, replacer, space) => {
-  let indent;
-  let keyValueSpace = '';
-  if (typeof space === 'string') {
-    if (space !== '') {
-      indent = space;
-      keyValueSpace = ' ';
-    }
-  }
-  else if (typeof space === 'number') {
-    if (isFinite(space) && space > 0) {
-      indent = concatStringNTimes(' ', space);
-      keyValueSpace = ' ';
-    }
-  }
-  return jsonIdRec(indent, replacer, keyValueSpace, '', value);
+const jsonId = (value: any) => {
+  return jsonIdRec('', '', value);
 };
 
 const merge = (obj1, obj2) => {
@@ -199,7 +152,7 @@ export class ClearRoad {
    * @param localStorageOptions Override default options
    */
   constructor(
-    url: string, login: string, password: string,
+    url: string, login?: string, password?: string,
     localStorageOptions: ILocalStorageOptions = {
       type: 'indexeddb'
     }
@@ -423,7 +376,7 @@ export class ClearRoad {
    * @param data The message
    */
   post(data: postData): IQueue {
-    const options: any = data;
+    const options: any = merge({}, data);
 
     switch (data.portal_type) {
       case 'Road Account Message':
@@ -444,7 +397,7 @@ export class ClearRoad {
     }
 
     options.grouping_reference = 'data';
-    const dataAsString = jsonId(options, '', ''); // jio.util.stringify
+    const dataAsString = jsonId(options);
     const rusha = new Rusha();
     const reference = rusha.digestFromString(dataAsString);
     options.source_reference = reference;
