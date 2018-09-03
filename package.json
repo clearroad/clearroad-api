@@ -11,6 +11,7 @@
     "lint:fix": "tslint --fix \"index.ts\"",
     "deploy": "node deploy.js",
     "test": "nyc mocha",
+    "coveralls": "npm test && cat ./coverage/lcov.info | coveralls",
     "start": "http-server -o --cors",
     "release": "standard-version",
     "postrelease": "git push origin master --follow-tags",
@@ -38,7 +39,8 @@
     ],
     "reporter": [
       "text-summary",
-      "html"
+      "html",
+      "lcov"
     ],
     "sourceMap": true,
     "instrument": true
@@ -72,6 +74,7 @@
     "@types/sinon": "^5.0.2",
     "azure-storage": "^2.10.0",
     "chai": "^4.1.2",
+    "coveralls": "^3.0.2",
     "dotenv": "^6.0.0",
     "http-server": "^0.11.1",
     "lodash.clonedeep": "^4.5.0",

@@ -1,5 +1,7 @@
 # ClearRoad API
 
+[![Build Status](https://travis-ci.org/clearroad/clearroad-api.svg?branch=master)](https://travis-ci.org/clearroad/clearroad-api)
+[![Coverage Status](https://coveralls.io/repos/github/clearroad/clearroad-api/badge.svg?branch=master)](https://coveralls.io/github/clearroad/clearroad-api?branch=master)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 ## <a name="install"></a> Install
