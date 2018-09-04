@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/clearroad/clearroad-api/compare/v0.1.0...v1.0.0) (2018-09-04)
+
+
+### Features
+
+* **clearroad:** use accessToken instead of login and password ([4aca062](https://github.com/clearroad/clearroad-api/commit/4aca062))
+
+
+### BREAKING CHANGES
+
+* **clearroad:** replace login and password with access token
+
+
+
 <a name="0.1.0"></a>
 # [0.1.0](https://github.com/clearroad/clearroad-api/compare/v0.0.1...v0.1.0) (2018-08-31)
 
