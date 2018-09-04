@@ -9,12 +9,13 @@ if (!process.env.CI) {
   catch (err) {}
 }
 
+const container = process.env.TARGET === 'master' ? 'prod' : 'dev';
 const azure = require('azure-storage');
 const blobService = azure.createBlobService();
 
 const jsFile = files => files.filter(file => path.extname(file) === '.js');
 
-const createShare = (container) => {
+const createContainer = () => {
   return new Promise((resolve, reject) => {
     blobService.createContainerIfNotExists(container, {
       publicAccessLevel: 'blob'
@@ -27,9 +28,9 @@ const createShare = (container) => {
   });
 };
 
-const updloadFile = (container, file) => {
+const updloadFile = (folder, file) => {
   return new Promise((resolve, reject) => {
-    const filename = path.basename(file);
+    const filename = `${folder}/${path.basename(file)}`;
     console.log(`\t- ${file}`);
     blobService.createBlockBlobFromLocalFile(container, filename, file, (error, result) => {
       if (!error) {
@@ -42,14 +43,14 @@ const updloadFile = (container, file) => {
 
 const run = async () => {
   try {
+    await createContainer();
+
     console.log('Uploading dist folder...');
-    await createShare('api');
     let directory = './dist/iife';
     let files = jsFile(fs.readdirSync(path.resolve(directory)));
     await Promise.all(files.map(file => updloadFile('api', path.resolve(directory, file))));
 
     console.log('Uploading lib folder...');
-    await createShare('lib');
     directory = './lib';
     files = jsFile(fs.readdirSync(path.resolve(directory)));
     await Promise.all(files.map(file => updloadFile('lib', path.resolve(directory, file))));

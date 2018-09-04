@@ -1,4 +1,4 @@
-branches: master
+branches: [ master, staging ]
 
 pipeline:
   publish:
@@ -7,6 +7,7 @@ pipeline:
     environment:
       - AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT
       - AZURE_STORAGE_ACCESS_KEY=$AZURE_STORAGE_ACCESS_KEY
+      - TARGET=${DRONE_COMMIT_BRANCH}
     commands:
       - npm install
       - npm run build
