@@ -3863,6 +3863,13 @@ jIO.util.ajax = function ajax(param) {
       };
       this._withCredentials = false;
     }
+    else if (spec.access_token) {
+      this._headers = {
+        Accept: "*/*",
+        'X-ACCESS-TOKEN': spec.access_token
+      };
+      this._withCredentials = false;
+    }
   }
 
   function convertJSONToGet(json) {

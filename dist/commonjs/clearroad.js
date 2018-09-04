@@ -71,11 +71,10 @@ var ClearRoad = /** @class */ (function () {
     /**
      * Instantiate a ClearRoad api instance.
      * @param url ClearRoad API url
-     * @param login ClearRoad API login (required when using Node)
-     * @param password ClearRoad API password (required when using Node)
+     * @param accessToken ClearRoad API access token (required when using Node)
      * @param localStorageOptions Override default options
      */
-    function ClearRoad(url, login, password, localStorageOptions) {
+    function ClearRoad(url, accessToken, localStorageOptions) {
         if (localStorageOptions === void 0) { localStorageOptions = {
             type: 'indexeddb'
         }; }
@@ -131,8 +130,7 @@ var ClearRoad = /** @class */ (function () {
                     type: 'erp5',
                     url: url,
                     default_view_reference: 'jio_view',
-                    login: login,
-                    password: password
+                    access_token: accessToken
                 }
             }
         });
@@ -176,8 +174,7 @@ var ClearRoad = /** @class */ (function () {
                     type: 'erp5',
                     url: url,
                     default_view_reference: 'jio_ingestion_report_view',
-                    login: login,
-                    password: password
+                    access_token: accessToken
                 }
             }
         });
@@ -218,8 +215,7 @@ var ClearRoad = /** @class */ (function () {
                     type: 'erp5',
                     url: url,
                     default_view_reference: 'jio_directory_view',
-                    login: login,
-                    password: password
+                    access_token: accessToken
                 }
             }
         });
@@ -277,8 +273,7 @@ var ClearRoad = /** @class */ (function () {
                     type: 'erp5',
                     url: url,
                     default_view_reference: 'jio_report_view',
-                    login: login,
-                    password: password
+                    access_token: accessToken
                 }
             }
         });

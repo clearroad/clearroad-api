@@ -23,28 +23,28 @@ If you want to include the files directly in your page, you can include via our 
 
 ```javascript
 import { ClearRoad } from '@clearroad/api';
-const cr = new ClearRoad('apiUrl', 'login', 'password');
+const cr = new ClearRoad('apiUrl', 'accessToken');
 ```
 
 ### Using with CommonJS
 
 ```javascript
 const ClearRoad = require('@clearroad/api').ClearRoad;
-const cr = new ClearRoad('apiUrl', 'login', 'password');
+const cr = new ClearRoad('apiUrl', 'accessToken');
 ```
 
 ### Using with Node
 
 ```javascript
 const ClearRoad = require('@clearroad/api/node').ClearRoad;
-const cr = new ClearRoad('apiUrl', 'login', 'password');
+const cr = new ClearRoad('apiUrl', 'accessToken');
 ```
 
 ### Using a different local storage
 
 By default, the api will use `indexeddb` as local storage. If you want to change the storage (or if you are using node and you need to), you can use:
 ```javascript
-const cr = new ClearRoad('apiUrl', 'login', 'password', {
+const cr = new ClearRoad('apiUrl', 'accessToken', {
   type: 'dropbox',
   accessToken: 'accessToken'
 });

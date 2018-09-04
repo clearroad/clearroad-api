@@ -6,10 +6,9 @@
     document.getElementById('result').innerHTML = ''; // cleanup logs
 
     var url = document.querySelector("[name='url']").value;
-    var login = document.querySelector("[name='login']").value;
-    var password = document.querySelector("[name='password']").value;
-    if (login && password) {
-      window.cr = new ClearRoad(url, login, password);
+    var accessToken = document.querySelector("[name='token']").value;
+    if (accessToken) {
+      window.cr = new ClearRoad(url, accessToken);
     }
     else {
       window.cr = new ClearRoad(url);

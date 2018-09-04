@@ -29,22 +29,22 @@ describe('ClearRoad', () => {
 
   describe('constructor', () => {
     it('should init a messages storage', () => {
-      const cr = new ClearRoad(url, null, null, {});
+      const cr = new ClearRoad(url, null, {});
       expect((cr as any).messagesStorage != undefined).to.equal(true);
     });
 
     it('should init a ingestionReport storage', () => {
-      const cr = new ClearRoad(url, null, null, {});
+      const cr = new ClearRoad(url, null, {});
       expect((cr as any).ingestionReportStorage != undefined).to.equal(true);
     });
 
     it('should init a directory storage', () => {
-      const cr = new ClearRoad(url, null, null, {});
+      const cr = new ClearRoad(url, null, {});
       expect((cr as any).directoryStorage != undefined).to.equal(true);
     });
 
     it('should init a report storage', () => {
-      const cr = new ClearRoad(url, null, null, {});
+      const cr = new ClearRoad(url, null, {});
       expect((cr as any).reportStorage != undefined).to.equal(true);
     });
   });
@@ -55,7 +55,7 @@ describe('ClearRoad', () => {
     let putStub: sinon.SinonStub;
 
     beforeEach(() => {
-      cr = new ClearRoad(url, null, null, {});
+      cr = new ClearRoad(url, null, {});
       putStub = sinon.stub((cr as any).messagesStorage, 'put').callsFake((_id, data) => data);
       stubs.push(putStub);
     });
@@ -190,7 +190,7 @@ describe('ClearRoad', () => {
     let repairStub: sinon.SinonStub;
 
     beforeEach(() => {
-      cr = new ClearRoad(url, null, null, {});
+      cr = new ClearRoad(url, null, {});
       repairStub = sinon.stub((cr as any).messagesStorage, 'repair').callsFake((_id, data) => data);
       stubs.push(repairStub);
     });
@@ -214,7 +214,7 @@ describe('ClearRoad', () => {
     let queryStub: sinon.SinonStub;
 
     beforeEach(() => {
-      cr = new ClearRoad(url, null, null, {});
+      cr = new ClearRoad(url, null, {});
       queryStub = sinon.stub((cr as any).messagesStorage, 'allDocs').callsFake(options => options);
       stubs.push(queryStub);
     });
@@ -230,7 +230,7 @@ describe('ClearRoad', () => {
     let getAttachmentStub: sinon.SinonStub;
 
     beforeEach(() => {
-      cr = new ClearRoad(url, null, null, {});
+      cr = new ClearRoad(url, null, {});
       getAttachmentStub = sinon.stub((cr as any).messagesStorage, 'getAttachment').callsFake(options => options);
       stubs.push(getAttachmentStub);
     });

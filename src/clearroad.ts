@@ -149,12 +149,11 @@ export class ClearRoad {
   /**
    * Instantiate a ClearRoad api instance.
    * @param url ClearRoad API url
-   * @param login ClearRoad API login (required when using Node)
-   * @param password ClearRoad API password (required when using Node)
+   * @param accessToken ClearRoad API access token (required when using Node)
    * @param localStorageOptions Override default options
    */
   constructor(
-    url: string, login?: string, password?: string,
+    url: string, accessToken?: string,
     localStorageOptions: ILocalStorageOptions = {
       type: 'indexeddb'
     }
@@ -213,8 +212,7 @@ export class ClearRoad {
           type: 'erp5',
           url,
           default_view_reference: 'jio_view',
-          login,
-          password
+          access_token: accessToken
         }
       }
     });
@@ -260,8 +258,7 @@ export class ClearRoad {
           type: 'erp5',
           url,
           default_view_reference: 'jio_ingestion_report_view',
-          login,
-          password
+          access_token: accessToken
         }
       }
     });
@@ -304,8 +301,7 @@ export class ClearRoad {
           type: 'erp5',
           url,
           default_view_reference: 'jio_directory_view',
-          login,
-          password
+          access_token: accessToken
         }
       }
     });
@@ -365,8 +361,7 @@ export class ClearRoad {
           type: 'erp5',
           url,
           default_view_reference: 'jio_report_view',
-          login,
-          password
+          access_token: accessToken
         }
       }
     });
