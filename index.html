@@ -36,7 +36,15 @@
       </div>
       <div style="margin: 10px 0">
         <label for="token">access token:</label>
-        <input type="string" name="token" placeholder="Token (optional)" style="width:400px" />
+        <input type="string" name="token" placeholder="Token (optional)" style="width:425px" />
+      </div>
+      <div style="margin: 10px 0">
+        <label for="type">storage type:</label>
+        <select name="type">
+          <option value="indexeddb" selected="true">IndexedDB (local)</option>
+          <option value="dropbox">Dropbox</option>
+        </select>
+        <input type="string" name="type_token" placeholder="Token (required)" style="display: none;width:300px" />
       </div>
       <div>
         <textarea name="usercode" rows="20" cols="100" placeholder="paste the code here"></textarea>

@@ -1,4 +1,10 @@
 (function() {
+  var type = '';
+
+  function updateType(el) {
+    type = el.options[el.selectedIndex].value;
+  }
+
   function validate(e) {
     e.preventDefault();
 
@@ -6,13 +12,12 @@
     document.getElementById('result').innerHTML = ''; // cleanup logs
 
     var url = document.querySelector("[name='url']").value;
-    var accessToken = document.querySelector("[name='token']").value;
-    if (accessToken) {
-      window.cr = new ClearRoad(url, accessToken);
-    }
-    else {
-      window.cr = new ClearRoad(url);
-    }
+    var accessToken = document.querySelector("[name='token']").value || null;
+    var typeAccessToken = document.querySelector("[name='type_token']").value || null;
+    window.cr = new ClearRoad(url, accessToken, {
+      type: type,
+      accessToken: typeAccessToken
+    });
 
     eval(document.querySelector("[name='usercode']").value);
   }
@@ -36,6 +41,13 @@
       wrap("warn");
       wrap("error");
     };
+
+    var typeEl = document.querySelector("[name='type']");
+    typeEl.onchange = function() {
+      updateType(this);
+      document.querySelector("[name='type_token']").style.display = type === 'indexeddb' ? 'none' : 'inline';
+    };
+    updateType(typeEl);
   }
 
   init();
