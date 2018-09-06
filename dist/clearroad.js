@@ -253,7 +253,7 @@ export class ClearRoad {
                 attachment: {
                     data: {
                         get: {
-                            uri_template: `${url}/{id}/Base_downloadWithCors`
+                            uri_template: `${url}/{+id}/Base_downloadWithCors`
                         },
                         put: {
                             erp5_put_template: `${url}/{+id}/Base_edit`
