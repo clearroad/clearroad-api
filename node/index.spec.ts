@@ -191,7 +191,9 @@ describe('ClearRoad', () => {
 
     beforeEach(() => {
       cr = new ClearRoad(url, null, {});
-      repairStub = sinon.stub((cr as any).messagesStorage, 'repair').callsFake((_id, data) => data);
+      repairStub = sinon.stub((cr as any).messagesStorage, 'repair').returns({
+        push: callback => callback()
+      });
       stubs.push(repairStub);
     });
 

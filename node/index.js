@@ -324,24 +324,13 @@ var ClearRoad = /** @class */ (function () {
         var _this = this;
         if (progress === void 0) { progress = function () { }; }
         var queue = new RSVP.Queue();
-        return queue
-            .push(function () {
-            return _this.messagesStorage.repair();
-        })
-            .push(function () {
-            progress('messages');
-            return _this.ingestionReportStorage.repair();
-        })
-            .push(function () {
-            progress('ingestion-reports');
-            return _this.directoryStorage.repair();
-        })
-            .push(function () {
-            progress('directories');
-            return _this.reportStorage.repair();
-        })
-            .push(function () {
-            progress('reports');
+        return queue.push(function () {
+            return RSVP.all([
+                _this.messagesStorage.repair().push(function () { return progress('messages'); }),
+                _this.ingestionReportStorage.repair().push(function () { return progress('ingestion-reports'); }),
+                _this.directoryStorage.repair().push(function () { return progress('directories'); }),
+                _this.reportStorage.repair().push(function () { return progress('reports'); })
+            ]);
         });
     };
     /**

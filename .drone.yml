@@ -2,7 +2,7 @@ branches: [ master, staging ]
 
 pipeline:
   publish:
-    image: node
+    image: atlassianlabs/docker-node-jdk-chrome-firefox
     secrets: [ azure_storage_account, azure_storage_access_key ]
     environment:
       - AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT
@@ -11,6 +11,7 @@ pipeline:
     commands:
       - npm install
       - npm run build
+      - npm run test
       - npm run deploy
 
   notify:

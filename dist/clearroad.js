@@ -312,24 +312,13 @@ export class ClearRoad {
      */
     sync(progress = () => { }) {
         const queue = new RSVP.Queue();
-        return queue
-            .push(() => {
-            return this.messagesStorage.repair();
-        })
-            .push(() => {
-            progress('messages');
-            return this.ingestionReportStorage.repair();
-        })
-            .push(() => {
-            progress('ingestion-reports');
-            return this.directoryStorage.repair();
-        })
-            .push(() => {
-            progress('directories');
-            return this.reportStorage.repair();
-        })
-            .push(() => {
-            progress('reports');
+        return queue.push(() => {
+            return RSVP.all([
+                this.messagesStorage.repair().push(() => progress('messages')),
+                this.ingestionReportStorage.repair().push(() => progress('ingestion-reports')),
+                this.directoryStorage.repair().push(() => progress('directories')),
+                this.reportStorage.repair().push(() => progress('reports'))
+            ]);
         });
     }
     /**

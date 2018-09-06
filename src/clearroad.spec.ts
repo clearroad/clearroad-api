@@ -182,7 +182,9 @@ describe('ClearRoad', () => {
 
     beforeEach(() => {
       cr = new ClearRoad(url);
-      repairSpy = spyOn((cr as any).messagesStorage, 'repair').and.callFake((_id, data) => data);
+      repairSpy = spyOn((cr as any).messagesStorage, 'repair').and.returnValue({
+        push: callback => callback()
+      });
     });
 
     it('should repair all storages', async () => {
