@@ -75,7 +75,8 @@ html, body {
   .logo {
     display: block;
     max-width: 100%;
-    margin-bottom: $logo-margin;
+    margin: $logo-margin;
+    width: $logo-width;
   }
 
   &>.search {
@@ -547,6 +548,25 @@ html, body {
       padding: $code-annotation-padding 2em;
       color: #eee;
     }
+  }
+
+  .center-column,
+  .full-column {
+    + pre {
+      position: static;
+      float: none;
+      clear: none;
+      margin: 0 $main-padding $main-padding;
+      left: 0;
+    }
+  }
+
+  .center-column + pre {
+    width: calc(50% - #{$main-padding});
+  }
+
+  .full-column + pre {
+    width: calc(100% - #{$main-padding});
   }
 }
 
