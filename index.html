@@ -222,6 +222,9 @@
         <ul class="search-results"></ul>
       <ul id="toc" class="toc-list-h1">
           <li>
+            <a href="#overview" class="toc-h1 toc-link" data-title="Overview">Overview</a>
+          </li>
+          <li>
             <a href="#quickstart" class="toc-h1 toc-link" data-title="QuickStart">QuickStart</a>
               <ul class="toc-list-h2">
                   <li>
@@ -238,12 +241,44 @@
                   </li>
               </ul>
           </li>
+          <li>
+            <a href="#sdk-reference" class="toc-h1 toc-link" data-title="SDK reference">SDK reference</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#constructor" class="toc-h2 toc-link" data-title="constructor">constructor</a>
+                  </li>
+                  <li>
+                    <a href="#post" class="toc-h2 toc-link" data-title="post">post</a>
+                  </li>
+                  <li>
+                    <a href="#sync" class="toc-h2 toc-link" data-title="sync">sync</a>
+                  </li>
+                  <li>
+                    <a href="#alldocs" class="toc-h2 toc-link" data-title="allDocs">allDocs</a>
+                  </li>
+                  <li>
+                    <a href="#getattachment" class="toc-h2 toc-link" data-title="getAttachment">getAttachment</a>
+                  </li>
+              </ul>
+          </li>
       </ul>
+        <ul class="toc-footer">
+            <li><a href='https://api.clearroadev.xyz/docs/'>Try it!</a></li>
+            <li><a href='https://github.com/clearroad/clearroad-api/' target='_blank'>Source code</a></li>
+        </ul>
     </div>
     <div class="page-wrapper">
       <div class="dark-box"></div>
       <div class="content">
-        <h1 id='quickstart'>QuickStart</h1><h2 id='step-1-install-the-library-as-dependency'>Step 1. Install the library as dependency</h2>
+        <h1 id='overview'>Overview</h1>
+<p>Welcome to the ClearRoad API guides!</p>
+
+<p>ClearRoad is an online platform that aims to centralize data in the Road Usage Charging industry and standardize its format.</p>
+
+<p>Many actors in the Road Usage Charging industry can simplify their IT integration needs by using the ClearRoad platform through its API.</p>
+
+<p>This document aims to provide complete steps on how to quickly get set-up to start building great applications using the ClearRoad API.</p>
+<h1 id='quickstart'>QuickStart</h1><h2 id='step-1-install-the-library-as-dependency'>Step 1. Install the library as dependency</h2>
 <p>We are using <code>npm</code> to install the <code>ClearRoad</code> api library.
 Open a terminal window in your project and nstall the dependency using the command:</p>
 
@@ -315,26 +350,159 @@ If you do not have an access token, you can request one on the <a href="https://
 <td>Yes</td>
 </tr>
 </tbody></table>
-<h2 id='step-4-retrieve-messages'>Step 4. Retrieve messages</h2><pre class="highlight javascript tab-javascript--browser"><code><span class="kr">const</span> <span class="nx">run</span> <span class="o">=</span> <span class="nx">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">();</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'sync done'</span><span class="p">);</span>
-  <span class="kr">const</span> <span class="nx">results</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">();</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">results</span><span class="p">);</span>
-<span class="p">};</span>
-
-<span class="nx">run</span><span class="p">();</span>
-</code></pre><pre class="highlight javascript tab-javascript--node"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'sync done'</span><span class="p">);</span>
-  <span class="p">})</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">();</span>
-  <span class="p">})</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">results</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">results</span><span class="p">);</span>
-  <span class="p">});</span>
+<h2 id='step-4-retrieve-messages'>Step 4. Retrieve messages</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'sync done'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">results</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">results</span><span class="p">);</span>
 </code></pre>
 <p>Now that you&#39;re all setup, you can start by synchronizing your local storage and then query the data.</p>
+<h1 id='sdk-reference'>SDK reference</h1>
+<p>The <code>ClearRoad</code> class contains a subset of functions from the <a href="https://jio.nexedi.com/">jio.js</a> library, which uses <a href="https://lab.nexedi.com/nexedi/rsvp.js">RSVP.js</a> to chain functions like Promises.</p>
+<h2 id='constructor'>constructor</h2><pre class="highlight javascript tab-javascript"><code><span class="k">new</span> <span class="nx">ClearRoad</span><span class="p">(</span><span class="s1">'apiUrl'</span><span class="p">,</span> <span class="s1">'accessToken'</span><span class="p">);</span>
+</code></pre>
+<p><code>new ClearRoad(url, accessToken)</code></p>
+
+<p>Initialise a new ClearRoad object to interact with the ERP5 storage.</p>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>url</td>
+<td>Url of the storage</td>
+</tr>
+<tr>
+<td>accessToken</td>
+<td>Optional. Access token to authenticate on ERP5 (if necessary)</td>
+</tr>
+</tbody></table>
+<h2 id='post'>post</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
+  <span class="na">key1</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">,</span>
+  <span class="na">key2</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+    <span class="s2">"subkey"</span><span class="p">:</span> <span class="s2">"subvalue"</span>
+  <span class="p">})</span>
+<span class="p">});</span>
+</code></pre>
+<p><code>post(data)</code></p>
+
+<p>Posts data in your local storage. Use the <a href="#sync">sync method</a> then to synchronize the data to the ClearRoad API.</p>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>data</td>
+<td>Data to post. Each <code>value</code> paired with a <code>key</code> must be a <code>string</code>.</td>
+</tr>
+</tbody></table>
+<h2 id='sync'>sync</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">();</span>
+</code></pre>
+<p><code>sync()</code></p>
+
+<p>Similar to the <code>repair</code> method of <code>jio</code>, this will synchronize or repair the storage and all data within.</p>
+<h2 id='alldocs'>allDocs</h2>
+<blockquote>
+<p>Query the documents:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="c1">// make sure you have the latest data locally</span>
+<span class="kr">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">({</span>
+  <span class="na">query</span><span class="p">:</span> <span class="nx">query_object</span><span class="p">,</span>
+  <span class="na">limit</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">42</span><span class="p">],</span>
+  <span class="na">sort_on</span><span class="p">:</span> <span class="p">[[</span><span class="s1">'key1'</span><span class="p">,</span> <span class="s1">'ascending'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'key2'</span><span class="p">,</span> <span class="s1">'descending'</span><span class="p">]],</span>
+  <span class="na">select_list</span><span class="p">:</span> <span class="p">[</span><span class="s1">'key1'</span><span class="p">,</span> <span class="s1">'key2'</span><span class="p">,</span> <span class="s1">'key3'</span><span class="p">],</span>
+  <span class="na">include_docs</span><span class="p">:</span> <span class="kc">false</span>
+<span class="p">});</span>
+<span class="c1">// read rows in result.rows</span>
+</code></pre>
+<blockquote>
+<p>Which returns object in the following format:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="c1">// with select_list: ['select_list_key']</span>
+<span class="p">{</span>
+  <span class="s2">"total_rows"</span><span class="p">:</span> <span class="mi">39</span><span class="p">,</span>
+  <span class="s2">"rows"</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="s2">"text_id"</span><span class="p">,</span>
+    <span class="s2">"value"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">"select_list_key"</span><span class="p">:</span> <span class="s2">"select_list_value"</span>
+    <span class="p">}</span>
+  <span class="p">},</span> <span class="p">...]</span>
+<span class="p">}</span>
+
+<span class="c1">// with include_docs = true</span>
+<span class="p">{</span>
+  <span class="s2">"total_rows"</span><span class="p">:</span> <span class="mi">39</span><span class="p">,</span>
+  <span class="s2">"rows"</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="s2">"text_id"</span><span class="p">,</span>
+    <span class="s2">"doc"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">"key"</span><span class="p">:</span> <span class="s2">"value"</span>
+    <span class="p">}</span>
+  <span class="p">},</span> <span class="p">...]</span>
+<span class="p">}</span>
+</code></pre>
+<p><code>allDocs({query, limit, sort_on, select_list, include_docs})</code></p>
+
+<p>Retrieve a list of documents.</p>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>query</td>
+<td>Refer to the <a href="https://jio.nexedi.com/">jio documentation</a> in the <strong>jIO Query Engine</strong> section for details</td>
+</tr>
+<tr>
+<td>limit (optional)</td>
+<td>Limit the results. Leave empty for no limit, or <code>[min, max]</code> for paging</td>
+</tr>
+<tr>
+<td>sort_on (optional)</td>
+<td>List of fields to sort on, each specifying the order with <code>ascending</code>/<code>descending</code></td>
+</tr>
+<tr>
+<td>select_list</td>
+<td>When provided, the response has a <code>value</code> containing the values of these keys for each document</td>
+</tr>
+<tr>
+<td>include_docs</td>
+<td>When <code>true</code>, the response has a <code>doc</code> containing the full metadata for each document</td>
+</tr>
+</tbody></table>
+<h2 id='getattachment'>getAttachment</h2><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">attachment</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getAttachment</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">format</span><span class="p">:</span> <span class="s1">'text'</span>
+<span class="p">});</span>
+</code></pre>
+<p><code>getAttachment(id, name, options)</code></p>
+
+<p>Retrieve the attachment with the given <code>name</code> from the document with the given <code>ID</code>.</p>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>Id of the document</td>
+</tr>
+<tr>
+<td>name</td>
+<td>Name of the attachment</td>
+</tr>
+<tr>
+<td>options.format</td>
+<td>Format of the returned attachment. Can be <code>text</code>, <code>json</code>, <code>Blob</code>, <code>DataURL</code>, or <code>ArrayBuffer</code></td>
+</tr>
+</tbody></table>
 
       </div>
       <div class="dark-box">
