@@ -10,9 +10,9 @@ export interface IQueue {
 
 export type Queue = () => IQueue;
 
-export type storageName = 'messages'|'ingestion-reports'|'directories'|'reports';
+export type storageName = 'messages' | 'ingestion-reports' | 'directories' | 'reports';
 
-export type localStorageType = 'indexeddb'|'dropbox'|'gdrive';
+export type localStorageType = 'indexeddb' | 'dropbox' | 'gdrive';
 export interface ILocalStorageOptions {
   type: localStorageType;
   accessToken?: string;
@@ -79,7 +79,7 @@ export type postData = IPostRoadAccountMessage | IPostBillingPeriodMessage | IPo
 
 const database = 'clearroad';
 
-const jsonIdRec = (keyValueSpace: string, key: string|number, value: any, deep = 0) => {
+const jsonIdRec = (keyValueSpace: string, key: string | number, value: any, deep = 0) => {
   let res;
   if (value && typeof value.toJSON === 'function') {
     value = value.toJSON();
@@ -244,7 +244,7 @@ export class ClearRoad {
       check_local_deletion: false,
       check_remote_modification: false, // there is no modification, only creation of report
       check_remote_creation: true,
-      check_remote_deletion: true,
+      check_remote_deletion: false,
       local_sub_storage: {
         type: 'query',
         sub_storage: merge({
@@ -287,7 +287,7 @@ export class ClearRoad {
       check_local_deletion: false,
       check_remote_modification: false,
       check_remote_creation: true,
-      check_remote_deletion: true,
+      check_remote_deletion: false,
       local_sub_storage: {
         type: 'query',
         sub_storage: merge({
@@ -330,7 +330,7 @@ export class ClearRoad {
       check_local_deletion: false,
       check_remote_modification: false,
       check_remote_creation: true,
-      check_remote_deletion: true,
+      check_remote_deletion: false,
       check_remote_attachment_creation: true,
       check_remote_attachment_modification: false,
       check_remote_attachment_deletion: true,

@@ -72,28 +72,11 @@ gdrive | Storage data in a google drive account | type: string, accessToken: str
 
 ## Step 4. Retrieve messages
 
-```javascript--browser
-const run = async () => {
-  await cr.sync();
-  console.log('sync done');
-  const results = await cr.allDocs();
-  console.log(results);
-};
-
-run();
-```
-
-```javascript--node
-cr.sync()
-  .then(() => {
-    console.log('sync done');
-  })
-  .then(() => {
-    return cr.allDocs();
-  })
-  .then(results => {
-    console.log(results);
-  });
+```javascript
+await cr.sync();
+console.log('sync done');
+const results = await cr.allDocs();
+console.log(results);
 ```
 
 Now that you're all setup, you can start by synchronizing your local storage and then query the data.
