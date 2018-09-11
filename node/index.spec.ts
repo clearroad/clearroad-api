@@ -15,6 +15,7 @@ class FakeJio {
   allDocs() {}
   repair() {}
   getAttachment() {}
+  allAttachments() {}
 }
 
 describe('ClearRoad', () => {
@@ -46,6 +47,13 @@ describe('ClearRoad', () => {
     it('should init a report storage', () => {
       const cr = new ClearRoad(url, null, {});
       expect((cr as any).reportStorage != undefined).to.equal(true);
+    });
+
+    it('should defaul to local storage', () => {
+      const cr = new ClearRoad(url, null, {
+        localStorage: {}
+      });
+      expect((cr as any).useLocalStorage).to.equal(true);
     });
   });
 
@@ -227,19 +235,40 @@ describe('ClearRoad', () => {
     });
   });
 
-  describe('.getAttachment', () => {
+  describe('.getReport', () => {
     let cr;
     let getAttachmentStub: sinon.SinonStub;
+    let allAttachmentsStub: sinon.SinonStub;
+    const id = 'reportId';
 
     beforeEach(() => {
       cr = new ClearRoad(url, null, {});
-      getAttachmentStub = sinon.stub((cr as any).messagesStorage, 'getAttachment').callsFake(options => options);
+      getAttachmentStub = sinon.stub((cr as any).reportStorage, 'getAttachment').callsFake(options => options);
       stubs.push(getAttachmentStub);
+      allAttachmentsStub = sinon.stub((cr as any).reportStorage, 'allAttachments').callsFake(options => options);
+      stubs.push(allAttachmentsStub);
     });
 
-    it('should get the report', async () => {
-      await cr.getAttachment();
-      expect(getAttachmentStub.called).to.equal(true);
+    describe('not using local storage', () => {
+      beforeEach(() => {
+        cr.useLocalStorage = false;
+      });
+
+      it('should get the report', async () => {
+        await cr.getReport(id);
+        expect(allAttachmentsStub.called).to.equal(true);
+      });
+    });
+
+    describe('using local storage', () => {
+      beforeEach(() => {
+        cr.useLocalStorage = true;
+      });
+
+      it('should get the report', async () => {
+        await cr.getReport(id);
+        expect(getAttachmentStub.called).to.equal(true);
+      });
     });
   });
 });

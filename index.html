@@ -47,7 +47,9 @@
         <input type="string" name="type_token" placeholder="Token (required)" style="display: none;width:300px" />
       </div>
       <div>
-        <textarea name="usercode" rows="20" cols="100" placeholder="paste the code here"></textarea>
+        <textarea name="usercode" rows="20" cols="100" placeholder="paste the code here">
+cr.sync(message => console.log(message)).push(() => console.log('done'), err => console.error(err))
+        </textarea>
       </div>
       <input type="submit" value="Submit" />
       <hr />

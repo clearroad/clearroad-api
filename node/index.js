@@ -72,12 +72,17 @@ var ClearRoad = /** @class */ (function () {
      * Instantiate a ClearRoad api instance.
      * @param url ClearRoad API url
      * @param accessToken ClearRoad API access token (required when using Node)
-     * @param localStorageOptions Override default options
+     * @param options Override default options
      */
-    function ClearRoad(url, accessToken, localStorageOptions) {
-        if (localStorageOptions === void 0) { localStorageOptions = {
-            type: 'indexeddb'
-        }; }
+    function ClearRoad(url, accessToken, options) {
+        if (options === void 0) { options = {}; }
+        this.useLocalStorage = false;
+        if (!options.localStorage || !options.localStorage.type) {
+            options.localStorage = {
+                type: 'indexeddb'
+            };
+        }
+        var localStorageOptions = options.localStorage;
         if (localStorageOptions.type === 'dropbox' || localStorageOptions.type === 'gdrive') {
             localStorageOptions = {
                 type: 'drivetojiomapping',
@@ -87,24 +92,46 @@ var ClearRoad = /** @class */ (function () {
                 }
             };
         }
-        else if (!localStorageOptions.type) {
-            localStorageOptions.type = 'indexeddb';
+        this.useLocalStorage = localStorageOptions.type === 'indexeddb';
+        // only retrieve the data since xxx
+        var queryMaxDate = '';
+        if (options.maxDate) {
+            var from = new Date(options.maxDate);
+            queryMaxDate = " AND modification_date: >= \"" + from.toJSON() + "\"";
         }
         var query = 'portal_type:(' +
             '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
             ' OR "Billing Period Message" OR "Road Report Request")' +
-            ' AND grouping_reference:"data"';
+            ' AND grouping_reference:"data"' + queryMaxDate;
+        var localSubStorage = {
+            type: 'query',
+            sub_storage: {
+                type: 'indexeddb',
+                database: database
+            }
+        };
+        var mappingSubStorage = {
+            type: 'mapping',
+            sub_storage: {
+                type: 'query',
+                sub_storage: localStorageOptions
+            }
+        };
+        var signatureSubStorage = {
+            type: this.useLocalStorage ? 'indexeddb' : 'memory'
+        };
+        var refKey = 'source_reference';
         this.messagesStorage = jIO.createJIO({
             type: 'replicate',
             parallel_operation_amount: 1,
             use_remote_post: false,
             conflict_handling: 1,
-            signature_hash_key: 'source_reference',
+            signature_hash_key: refKey,
             signature_sub_storage: {
                 type: 'query',
-                sub_storage: merge({
+                sub_storage: merge(signatureSubStorage, {
                     database: database + "-messages-signatures"
-                }, localStorageOptions)
+                })
             },
             query: {
                 query: query,
@@ -117,15 +144,14 @@ var ClearRoad = /** @class */ (function () {
             check_remote_modification: false,
             check_remote_creation: true,
             check_remote_deletion: false,
-            local_sub_storage: {
-                type: 'query',
-                sub_storage: merge({
-                    database: database
-                }, localStorageOptions)
-            },
+            local_sub_storage: this.useLocalStorage ? localSubStorage : merge(mappingSubStorage, {
+                mapping_dict: {
+                    portal_type: ['equalSubProperty', refKey]
+                }
+            }),
             remote_sub_storage: {
                 type: 'mapping',
-                id: ['equalSubProperty', 'source_reference'],
+                id: ['equalSubProperty', refKey],
                 sub_storage: {
                     type: 'erp5',
                     url: url,
@@ -134,21 +160,22 @@ var ClearRoad = /** @class */ (function () {
                 }
             }
         });
+        refKey = 'destination_reference';
         query = 'portal_type:(' +
             '"Road Account Message" OR "Road Event Message" OR "Road Message" ' +
             'OR "Billing Period Message" OR "Road Report Request")' +
-            ' AND validation_state:("processed" OR "rejected")';
+            ' AND validation_state:("processed" OR "rejected")' + queryMaxDate;
         this.ingestionReportStorage = jIO.createJIO({
             type: 'replicate',
             parallel_operation_amount: 1,
             use_remote_post: false,
             conflict_handling: 1,
-            signature_hash_key: 'destination_reference',
+            signature_hash_key: refKey,
             signature_sub_storage: {
                 type: 'query',
-                sub_storage: merge({
+                sub_storage: merge(signatureSubStorage, {
                     database: database + "-ingestion-signatures"
-                }, localStorageOptions)
+                })
             },
             query: {
                 query: query,
@@ -160,16 +187,15 @@ var ClearRoad = /** @class */ (function () {
             check_local_deletion: false,
             check_remote_modification: false,
             check_remote_creation: true,
-            check_remote_deletion: true,
-            local_sub_storage: {
-                type: 'query',
-                sub_storage: merge({
-                    database: database
-                }, localStorageOptions)
-            },
+            check_remote_deletion: false,
+            local_sub_storage: this.useLocalStorage ? localSubStorage : merge(mappingSubStorage, {
+                mapping_dict: {
+                    portal_type: ['equalSubProperty', refKey]
+                }
+            }),
             remote_sub_storage: {
                 type: 'mapping',
-                id: ['equalSubProperty', 'destination_reference'],
+                id: ['equalSubProperty', refKey],
                 sub_storage: {
                     type: 'erp5',
                     url: url,
@@ -178,18 +204,19 @@ var ClearRoad = /** @class */ (function () {
                 }
             }
         });
-        query = 'portal_type:("Road Account" OR "Road Event" OR "Road Transaction")';
+        refKey = 'source_reference';
+        query = 'portal_type:("Road Account" OR "Road Event" OR "Road Transaction")' + queryMaxDate;
         this.directoryStorage = jIO.createJIO({
             type: 'replicate',
             parallel_operation_amount: 1,
             use_remote_post: false,
             conflict_handling: 1,
-            signature_hash_key: 'source_reference',
+            signature_hash_key: refKey,
             signature_sub_storage: {
                 type: 'query',
-                sub_storage: merge({
+                sub_storage: merge(signatureSubStorage, {
                     database: database + "-directory-signatures"
-                }, localStorageOptions)
+                })
             },
             query: {
                 query: query,
@@ -201,16 +228,15 @@ var ClearRoad = /** @class */ (function () {
             check_local_deletion: false,
             check_remote_modification: false,
             check_remote_creation: true,
-            check_remote_deletion: true,
-            local_sub_storage: {
-                type: 'query',
-                sub_storage: merge({
-                    database: database
-                }, localStorageOptions)
-            },
+            check_remote_deletion: false,
+            local_sub_storage: this.useLocalStorage ? localSubStorage : merge(mappingSubStorage, {
+                mapping_dict: {
+                    portal_type: ['equalSubProperty', refKey]
+                }
+            }),
             remote_sub_storage: {
                 type: 'mapping',
-                id: ['equalSubProperty', 'source_reference'],
+                id: ['equalSubProperty', refKey],
                 sub_storage: {
                     type: 'erp5',
                     url: url,
@@ -219,19 +245,33 @@ var ClearRoad = /** @class */ (function () {
                 }
             }
         });
-        query = 'portal_type:("File")';
+        refKey = 'reference';
+        query = 'portal_type:("File")' + queryMaxDate;
+        var mappingStorageWithEnclosure = merge(mappingSubStorage, {
+            attachment_list: ['data'],
+            attachment: {
+                data: {
+                    get: { uri_template: 'enclosure' },
+                    put: { uri_template: 'enclosure' }
+                }
+            }
+        });
         this.reportStorage = jIO.createJIO({
             type: 'replicate',
             parallel_operation_amount: 1,
             use_remote_post: false,
             conflict_handling: 1,
-            signature_hash_key: 'reference',
-            signature_sub_storage: {
+            signature_hash_key: 'source_reference',
+            signature_sub_storage: this.useLocalStorage ? {
                 type: 'query',
-                sub_storage: merge({
+                sub_storage: merge(signatureSubStorage, {
                     database: database + "-files-signatures"
-                }, localStorageOptions)
-            },
+                })
+            } : merge(mappingStorageWithEnclosure, {
+                mapping_dict: {
+                    portal_type: ['equalSubProperty', 'source_reference']
+                }
+            }),
             query: {
                 query: query,
                 sort_on: [['modification_date', 'descending']],
@@ -242,22 +282,21 @@ var ClearRoad = /** @class */ (function () {
             check_local_deletion: false,
             check_remote_modification: false,
             check_remote_creation: true,
-            check_remote_deletion: true,
+            check_remote_deletion: false,
             check_remote_attachment_creation: true,
             check_remote_attachment_modification: false,
             check_remote_attachment_deletion: true,
             check_local_attachment_creation: false,
             check_local_attachment_modification: false,
             check_local_attachment_deletion: false,
-            local_sub_storage: {
-                type: 'query',
-                sub_storage: merge({
-                    database: database
-                }, localStorageOptions)
-            },
+            local_sub_storage: this.useLocalStorage ? localSubStorage : merge(mappingStorageWithEnclosure, {
+                mapping_dict: {
+                    portal_type: ['equalSubProperty', refKey]
+                }
+            }),
             remote_sub_storage: {
                 type: 'mapping',
-                id: ['equalSubProperty', 'reference'],
+                id: ['equalSubProperty', refKey],
                 attachment_list: ['data'],
                 attachment: {
                     data: {
@@ -324,13 +363,18 @@ var ClearRoad = /** @class */ (function () {
         var _this = this;
         if (progress === void 0) { progress = function () { }; }
         var queue = new RSVP.Queue();
-        return queue.push(function () {
-            return RSVP.all([
-                _this.messagesStorage.repair().push(function () { return progress('messages'); }),
-                _this.ingestionReportStorage.repair().push(function () { return progress('ingestion-reports'); }),
-                _this.directoryStorage.repair().push(function () { return progress('directories'); }),
-                _this.reportStorage.repair().push(function () { return progress('reports'); })
-            ]);
+        return queue
+            .push(function () {
+            return _this.messagesStorage.repair().push(function () { return progress('messages'); });
+        })
+            .push(function () {
+            return _this.ingestionReportStorage.repair().push(function () { return progress('ingestion-reports'); });
+        })
+            .push(function () {
+            return _this.directoryStorage.repair().push(function () { return progress('directories'); });
+        })
+            .push(function () {
+            return _this.reportStorage.repair().push(function () { return progress('reports'); });
         });
     };
     /**
@@ -341,13 +385,14 @@ var ClearRoad = /** @class */ (function () {
         return this.messagesStorage.allDocs(options);
     };
     /**
-     * Get an attachment from the API.
-     * @param id The id of the attachment
-     * @param name The name of the attachment
-     * @param options Attachment options.
+     * Get a report from the API.
+     * @param id The id of the report
      */
-    ClearRoad.prototype.getAttachment = function (id, name, options) {
-        return this.reportStorage.getAttachment(id, name, options);
+    ClearRoad.prototype.getReport = function (id) {
+        if (this.useLocalStorage) {
+            return this.reportStorage.getAttachment(id, 'data');
+        }
+        return this.reportStorage.allAttachments(id);
     };
     return ClearRoad;
 }());

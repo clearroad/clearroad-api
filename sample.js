@@ -15,8 +15,10 @@
     var accessToken = document.querySelector("[name='token']").value || null;
     var typeAccessToken = document.querySelector("[name='type_token']").value || null;
     window.cr = new ClearRoad(url, accessToken, {
-      type: type,
-      accessToken: typeAccessToken
+      localStorage: {
+        type: type,
+        accessToken: typeAccessToken
+      }
     });
 
     eval(document.querySelector("[name='usercode']").value);

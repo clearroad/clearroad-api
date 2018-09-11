@@ -51,24 +51,16 @@ DROPBOX_ACCESS_TOKEN=<access token>
 const dotenv = require('dotenv');
 dotenv.config();
 const cr = new ClearRoad(process.env.CLEARROAD_URL, process.env.CLEARROAD_ACCESS_TOKEN, {
-  type: 'dropbox',
-  accessToken: process.env.DROPBOX_ACCESS_TOKEN
+  localStorage: {
+    type: 'dropbox',
+    accessToken: process.env.DROPBOX_ACCESS_TOKEN
+  }
 });
 ```
 
 The ClearRoad API is based on a synchronization process, which will effectively synchronize data from the API to a "local" storage. This local storage can be on a local server, on the browser, or on a remote server.
 
-By default, the api will use `indexeddb` as local storage. If you want to change the storage (or if you are using node and you need to), you can use:
-
-`new ClearRoad('apiUrl', 'accessToken', options);`
-
-### Storage options
-
-Type | Description | Options | Support | Need access token
---------- | --------- | ----------- | ----------- | -----------
-indexeddb | Native Browser IndexedDB storage | type: string | Browser only | No
-dropbox | Storage data in a dropbox account | type: string, accessToken: string | Browser and Node | Yes
-gdrive | Storage data in a google drive account | type: string, accessToken: string | Browser and Node | Yes
+By default, the api will use `indexeddb` as local storage. If you want to change the storage (or if you are using node and you need to), please refer to [the ClearRoad reference](#constructor).
 
 ## Step 4. Retrieve messages
 

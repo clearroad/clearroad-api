@@ -12,6 +12,7 @@ class FakeJio {
   allDocs() {}
   repair() {}
   getAttachment() {}
+  allAttachments() {}
 }
 
 describe('ClearRoad', () => {
@@ -38,6 +39,11 @@ describe('ClearRoad', () => {
     it('should init a report storage', () => {
       const cr = new ClearRoad(url);
       expect((cr as any).reportStorage != undefined).toEqual(true);
+    });
+
+    it('should defaul to local storage', () => {
+      const cr = new ClearRoad(url);
+      expect((cr as any).useLocalStorage).toEqual(true);
     });
   });
 
@@ -216,18 +222,38 @@ describe('ClearRoad', () => {
     });
   });
 
-  describe('.getAttachment', () => {
+  describe('.getReport', () => {
     let cr;
     let getAttachmentSpy: jasmine.Spy;
+    let allAttachmentsSpy: jasmine.Spy;
+    const id = 'reportId';
 
     beforeEach(() => {
       cr = new ClearRoad(url);
-      getAttachmentSpy = spyOn((cr as any).messagesStorage, 'getAttachment').and.callFake(options => options);
+      getAttachmentSpy = spyOn((cr as any).reportStorage, 'getAttachment').and.callFake(options => options);
+      allAttachmentsSpy = spyOn((cr as any).reportStorage, 'allAttachments').and.callFake(options => options);
     });
 
-    it('should get the report', async () => {
-      await cr.getAttachment();
-      expect(getAttachmentSpy).toHaveBeenCalled();
+    describe('not using local storage', () => {
+      beforeEach(() => {
+        cr.useLocalStorage = false;
+      });
+
+      it('should get the report', async () => {
+        await cr.getReport(id);
+        expect(allAttachmentsSpy).toHaveBeenCalledWith(id);
+      });
+    });
+
+    describe('using local storage', () => {
+      beforeEach(() => {
+        cr.useLocalStorage = true;
+      });
+
+      it('should get the report', async () => {
+        await cr.getReport(id);
+        expect(getAttachmentSpy).toHaveBeenCalledWith(id, 'data');
+      });
     });
   });
 });

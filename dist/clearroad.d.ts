@@ -4,9 +4,12 @@ export interface IQueue {
 export declare type Queue = () => IQueue;
 export declare type storageName = 'messages' | 'ingestion-reports' | 'directories' | 'reports';
 export declare type localStorageType = 'indexeddb' | 'dropbox' | 'gdrive';
-export interface ILocalStorageOptions {
-    type: localStorageType;
-    accessToken?: string;
+export interface IOptions {
+    localStorage?: {
+        type: localStorageType;
+        accessToken?: string;
+    };
+    maxDate?: Date | number | string;
 }
 export interface IAttachmentOptions {
     format: 'text' | 'json' | 'blob' | 'data_url' | 'array_buffer';
@@ -65,13 +68,14 @@ export declare class ClearRoad {
     private ingestionReportStorage;
     private directoryStorage;
     private reportStorage;
+    private useLocalStorage;
     /**
      * Instantiate a ClearRoad api instance.
      * @param url ClearRoad API url
      * @param accessToken ClearRoad API access token (required when using Node)
-     * @param localStorageOptions Override default options
+     * @param options Override default options
      */
-    constructor(url: string, accessToken?: string, localStorageOptions?: ILocalStorageOptions);
+    constructor(url: string, accessToken?: string, options?: IOptions);
     /**
      * Post a message to the ClearRoad API.
      * If not currently connected, messages will be put in the local storage and sent later when using `.sync()`
@@ -91,10 +95,8 @@ export declare class ClearRoad {
      */
     allDocs(options?: IQueryOptions): IQueue;
     /**
-     * Get an attachment from the API.
-     * @param id The id of the attachment
-     * @param name The name of the attachment
-     * @param options Attachment options.
+     * Get a report from the API.
+     * @param id The id of the report
      */
-    getAttachment(id: string, name: string, options?: IAttachmentOptions): IQueue;
+    getReport(id: string): IQueue;
 }

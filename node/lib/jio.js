@@ -1271,7 +1271,7 @@ return new Parser;
       }
     }
 
-    if (option.sort_on) {
+    if (option.sort_on && option.sort_on.length) {
       sortOn(option.sort_on, item_list, this._key_schema);
     }
 
@@ -5331,14 +5331,20 @@ jIO.util.ajax = function ajax(param) {
     if (query !== undefined) {
       query = Query.objectToSearchText(query);
     }
-    return this._sub_storage.allDocs(
-      {
-        query: query,
-        select_list: select_list,
-        sort_on: sort_on,
-        limit: option.limit
-      }
-    )
+    var queryOptions = {};
+    if (query) {
+      queryOptions.query = query;
+    }
+    if (select_list) {
+      queryOptions.select_list = select_list;
+    }
+    if (sort_on) {
+      queryOptions.sort_on = sort_on;
+    }
+    if (option.limit) {
+      queryOptions.limit = option.limit;
+    }
+    return this._sub_storage.allDocs(queryOptions)
       .push(function (result) {
         var sub_doc, map_info = storage._map_id || ["equalSubId"];
         for (i = 0; i < result.data.total_rows; i += 1) {

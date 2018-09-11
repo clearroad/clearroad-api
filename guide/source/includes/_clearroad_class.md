@@ -8,7 +8,7 @@ The `ClearRoad` class contains a subset of functions from the [jio.js](https://j
 new ClearRoad('apiUrl', 'accessToken');
 ```
 
-`new ClearRoad(url, accessToken)`
+`new ClearRoad(url, accessToken, options)`
 
 Initialise a new ClearRoad object to interact with the ERP5 storage.
 
@@ -16,6 +16,16 @@ Property | Description
 --------- | -----------
 url | Url of the storage
 accessToken | Optional. Access token to authenticate on ERP5 (if necessary)
+options.localStorage.type | View [types](#local-storage-types) below
+options.localStorage.accessToken | Access token (if required)
+
+### Local Storage Types
+
+Type | Description | Options | Support | Need access token
+--------- | --------- | ----------- | ----------- | -----------
+indexeddb | Native Browser IndexedDB storage | type: string | Browser only | No
+dropbox | Storage data in a dropbox account | type: string, accessToken: string | Browser and Node | Yes
+gdrive | Storage data in a google drive account | type: string, accessToken: string | Browser and Node | Yes
 
 ## post
 
@@ -100,20 +110,16 @@ sort_on (optional) | List of fields to sort on, each specifying the order with `
 select_list | When provided, the response has a `value` containing the values of these keys for each document
 include_docs | When `true`, the response has a `doc` containing the full metadata for each document
 
-## getAttachment
+## getReport
 
 ```javascript
-const attachment = await cr.getAttachment(id, name, {
-  format: 'text'
-});
+const report = await cr.getReport(id);
 ```
 
-`getAttachment(id, name, options)`
+`getReport(id)`
 
-Retrieve the attachment with the given `name` from the document with the given `ID`.
+Retrieve the report with the given `id`.
 
 Property | Description
 --------- | -----------
-id | Id of the document
-name | Name of the attachment
-options.format | Format of the returned attachment. Can be `text`, `json`, `Blob`, `DataURL`, or `ArrayBuffer`
+id | Id (reference) of the report

@@ -45,12 +45,14 @@ const cr = new ClearRoad('apiUrl', 'accessToken');
 By default, the api will use `indexeddb` as local storage. If you want to change the storage (or if you are using node and you need to), you can use:
 ```javascript
 const cr = new ClearRoad('apiUrl', 'accessToken', {
-  type: 'dropbox',
-  accessToken: 'accessToken'
+  localStorage: {
+    type: 'dropbox',
+    accessToken: 'accessToken'
+  }
 });
 ```
 
-The options are:
+`options.localStorage.types`
 
 Type | Description | Options | Support | Need access token
 --------- | --------- | ----------- | ----------- | -----------
