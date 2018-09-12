@@ -205,7 +205,7 @@
       <script src="javascripts/all.js"></script>
   </head>
 
-  <body class="index" data-languages="[&quot;javascript--node&quot;,&quot;javascript--browser&quot;]">
+  <body class="index" data-languages="[&quot;javascript--node&quot;,&quot;javascript--browser&quot;,&quot;javascript--browser-es6&quot;]">
     <a href="#" id="nav-button">
       <span>
         NAV
@@ -221,7 +221,7 @@
         <ul>
           <li>
             <a href='https://github.com/clearroad/clearroad-api/' target='_blank'>
-              <i class="fab fa-github"></i><span>Source code</span>
+              <i class="fab fa-github"></i><span>SDK Source code</span>
             </a>
           </li>
           <li>
@@ -240,7 +240,8 @@
     <div class="toc-wrapper">
         <div class="lang-selector">
               <a href="#" data-language-name="javascript--node">Node.js</a>
-              <a href="#" data-language-name="javascript--browser">Browser (es6)</a>
+              <a href="#" data-language-name="javascript--browser">JavaScript (es5)</a>
+              <a href="#" data-language-name="javascript--browser-es6">JavaScript (es6)</a>
         </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
@@ -248,7 +249,7 @@
         <ul class="search-results"></ul>
       <ul id="toc" class="toc-list-h1">
           <li>
-            <a href="#overview" class="toc-h1 toc-link" data-title="Overview">Overview</a>
+            <a href="#introduction" class="toc-h1 toc-link" data-title="Introduction">Introduction</a>
           </li>
           <li>
             <a href="#quickstart" class="toc-h1 toc-link" data-title="QuickStart">QuickStart</a>
@@ -292,8 +293,8 @@
     <div class="page-wrapper">
       <div class="dark-box"></div>
       <div class="content">
-        <h1 id='overview'>Overview</h1>
-<p>Welcome to the ClearRoad API guides!</p>
+        <h1 id='introduction'>Introduction</h1>
+<p>Welcome to the ClearRoad API!</p>
 
 <p>ClearRoad is an online platform that aims to centralize data in the Road Usage Charging industry and standardize its format.</p>
 
@@ -313,7 +314,10 @@ Open a terminal window in your project and nstall the dependency using the comma
 <pre class="highlight html tab-html"><code><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"https://clearroadlab.azureedge.net/lib/rsvp.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
 <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"https://clearroadlab.azureedge.net/lib/jio.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
 <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"https://clearroadlab.azureedge.net/api/clearroad.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
-</code></pre><h2 id='step-2-create-a-new-clearroad-instance'>Step 2. Create a new ClearRoad instance</h2><pre class="highlight javascript tab-javascript--browser"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">ClearRoad</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'@clearroad/api'</span><span class="p">;</span>
+</code></pre><h2 id='step-2-create-a-new-clearroad-instance'>Step 2. Create a new ClearRoad instance</h2><pre class="highlight javascript tab-javascript--browser"><code><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">ClearRoad</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">cr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ClearRoad</span><span class="p">(</span><span class="s1">'apiUrl'</span><span class="p">,</span> <span class="s1">'accessToken'</span><span class="p">);</span>
+<span class="p">})(</span><span class="nx">ClearRoad</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript tab-javascript--browser-es6"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">ClearRoad</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'@clearroad/api'</span><span class="p">;</span>
 <span class="kr">const</span> <span class="nx">cr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ClearRoad</span><span class="p">(</span><span class="s1">'apiUrl'</span><span class="p">,</span> <span class="s1">'accessToken'</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript tab-javascript--node"><code><span class="kr">const</span> <span class="nx">ClearRoad</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'@clearroad/api/node'</span><span class="p">).</span><span class="nx">ClearRoad</span><span class="p">;</span>
 <span class="kr">const</span> <span class="nx">cr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ClearRoad</span><span class="p">(</span><span class="s1">'apiUrl'</span><span class="p">,</span> <span class="s1">'accessToken'</span><span class="p">);</span>
@@ -340,10 +344,20 @@ If you do not have an access token, you can request one on the <a href="https://
 <p>The ClearRoad API is based on a synchronization process, which will effectively synchronize data from the API to a &quot;local&quot; storage. This local storage can be on a local server, on the browser, or on a remote server.</p>
 
 <p>By default, the api will use <code>indexeddb</code> as local storage. If you want to change the storage (or if you are using node and you need to), please refer to <a href="#constructor">the ClearRoad reference</a>.</p>
-<h2 id='step-4-retrieve-messages'>Step 4. Retrieve messages</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">();</span>
+<h2 id='step-4-retrieve-messages'>Step 4. Retrieve messages</h2><pre class="highlight javascript tab-javascript--browser"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'sync done'</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">();</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">results</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre><pre class="highlight javascript tab-javascript--browser-es6"><code><span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">();</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'sync done'</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">results</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">();</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">results</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript tab-javascript--node"><code><span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">();</span>
+<span class="kr">const</span> <span class="nx">results</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">();</span>
 </code></pre>
 <p>Now that you&#39;re all setup, you can start by synchronizing your local storage and then query the data.</p>
 <h1 id='sdk-reference'>SDK reference</h1>
@@ -409,7 +423,7 @@ If you do not have an access token, you can request one on the <a href="https://
 <td>Yes</td>
 </tr>
 </tbody></table>
-<h2 id='post'>post</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
+<h2 id='post'>post</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
   <span class="na">key1</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">,</span>
   <span class="na">key2</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
     <span class="s2">"subkey"</span><span class="p">:</span> <span class="s2">"subvalue"</span>
@@ -431,7 +445,7 @@ If you do not have an access token, you can request one on the <a href="https://
 <td>Data to post. Each <code>value</code> paired with a <code>key</code> must be a <code>string</code>.</td>
 </tr>
 </tbody></table>
-<h2 id='sync'>sync</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">();</span>
+<h2 id='sync'>sync</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">();</span>
 </code></pre>
 <p><code>sync()</code></p>
 
@@ -440,8 +454,24 @@ If you do not have an access token, you can request one on the <a href="https://
 <blockquote>
 <p>Query the documents:</p>
 </blockquote>
-<pre class="highlight javascript tab-javascript"><code><span class="c1">// make sure you have the latest data locally</span>
-<span class="kr">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">({</span>
+<pre class="highlight javascript tab-javascript--browser"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">({</span>
+  <span class="na">query</span><span class="p">:</span> <span class="nx">query_object</span><span class="p">,</span>
+  <span class="na">limit</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">42</span><span class="p">],</span>
+  <span class="na">sort_on</span><span class="p">:</span> <span class="p">[[</span><span class="s1">'key1'</span><span class="p">,</span> <span class="s1">'ascending'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'key2'</span><span class="p">,</span> <span class="s1">'descending'</span><span class="p">]],</span>
+  <span class="na">select_list</span><span class="p">:</span> <span class="p">[</span><span class="s1">'key1'</span><span class="p">,</span> <span class="s1">'key2'</span><span class="p">,</span> <span class="s1">'key3'</span><span class="p">],</span>
+  <span class="na">include_docs</span><span class="p">:</span> <span class="kc">false</span>
+<span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// read rows in result.rows</span>
+<span class="p">})</span>
+</code></pre><pre class="highlight javascript tab-javascript--browser-es6"><code><span class="kr">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">({</span>
+  <span class="na">query</span><span class="p">:</span> <span class="nx">query_object</span><span class="p">,</span>
+  <span class="na">limit</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">42</span><span class="p">],</span>
+  <span class="na">sort_on</span><span class="p">:</span> <span class="p">[[</span><span class="s1">'key1'</span><span class="p">,</span> <span class="s1">'ascending'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'key2'</span><span class="p">,</span> <span class="s1">'descending'</span><span class="p">]],</span>
+  <span class="na">select_list</span><span class="p">:</span> <span class="p">[</span><span class="s1">'key1'</span><span class="p">,</span> <span class="s1">'key2'</span><span class="p">,</span> <span class="s1">'key3'</span><span class="p">],</span>
+  <span class="na">include_docs</span><span class="p">:</span> <span class="kc">false</span>
+<span class="p">});</span>
+<span class="c1">// read rows in result.rows</span>
+</code></pre><pre class="highlight javascript tab-javascript--node"><code><span class="kr">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">({</span>
   <span class="na">query</span><span class="p">:</span> <span class="nx">query_object</span><span class="p">,</span>
   <span class="na">limit</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">42</span><span class="p">],</span>
   <span class="na">sort_on</span><span class="p">:</span> <span class="p">[[</span><span class="s1">'key1'</span><span class="p">,</span> <span class="s1">'ascending'</span><span class="p">],</span> <span class="p">[</span><span class="s1">'key2'</span><span class="p">,</span> <span class="s1">'descending'</span><span class="p">]],</span>
@@ -506,7 +536,11 @@ If you do not have an access token, you can request one on the <a href="https://
 <td>When <code>true</code>, the response has a <code>doc</code> containing the full metadata for each document</td>
 </tr>
 </tbody></table>
-<h2 id='getreport'>getReport</h2><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+<h2 id='getreport'>getReport</h2><pre class="highlight javascript tab-javascript--browser"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">report</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// read report</span>
+<span class="p">})</span>
+</code></pre><pre class="highlight javascript tab-javascript--browser-es6"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript tab-javascript--node"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
 </code></pre>
 <p><code>getReport(id)</code></p>
 
@@ -528,7 +562,8 @@ If you do not have an access token, you can request one on the <a href="https://
       <div class="dark-box">
           <div class="lang-selector">
                 <a href="#" data-language-name="javascript--node">Node.js</a>
-                <a href="#" data-language-name="javascript--browser">Browser (es6)</a>
+                <a href="#" data-language-name="javascript--browser">JavaScript (es5)</a>
+                <a href="#" data-language-name="javascript--browser-es6">JavaScript (es6)</a>
           </div>
       </div>
     </div>
