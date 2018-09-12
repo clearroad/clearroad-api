@@ -1,6 +1,6 @@
-# Overview
+# Introduction
 
-Welcome to the ClearRoad API guides!
+Welcome to the ClearRoad API!
 
 ClearRoad is an online platform that aims to centralize data in the Road Usage Charging industry and standardize its format.
 

@@ -22,6 +22,12 @@ If you want to include the files directly in your page, you can include via our 
 ## Step 2. Create a new ClearRoad instance
 
 ```javascript--browser
+(function(ClearRoad) {
+  const cr = new ClearRoad('apiUrl', 'accessToken');
+})(ClearRoad);
+```
+
+```javascript--browser-es6
 import { ClearRoad } from '@clearroad/api';
 const cr = new ClearRoad('apiUrl', 'accessToken');
 ```
@@ -64,11 +70,27 @@ By default, the api will use `indexeddb` as local storage. If you want to change
 
 ## Step 4. Retrieve messages
 
-```javascript
+```javascript--browser
+cr.sync()
+  .then(function() {
+    console.log('sync done');
+    return cr.allDocs();
+  })
+  .then(function(results) {
+    console.log(results);
+  });
+```
+
+```javascript--browser-es6
 await cr.sync();
 console.log('sync done');
 const results = await cr.allDocs();
 console.log(results);
+```
+
+```javascript--node
+await cr.sync();
+const results = await cr.allDocs();
 ```
 
 Now that you're all setup, you can start by synchronizing your local storage and then query the data.

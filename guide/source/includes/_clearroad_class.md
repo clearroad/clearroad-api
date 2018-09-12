@@ -30,7 +30,7 @@ gdrive | Storage data in a google drive account | type: string, accessToken: str
 ## post
 
 ```javascript
-await cr.post({
+cr.post({
   key1: "value",
   key2: JSON.stringify({
     "subkey": "subvalue"
@@ -49,7 +49,7 @@ data | Data to post. Each `value` paired with a `key` must be a `string`.
 ## sync
 
 ```javascript
-await cr.sync();
+cr.sync();
 ```
 
 `sync()`
@@ -60,8 +60,30 @@ Similar to the `repair` method of `jio`, this will synchronize or repair the sto
 
 > Query the documents:
 
-```javascript
-// make sure you have the latest data locally
+```javascript--browser
+cr.allDocs({
+  query: query_object,
+  limit: [3, 42],
+  sort_on: [['key1', 'ascending'], ['key2', 'descending']],
+  select_list: ['key1', 'key2', 'key3'],
+  include_docs: false
+}).then(function(result) {
+  // read rows in result.rows
+})
+```
+
+```javascript--browser-es6
+const result = await cr.allDocs({
+  query: query_object,
+  limit: [3, 42],
+  sort_on: [['key1', 'ascending'], ['key2', 'descending']],
+  select_list: ['key1', 'key2', 'key3'],
+  include_docs: false
+});
+// read rows in result.rows
+```
+
+```javascript--node
 const result = await cr.allDocs({
   query: query_object,
   limit: [3, 42],
@@ -112,7 +134,17 @@ include_docs | When `true`, the response has a `doc` containing the full metadat
 
 ## getReport
 
-```javascript
+```javascript--browser
+cr.getReport(id).then(function(report) {
+  // read report
+})
+```
+
+```javascript--browser-es6
+const report = await cr.getReport(id);
+```
+
+```javascript--node
 const report = await cr.getReport(id);
 ```
 
