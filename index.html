@@ -210,8 +210,27 @@
         <img src="images/navbar.png" alt="Navbar" />
       </span>
     </a>
+    <div class="navbar-container">
+      <nav class="navbar">
+        <a class="logo-container" href="/">
+          <img src="images/logo.svg" class="logo" alt="Logo" />
+          <span>API</span>
+        </a>
+        <ul>
+          <li>
+            <a href="https://api.clearroadev.xyz/docs/">
+              <i class="fas fa-terminal"></i><span>Try it</span>
+            </a>
+          </li>
+          <li>
+            <a href='https://github.com/clearroad/clearroad-api/' target='_blank'>
+              <i class="fab fa-github"></i><span>Source code</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
     <div class="toc-wrapper">
-      <img src="images/logo.svg" class="logo" alt="Logo" />
         <div class="lang-selector">
               <a href="#" data-language-name="javascript--node">Node.js</a>
               <a href="#" data-language-name="javascript--browser">Browser (es6)</a>
@@ -257,15 +276,11 @@
                     <a href="#alldocs" class="toc-h2 toc-link" data-title="allDocs">allDocs</a>
                   </li>
                   <li>
-                    <a href="#getattachment" class="toc-h2 toc-link" data-title="getAttachment">getAttachment</a>
+                    <a href="#getreport" class="toc-h2 toc-link" data-title="getReport">getReport</a>
                   </li>
               </ul>
           </li>
       </ul>
-        <ul class="toc-footer">
-            <li><a href='https://api.clearroadev.xyz/docs/'>Try it!</a></li>
-            <li><a href='https://github.com/clearroad/clearroad-api/' target='_blank'>Source code</a></li>
-        </ul>
     </div>
     <div class="page-wrapper">
       <div class="dark-box"></div>
@@ -309,16 +324,53 @@ If you do not have an access token, you can request one on the <a href="https://
 <span class="kr">const</span> <span class="nx">dotenv</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'dotenv'</span><span class="p">);</span>
 <span class="nx">dotenv</span><span class="p">.</span><span class="nx">config</span><span class="p">();</span>
 <span class="kr">const</span> <span class="nx">cr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ClearRoad</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">CLEARROAD_URL</span><span class="p">,</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">CLEARROAD_ACCESS_TOKEN</span><span class="p">,</span> <span class="p">{</span>
-  <span class="na">type</span><span class="p">:</span> <span class="s1">'dropbox'</span><span class="p">,</span>
-  <span class="na">accessToken</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DROPBOX_ACCESS_TOKEN</span>
+  <span class="na">localStorage</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">type</span><span class="p">:</span> <span class="s1">'dropbox'</span><span class="p">,</span>
+    <span class="na">accessToken</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DROPBOX_ACCESS_TOKEN</span>
+  <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
 <p>The ClearRoad API is based on a synchronization process, which will effectively synchronize data from the API to a &quot;local&quot; storage. This local storage can be on a local server, on the browser, or on a remote server.</p>
 
-<p>By default, the api will use <code>indexeddb</code> as local storage. If you want to change the storage (or if you are using node and you need to), you can use:</p>
+<p>By default, the api will use <code>indexeddb</code> as local storage. If you want to change the storage (or if you are using node and you need to), please refer to <a href="#constructor">the ClearRoad reference</a>.</p>
+<h2 id='step-4-retrieve-messages'>Step 4. Retrieve messages</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'sync done'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">results</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">results</span><span class="p">);</span>
+</code></pre>
+<p>Now that you&#39;re all setup, you can start by synchronizing your local storage and then query the data.</p>
+<h1 id='sdk-reference'>SDK reference</h1>
+<p>The <code>ClearRoad</code> class contains a subset of functions from the <a href="https://jio.nexedi.com/">jio.js</a> library, which uses <a href="https://lab.nexedi.com/nexedi/rsvp.js">RSVP.js</a> to chain functions like Promises.</p>
+<h2 id='constructor'>constructor</h2><pre class="highlight javascript tab-javascript"><code><span class="k">new</span> <span class="nx">ClearRoad</span><span class="p">(</span><span class="s1">'apiUrl'</span><span class="p">,</span> <span class="s1">'accessToken'</span><span class="p">);</span>
+</code></pre>
+<p><code>new ClearRoad(url, accessToken, options)</code></p>
 
-<p><code>new ClearRoad(&#39;apiUrl&#39;, &#39;accessToken&#39;, options);</code></p>
-<h3 id='storage-options'>Storage options</h3>
+<p>Initialise a new ClearRoad object to interact with the ERP5 storage.</p>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>url</td>
+<td>Url of the storage</td>
+</tr>
+<tr>
+<td>accessToken</td>
+<td>Optional. Access token to authenticate on ERP5 (if necessary)</td>
+</tr>
+<tr>
+<td>options.localStorage.type</td>
+<td>View <a href="#local-storage-types">types</a> below</td>
+</tr>
+<tr>
+<td>options.localStorage.accessToken</td>
+<td>Access token (if required)</td>
+</tr>
+</tbody></table>
+<h3 id='local-storage-types'>Local Storage Types</h3>
 <table><thead>
 <tr>
 <th>Type</th>
@@ -348,35 +400,6 @@ If you do not have an access token, you can request one on the <a href="https://
 <td>type: string, accessToken: string</td>
 <td>Browser and Node</td>
 <td>Yes</td>
-</tr>
-</tbody></table>
-<h2 id='step-4-retrieve-messages'>Step 4. Retrieve messages</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">();</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'sync done'</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">results</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">();</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">results</span><span class="p">);</span>
-</code></pre>
-<p>Now that you&#39;re all setup, you can start by synchronizing your local storage and then query the data.</p>
-<h1 id='sdk-reference'>SDK reference</h1>
-<p>The <code>ClearRoad</code> class contains a subset of functions from the <a href="https://jio.nexedi.com/">jio.js</a> library, which uses <a href="https://lab.nexedi.com/nexedi/rsvp.js">RSVP.js</a> to chain functions like Promises.</p>
-<h2 id='constructor'>constructor</h2><pre class="highlight javascript tab-javascript"><code><span class="k">new</span> <span class="nx">ClearRoad</span><span class="p">(</span><span class="s1">'apiUrl'</span><span class="p">,</span> <span class="s1">'accessToken'</span><span class="p">);</span>
-</code></pre>
-<p><code>new ClearRoad(url, accessToken)</code></p>
-
-<p>Initialise a new ClearRoad object to interact with the ERP5 storage.</p>
-
-<table><thead>
-<tr>
-<th>Property</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>url</td>
-<td>Url of the storage</td>
-</tr>
-<tr>
-<td>accessToken</td>
-<td>Optional. Access token to authenticate on ERP5 (if necessary)</td>
 </tr>
 </tbody></table>
 <h2 id='post'>post</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
@@ -476,13 +499,11 @@ If you do not have an access token, you can request one on the <a href="https://
 <td>When <code>true</code>, the response has a <code>doc</code> containing the full metadata for each document</td>
 </tr>
 </tbody></table>
-<h2 id='getattachment'>getAttachment</h2><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">attachment</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getAttachment</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="p">{</span>
-  <span class="na">format</span><span class="p">:</span> <span class="s1">'text'</span>
-<span class="p">});</span>
+<h2 id='getreport'>getReport</h2><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
 </code></pre>
-<p><code>getAttachment(id, name, options)</code></p>
+<p><code>getReport(id)</code></p>
 
-<p>Retrieve the attachment with the given <code>name</code> from the document with the given <code>ID</code>.</p>
+<p>Retrieve the report with the given <code>id</code>.</p>
 
 <table><thead>
 <tr>
@@ -492,15 +513,7 @@ If you do not have an access token, you can request one on the <a href="https://
 </thead><tbody>
 <tr>
 <td>id</td>
-<td>Id of the document</td>
-</tr>
-<tr>
-<td>name</td>
-<td>Name of the attachment</td>
-</tr>
-<tr>
-<td>options.format</td>
-<td>Format of the returned attachment. Can be <code>text</code>, <code>json</code>, <code>Blob</code>, <code>DataURL</code>, or <code>ArrayBuffer</code></td>
+<td>Id (reference) of the report</td>
 </tr>
 </tbody></table>
 
