@@ -52,8 +52,27 @@ under the License.
         <%= image_tag('navbar.png') %>
       </span>
     </a>
+    <div class="navbar-container">
+      <nav class="navbar">
+        <a class="logo-container" href="/">
+          <%= image_tag "logo.svg", class: 'logo' %>
+          <span>API</span>
+        </a>
+        <ul>
+          <li>
+            <a href="https://api.clearroadev.xyz/docs/">
+              <i class="fas fa-terminal"></i><span>Try it</span>
+            </a>
+          </li>
+          <li>
+            <a href='https://github.com/clearroad/clearroad-api/' target='_blank'>
+              <i class="fab fa-github"></i><span>Source code</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
     <div class="toc-wrapper">
-      <%= image_tag "logo.svg", class: 'logo' %>
       <% if language_tabs.any? %>
         <div class="lang-selector">
           <% language_tabs.each do |lang| %>
