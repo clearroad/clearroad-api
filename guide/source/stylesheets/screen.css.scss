@@ -1,7 +1,10 @@
 @charset "utf-8";
+@import 'font-awesome-sprockets';
+@import 'font-awesome';
 @import 'normalize';
 @import 'variables';
 @import 'icon-font';
+@import 'forms';
 // @import 'rtl'; // uncomment to switch to RTL format
 
 /*
@@ -57,6 +60,7 @@ html, body {
   top: 0;
   left: 0;
   bottom: 0;
+  border-right: 1px solid rgba(221, 221, 221, .5);
   width: $nav-width;
   background-color: $nav-bg;
   font-size: 13px;
@@ -180,19 +184,43 @@ html, body {
     margin-top: 1em;
     border-top: 1px dashed $nav-footer-border-color;
 
-    li,a {
-      color: $nav-text;
-      text-decoration: none;
+    li + li {
+      margin-top: .5em;
     }
 
-    a:hover {
-      text-decoration: underline;
+    a {
+      text-decoration: none;
+
+      &:not(.btn) {
+        color: $nav-text;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      &.btn {
+        // border-radius: 0;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+        box-sizing: border-box;
+        text-align: left;
+        width: $nav-width - ($nav-padding * 2);
+
+        span {
+          border-left-style: solid;
+          border-left-width: 2px;
+          border-color: rgba($nav-bg, .5);
+          margin-left: .5rem;
+          padding: 1rem .5rem;
+        }
+      }
     }
 
-    li {
-      font-size: 0.8em;
-      line-height: 1.7;
-      text-decoration: none;
+    i {
+      text-align: center;
+      width: 20px;
     }
   }
 }

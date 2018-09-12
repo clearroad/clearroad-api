@@ -20,21 +20,26 @@ under the License.
 ////////////////////////////////////////////////////////////////////////////////
 // Use these settings to help adjust the appearance of Slate
 
+$primary: #0832a0 !default;
+$primary-x-light: lighten($primary, 10) !default;
+$secondary: #234168 !default;
+$secondary-x-light: lighten($secondary, 10) !default;
+$secondary-xx-light: lighten($secondary, 20) !default;
 
 // BACKGROUND COLORS
 ////////////////////
-$nav-bg: #2E3336 !default;
-$examples-bg: #2E3336 !default;
-$code-bg: #1E2224 !default;
-$code-annotation-bg: #191D1F !default;
-$nav-subitem-bg: #1E2224 !default;
-$nav-active-bg: #0F75D4 !default;
-$nav-active-parent-bg: #1E2224 !default; // parent links of the current section
+$nav-bg: #f8f8f8 !default;
+$examples-bg: $secondary !default;
+$code-bg: darken($secondary, 10) !default;
+$code-annotation-bg: $secondary-x-light !default;
+$nav-subitem-bg: darken($nav-bg, 10) !default;
+$nav-active-bg: $primary !default;
+$nav-active-parent-bg: $primary-x-light !default; // parent links of the current section
 $lang-select-border: #000 !default;
-$lang-select-bg: #1E2224 !default;
+$lang-select-bg: $secondary-xx-light !default;
 $lang-select-active-bg: $examples-bg !default; // feel free to change this to blue or something
-$lang-select-pressed-bg: #111 !default; // color of language tab bg when mouse is pressed
-$main-bg: #F3F7F9 !default;
+$lang-select-pressed-bg: darken($secondary, 20) !default; // color of language tab bg when mouse is pressed
+$main-bg: #fff !default;
 $aside-notice-bg: #8fbcd4 !default;
 $aside-warning-bg: #c97a7e !default;
 $aside-success-bg: #6ac174 !default;
@@ -44,7 +49,7 @@ $search-notice-bg: #c97a7e !default;
 // TEXT COLORS
 ////////////////////
 $main-text: #333 !default; // main content text color
-$nav-text: #fff !default;
+$nav-text: $secondary !default;
 $nav-active-text: #fff !default;
 $nav-active-parent-text: #fff !default; // parent links of the current section
 $lang-select-text: #fff !default; // color of unselected language tab text
