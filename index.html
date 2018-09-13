@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>ClearRoad API Guide</title>
+    <title>API Reference</title>
 
     <link href="images/favicon.ico" rel="icon" type="image/ico" />
 
@@ -269,6 +269,17 @@
               </ul>
           </li>
           <li>
+            <a href="#concepts" class="toc-h1 toc-link" data-title="Concepts">Concepts</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#pushing-data-to-clearroad-api" class="toc-h2 toc-link" data-title="Pushing data to ClearRoad API">Pushing data to ClearRoad API</a>
+                  </li>
+                  <li>
+                    <a href="#retrieving-data-from-clearroad-api" class="toc-h2 toc-link" data-title="Retrieving data from ClearRoad API">Retrieving data from ClearRoad API</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
             <a href="#sdk-reference" class="toc-h1 toc-link" data-title="SDK reference">SDK reference</a>
               <ul class="toc-list-h2">
                   <li>
@@ -301,6 +312,8 @@
 <p>Many actors in the Road Usage Charging industry can simplify their IT integration needs by using the ClearRoad platform through its API.</p>
 
 <p>This document aims to provide complete steps on how to quickly get set-up to start building great applications using the ClearRoad API.</p>
+
+<p>All API interactions with ClearRoad are described in this document. The ClearRoad API is focused around the synchronization of data rather than a specification of API messages.</p>
 <h1 id='quickstart'>QuickStart</h1><h2 id='step-1-install-the-library-as-dependency'>Step 1. Install the library as dependency</h2>
 <p>We are using <code>npm</code> to install the <code>ClearRoad</code> api library.
 Open a terminal window in your project and nstall the dependency using the command:</p>
@@ -360,6 +373,40 @@ If you do not have an access token, you can request one on the <a href="https://
 <span class="kr">const</span> <span class="nx">results</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">();</span>
 </code></pre>
 <p>Now that you&#39;re all setup, you can start by synchronizing your local storage and then query the data.</p>
+<h1 id='concepts'>Concepts</h1><h2 id='pushing-data-to-clearroad-api'>Pushing data to ClearRoad API</h2>
+<blockquote>
+<p>The storage must first be instantiated:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">cr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ClearRoad</span><span class="p">(</span><span class="s1">'APIUrl'</span><span class="p">,</span> <span class="s1">'accessToken'</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>Data can then be pushed on the storage using the post method, and then data is synchronized with the ClearRoad platform using:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">().</span><span class="nx">push</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'sync done'</span><span class="p">));</span>
+</code></pre>
+<p>Pushing data to ClearRoad is done by <a href="#post">posting it</a> in a local storage and <a href="#sync">synchronizing</a> that storage with the ClearRoad API.</p>
+<h2 id='retrieving-data-from-clearroad-api'>Retrieving data from ClearRoad API</h2>
+<blockquote>
+<p>The storage must first be instantiated:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">cr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ClearRoad</span><span class="p">(</span><span class="s1">'APIUrl'</span><span class="p">,</span> <span class="s1">'accessToken'</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>Then create a query on the <code>portal_type</code> that you want:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">({</span>
+  <span class="na">query</span><span class="p">:</span> <span class="s1">'grouping_reference: "report" AND portal_type:"Road Account Message"'</span><span class="p">,</span>
+  <span class="na">select_list</span><span class="p">:</span> <span class="p">[</span><span class="s1">'source_reference'</span><span class="p">,</span> <span class="s1">'state'</span><span class="p">,</span> <span class="s1">'comment'</span><span class="p">]</span>
+<span class="p">}).</span><span class="nx">push</span><span class="p">(</span><span class="nx">result</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">result</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">total_rows</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">ref</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">rows</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">value</span><span class="p">.</span><span class="nx">source_reference</span><span class="p">;</span>
+    <span class="kr">const</span> <span class="nx">state</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">rows</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">value</span><span class="p">.</span><span class="nx">state</span><span class="p">;</span>
+    <span class="kr">const</span> <span class="nx">comment</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">rows</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">value</span><span class="p">.</span><span class="nx">comment</span><span class="p">;</span>
+    <span class="p">...</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+<p>After <a href="#pushing-data-to-clearroad-api">pushing data</a> to the API, you can retrieve it using the <a href="#alldocs">cr.allDocs</a> function.</p>
 <h1 id='sdk-reference'>SDK reference</h1>
 <p>The <code>ClearRoad</code> class contains a subset of functions from the <a href="https://jio.nexedi.com/">jio.js</a> library, which uses <a href="https://lab.nexedi.com/nexedi/rsvp.js">RSVP.js</a> to chain functions like Promises.</p>
 <h2 id='constructor'>constructor</h2><pre class="highlight javascript tab-javascript"><code><span class="k">new</span> <span class="nx">ClearRoad</span><span class="p">(</span><span class="s1">'apiUrl'</span><span class="p">,</span> <span class="s1">'accessToken'</span><span class="p">);</span>
