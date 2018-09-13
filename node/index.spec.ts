@@ -271,4 +271,49 @@ describe('ClearRoad', () => {
       });
     });
   });
+
+  describe('.getReportFromRequest', () => {
+    let cr;
+    let getReportStub: sinon.SinonStub;
+    const id = 'reportId';
+    const result: any = {
+      data: {}
+    };
+
+    beforeEach(() => {
+      cr = new ClearRoad(url, null, {});
+      stubs.push(sinon.stub(cr, 'allDocs').returns({
+        push: (callback) => callback(result)
+      }));
+      getReportStub = sinon.stub(cr, 'getReport').returns({});
+      stubs.push(getReportStub);
+    });
+
+    describe('when the report exists', () => {
+      beforeEach(() => {
+        result.data.rows = [{
+          value: {
+            source_reference: id,
+            reference: 'reference'
+          }
+        }];
+      });
+
+      it('should get the report', async () => {
+        await cr.getReportFromRequest(id);
+        expect(getReportStub.called).to.equal(true);
+      });
+    });
+
+    describe('when the report does not exist', () => {
+      beforeEach(() => {
+        result.data.rows = [];
+      });
+
+      it('should get the report', async () => {
+        await cr.getReportFromRequest(id);
+        expect(getReportStub.called).to.equal(false);
+      });
+    });
+  });
 });

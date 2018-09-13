@@ -135,23 +135,45 @@ include_docs | When `true`, the response has a `doc` containing the full metadat
 ## getReport
 
 ```javascript--browser
-cr.getReport(id).then(function(report) {
+cr.getReport('reference').then(function(report) {
   // read report
 })
 ```
 
 ```javascript--browser-es6
-const report = await cr.getReport(id);
+const report = await cr.getReport('reference');
 ```
 
 ```javascript--node
-const report = await cr.getReport(id);
+const report = await cr.getReport('reference');
 ```
 
-`getReport(id)`
+`getReport(reference)`
 
-Retrieve the report with the given `id`.
+Retrieve the report with the given report `reference`. If you only have the `reference` of the request for a report, please use [getReportFromRequest](#getReportFromRequest) instead.
 
 Property | Description
 --------- | -----------
-id | Id (reference) of the report
+reference | Reference of the report
+
+## getReportFromRequest
+
+```javascript--browser
+cr.getReportFromRequest('reference').then(function(report) {
+  // read report
+})
+```
+
+```javascript--browser-es6
+const report = await cr.getReportFromRequest('reference');
+```
+
+```javascript--node
+const report = await cr.getReportFromRequest('reference');
+```
+
+`getReportFromRequest(reference)`
+
+Property | Description
+--------- | -----------
+reference | Reference of the report request

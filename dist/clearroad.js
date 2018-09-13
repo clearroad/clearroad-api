@@ -373,14 +373,31 @@ export class ClearRoad {
         return this.messagesStorage.allDocs(options);
     }
     /**
-     * Get a report from the API.
-     * @param id The id of the report
+     * Get a report using the Report Request reference
+     * @param sourceReference The reference of the Report Request
      */
-    getReport(id) {
+    getReportFromRequest(sourceReference) {
+        return this.allDocs({
+            query: 'portal_type:"File"',
+            select_list: ['source_reference', 'reference']
+        }).push(result => {
+            const report = result.data.rows.find(row => row.value.source_reference === sourceReference);
+            if (report) {
+                return this.getReport(report.value.reference);
+            }
+            return {};
+        });
+    }
+    /**
+     * Get a report using the reference.
+     * If you do not have the Report reference, use `getReportFromRequest` with the Report Request reference instead.
+     * @param reference The reference of the Report
+     */
+    getReport(reference) {
         if (this.useLocalStorage) {
-            return this.reportStorage.getAttachment(id, 'data');
+            return this.reportStorage.getAttachment(reference, 'data');
         }
-        return this.reportStorage.allAttachments(id);
+        return this.reportStorage.allAttachments(reference);
     }
 }
 //# sourceMappingURL=clearroad.js.map

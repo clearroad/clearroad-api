@@ -385,14 +385,32 @@ var ClearRoad = /** @class */ (function () {
         return this.messagesStorage.allDocs(options);
     };
     /**
-     * Get a report from the API.
-     * @param id The id of the report
+     * Get a report using the Report Request reference
+     * @param sourceReference The reference of the Report Request
      */
-    ClearRoad.prototype.getReport = function (id) {
+    ClearRoad.prototype.getReportFromRequest = function (sourceReference) {
+        var _this = this;
+        return this.allDocs({
+            query: 'portal_type:"File"',
+            select_list: ['source_reference', 'reference']
+        }).push(function (result) {
+            var report = result.data.rows.find(function (row) { return row.value.source_reference === sourceReference; });
+            if (report) {
+                return _this.getReport(report.value.reference);
+            }
+            return {};
+        });
+    };
+    /**
+     * Get a report using the reference.
+     * If you do not have the Report reference, use `getReportFromRequest` with the Report Request reference instead.
+     * @param reference The reference of the Report
+     */
+    ClearRoad.prototype.getReport = function (reference) {
         if (this.useLocalStorage) {
-            return this.reportStorage.getAttachment(id, 'data');
+            return this.reportStorage.getAttachment(reference, 'data');
         }
-        return this.reportStorage.allAttachments(id);
+        return this.reportStorage.allAttachments(reference);
     };
     return ClearRoad;
 }());

@@ -256,4 +256,48 @@ describe('ClearRoad', () => {
       });
     });
   });
+
+  describe('.getReportFromRequest', () => {
+    let cr;
+    let getReportSpy: jasmine.Spy;
+    const id = 'reportId';
+    const result: any = {
+      data: {}
+    };
+
+    beforeEach(() => {
+      cr = new ClearRoad(url);
+      spyOn(cr, 'allDocs').and.returnValue({
+        push: (callback) => callback(result)
+      });
+      getReportSpy = spyOn(cr, 'getReport').and.returnValue({});
+    });
+
+    describe('when the report exists', () => {
+      beforeEach(() => {
+        result.data.rows = [{
+          value: {
+            source_reference: id,
+            reference: 'reference'
+          }
+        }];
+      });
+
+      it('should get the report', async () => {
+        await cr.getReportFromRequest(id);
+        expect(getReportSpy).toHaveBeenCalledWith('reference');
+      });
+    });
+
+    describe('when the report does not exist', () => {
+      beforeEach(() => {
+        result.data.rows = [];
+      });
+
+      it('should get the report', async () => {
+        await cr.getReportFromRequest(id);
+        expect(getReportSpy).not.toHaveBeenCalled();
+      });
+    });
+  });
 });

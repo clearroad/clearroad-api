@@ -95,8 +95,14 @@ export declare class ClearRoad {
      */
     allDocs(options?: IQueryOptions): IQueue;
     /**
-     * Get a report from the API.
-     * @param id The id of the report
+     * Get a report using the Report Request reference
+     * @param sourceReference The reference of the Report Request
      */
-    getReport(id: string): IQueue;
+    getReportFromRequest(sourceReference: string): IQueue;
+    /**
+     * Get a report using the reference.
+     * If you do not have the Report reference, use `getReportFromRequest` with the Report Request reference instead.
+     * @param reference The reference of the Report
+     */
+    getReport(reference: string): IQueue;
 }
