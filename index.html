@@ -297,6 +297,9 @@
                   <li>
                     <a href="#getreport" class="toc-h2 toc-link" data-title="getReport">getReport</a>
                   </li>
+                  <li>
+                    <a href="#getreportfromrequest" class="toc-h2 toc-link" data-title="getReportFromRequest">getReportFromRequest</a>
+                  </li>
               </ul>
           </li>
       </ul>
@@ -619,15 +622,15 @@ If you do not have an access token, you can request one on the <a href="https://
 <td>When <code>true</code>, the response has a <code>doc</code> containing the full metadata for each document</td>
 </tr>
 </tbody></table>
-<h2 id='getreport'>getReport</h2><pre class="highlight javascript tab-javascript--browser"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">report</span><span class="p">)</span> <span class="p">{</span>
+<h2 id='getreport'>getReport</h2><pre class="highlight javascript tab-javascript--browser"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="s1">'reference'</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">report</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// read report</span>
 <span class="p">})</span>
-</code></pre><pre class="highlight javascript tab-javascript--browser-es6"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
-</code></pre><pre class="highlight javascript tab-javascript--node"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript tab-javascript--browser-es6"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="s1">'reference'</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript tab-javascript--node"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="s1">'reference'</span><span class="p">);</span>
 </code></pre>
-<p><code>getReport(id)</code></p>
+<p><code>getReport(reference)</code></p>
 
-<p>Retrieve the report with the given <code>id</code>.</p>
+<p>Retrieve the report with the given report <code>reference</code>. If you only have the <code>reference</code> of the request for a report, please use <a href="#getReportFromRequest">getReportFromRequest</a> instead.</p>
 
 <table><thead>
 <tr>
@@ -636,8 +639,27 @@ If you do not have an access token, you can request one on the <a href="https://
 </tr>
 </thead><tbody>
 <tr>
-<td>id</td>
-<td>Id (reference) of the report</td>
+<td>reference</td>
+<td>Reference of the report</td>
+</tr>
+</tbody></table>
+<h2 id='getreportfromrequest'>getReportFromRequest</h2><pre class="highlight javascript tab-javascript--browser"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">getReportFromRequest</span><span class="p">(</span><span class="s1">'reference'</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">report</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// read report</span>
+<span class="p">})</span>
+</code></pre><pre class="highlight javascript tab-javascript--browser-es6"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReportFromRequest</span><span class="p">(</span><span class="s1">'reference'</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript tab-javascript--node"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReportFromRequest</span><span class="p">(</span><span class="s1">'reference'</span><span class="p">);</span>
+</code></pre>
+<p><code>getReportFromRequest(reference)</code></p>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>reference</td>
+<td>Reference of the report request</td>
 </tr>
 </tbody></table>
 
