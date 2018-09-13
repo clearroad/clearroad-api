@@ -1,5 +1,5 @@
 ---
-title: ClearRoad API Guide
+title: API Reference
 
 language_tabs:
   - javascript--node: Node.js
@@ -9,6 +9,7 @@ language_tabs:
 includes:
   - overview
   - getting_started
+  - concepts
   - clearroad_class
 
 search: true
