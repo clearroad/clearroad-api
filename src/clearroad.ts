@@ -4,6 +4,44 @@ require('../lib/jio.js');
 
 declare var jIO;
 
+const queryPortalType = 'portal_type';
+
+export type portalType = 'Billing Period Message' |
+  'Road Account Message' |
+  'Road Event Message' |
+  'Road Message' |
+  'Road Report Request';
+
+enum PortalTypes {
+  BillingPeriodMessage = 'Billing Period Message',
+  File = 'File',
+  RoadAccount = 'Road Account',
+  RoadAccountMessage = 'Road Account Message',
+  RoadEvent = 'Road Event',
+  RoadEventMessage = 'Road Event Message',
+  RoadMessage = 'Road Message',
+  RoadReportRequest = 'Road Report Request',
+  RoadTransaction = 'Road Transaction'
+}
+
+const queryPortalTypes = [
+  `"${PortalTypes.BillingPeriodMessage}"`,
+  `"${PortalTypes.RoadAccountMessage}"`,
+  `"${PortalTypes.RoadEventMessage}"`,
+  `"${PortalTypes.RoadMessage}" `,
+  `"${PortalTypes.RoadReportRequest}"`
+].join(' OR ');
+
+enum ValidationStates {
+  Processed = 'processed',
+  Rejected = 'rejected'
+  // TODO: submitted does not work yet
+  // Submitted = 'submitted'
+}
+
+const queryValidationStates = Object.keys(ValidationStates)
+  .map(key => ValidationStates[key]).map(val => `"${val}"`).join(' OR ');
+
 export interface IQueue {
   push: (onFullfilled?: Function, onRejected?: Function) => IQueue;
 }
@@ -35,14 +73,11 @@ export interface IQueryOptions {
 
 export type syncProgressCallback = (type: storageName) => void;
 
-export type portalType = 'Road Account Message' | 'Billing Period Message' |
-  'Road Message' | 'Road Report Request' | 'Road Event Message';
-
 export interface IPostData {
   portal_type: portalType;
 }
 export interface IPostRoadAccountMessage extends IPostData {
-  portal_type: 'Road Account Message';
+  portal_type: PortalTypes.RoadAccountMessage;
   account_manager: string;
   data_collector: string;
   condition: string;
@@ -57,24 +92,24 @@ export interface IPostRoadAccountMessage extends IPostData {
   product_line: string;
 }
 export interface IPostBillingPeriodMessage extends IPostData {
-  portal_type: 'Billing Period Message';
+  portal_type: PortalTypes.BillingPeriodMessage;
   reference: string;
   start_date: string;
   stop_date: string;
 }
 export interface IPostRoadReportRequest extends IPostData {
-  portal_type: 'Road Report Request';
+  portal_type: PortalTypes.RoadReportRequest;
   report_type: string;
   billing_period_reference: string;
   request_date: string;
   request: string;
 }
 export interface IPostRoadEventMessage extends IPostData {
-  portal_type: 'Road Event Message';
+  portal_type: PortalTypes.RoadEventMessage;
   request: string;
 }
 export interface IPostRoadMessage extends IPostData {
-  portal_type: 'Road Message';
+  portal_type: PortalTypes.RoadMessage;
   request: string;
 }
 export type postData = IPostRoadAccountMessage | IPostBillingPeriodMessage | IPostRoadReportRequest |
@@ -176,18 +211,6 @@ export class ClearRoad {
 
     this.useLocalStorage = localStorageOptions.type === 'indexeddb';
 
-    // only retrieve the data since xxx
-    let queryMaxDate = '';
-    if (options.maxDate) {
-      const from = new Date(options.maxDate);
-      queryMaxDate = ` AND modification_date: >= "${from.toJSON()}"`;
-    }
-
-    let query = 'portal_type:(' +
-      '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
-      ' OR "Billing Period Message" OR "Road Report Request")' +
-      ' AND grouping_reference:"data"' + queryMaxDate;
-
     const localSubStorage = {
       type: 'query',
       sub_storage: {
@@ -206,7 +229,15 @@ export class ClearRoad {
       type: this.useLocalStorage ? 'indexeddb' : 'memory'
     };
 
+    // only retrieve the data since xxx
+    let queryMaxDate = '';
+    if (options.maxDate) {
+      const from = new Date(options.maxDate);
+      queryMaxDate = ` AND modification_date: >= "${from.toJSON()}"`;
+    }
+
     let refKey = 'source_reference';
+    let query = `${queryPortalType}:(${queryPortalTypes}) AND grouping_reference:"data"${queryMaxDate}`;
 
     this.messagesStorage = jIO.createJIO({
       type: 'replicate',
@@ -249,10 +280,7 @@ export class ClearRoad {
     });
 
     refKey = 'destination_reference';
-    query = 'portal_type:(' +
-      '"Road Account Message" OR "Road Event Message" OR "Road Message" ' +
-      'OR "Billing Period Message" OR "Road Report Request")' +
-      ' AND validation_state:("processed" OR "rejected")' + queryMaxDate;
+    query = `${queryPortalType}:(${queryPortalTypes}) AND validation_state:(${queryValidationStates})${queryMaxDate}`;
 
     this.ingestionReportStorage = jIO.createJIO({
       type: 'replicate',
@@ -295,7 +323,11 @@ export class ClearRoad {
     });
 
     refKey = 'source_reference';
-    query = 'portal_type:("Road Account" OR "Road Event" OR "Road Transaction")' + queryMaxDate;
+    query = `${queryPortalType}:(` + [
+      `"${PortalTypes.RoadAccount}"`,
+      `"${PortalTypes.RoadEvent}"`,
+      `"${PortalTypes.RoadTransaction}"`
+    ].join('OR') + ')' + queryMaxDate;
 
     this.directoryStorage = jIO.createJIO({
       type: 'replicate',
@@ -338,7 +370,7 @@ export class ClearRoad {
     });
 
     refKey = 'reference';
-    query = 'portal_type:("File")' + queryMaxDate;
+    query = `${queryPortalType}:("${PortalTypes.File}")${queryMaxDate}`;
 
     const mappingStorageWithEnclosure = merge(mappingSubStorage, {
       attachment_list: ['data'],
@@ -421,19 +453,19 @@ export class ClearRoad {
     const options: any = merge({}, data);
 
     switch (data.portal_type) {
-      case 'Road Account Message':
+      case PortalTypes.RoadAccountMessage:
         options.parent_relative_url = 'road_account_message_module';
         break;
-      case 'Road Event Message':
+      case PortalTypes.RoadEventMessage:
         options.parent_relative_url = 'road_event_message_module';
         break;
-      case 'Road Message':
+      case PortalTypes.RoadMessage:
         options.parent_relative_url = 'road_message_module';
         break;
-      case 'Billing Period Message':
+      case PortalTypes.BillingPeriodMessage:
         options.parent_relative_url = 'billing_period_message_module';
         break;
-      case 'Road Report Request':
+      case PortalTypes.RoadReportRequest:
         options.parent_relative_url = 'road_report_request_module';
         break;
     }
@@ -488,7 +520,7 @@ export class ClearRoad {
    */
   getReportFromRequest(sourceReference: string) {
     return this.allDocs({
-      query: 'portal_type:"File"',
+      query: `${queryPortalType}:"${PortalTypes.File}"`,
       select_list: ['source_reference', 'reference']
     }).push(result => {
       const report = result.data.rows.find(row => row.value.source_reference === sourceReference);

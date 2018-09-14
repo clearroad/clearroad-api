@@ -1,3 +1,15 @@
+export declare type portalType = 'Billing Period Message' | 'Road Account Message' | 'Road Event Message' | 'Road Message' | 'Road Report Request';
+declare enum PortalTypes {
+    BillingPeriodMessage = "Billing Period Message",
+    File = "File",
+    RoadAccount = "Road Account",
+    RoadAccountMessage = "Road Account Message",
+    RoadEvent = "Road Event",
+    RoadEventMessage = "Road Event Message",
+    RoadMessage = "Road Message",
+    RoadReportRequest = "Road Report Request",
+    RoadTransaction = "Road Transaction"
+}
 export interface IQueue {
     push: (onFullfilled?: Function, onRejected?: Function) => IQueue;
 }
@@ -22,12 +34,11 @@ export interface IQueryOptions {
     include_docs?: boolean;
 }
 export declare type syncProgressCallback = (type: storageName) => void;
-export declare type portalType = 'Road Account Message' | 'Billing Period Message' | 'Road Message' | 'Road Report Request' | 'Road Event Message';
 export interface IPostData {
     portal_type: portalType;
 }
 export interface IPostRoadAccountMessage extends IPostData {
-    portal_type: 'Road Account Message';
+    portal_type: PortalTypes.RoadAccountMessage;
     account_manager: string;
     data_collector: string;
     condition: string;
@@ -42,24 +53,24 @@ export interface IPostRoadAccountMessage extends IPostData {
     product_line: string;
 }
 export interface IPostBillingPeriodMessage extends IPostData {
-    portal_type: 'Billing Period Message';
+    portal_type: PortalTypes.BillingPeriodMessage;
     reference: string;
     start_date: string;
     stop_date: string;
 }
 export interface IPostRoadReportRequest extends IPostData {
-    portal_type: 'Road Report Request';
+    portal_type: PortalTypes.RoadReportRequest;
     report_type: string;
     billing_period_reference: string;
     request_date: string;
     request: string;
 }
 export interface IPostRoadEventMessage extends IPostData {
-    portal_type: 'Road Event Message';
+    portal_type: PortalTypes.RoadEventMessage;
     request: string;
 }
 export interface IPostRoadMessage extends IPostData {
-    portal_type: 'Road Message';
+    portal_type: PortalTypes.RoadMessage;
     request: string;
 }
 export declare type postData = IPostRoadAccountMessage | IPostBillingPeriodMessage | IPostRoadReportRequest | IPostRoadEventMessage | IPostRoadMessage;
@@ -106,3 +117,4 @@ export declare class ClearRoad {
      */
     getReport(reference: string): IQueue;
 }
+export {};

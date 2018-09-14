@@ -8,6 +8,35 @@ var RSVP = _interopDefault(require('rsvp'));
 var Rusha = _interopDefault(require('rusha'));
 
 var jIO = require('./lib/jio.js').jIO;
+var queryPortalType = 'portal_type';
+var PortalTypes;
+(function (PortalTypes) {
+    PortalTypes["BillingPeriodMessage"] = "Billing Period Message";
+    PortalTypes["File"] = "File";
+    PortalTypes["RoadAccount"] = "Road Account";
+    PortalTypes["RoadAccountMessage"] = "Road Account Message";
+    PortalTypes["RoadEvent"] = "Road Event";
+    PortalTypes["RoadEventMessage"] = "Road Event Message";
+    PortalTypes["RoadMessage"] = "Road Message";
+    PortalTypes["RoadReportRequest"] = "Road Report Request";
+    PortalTypes["RoadTransaction"] = "Road Transaction";
+})(PortalTypes || (PortalTypes = {}));
+var queryPortalTypes = [
+    "\"" + PortalTypes.BillingPeriodMessage + "\"",
+    "\"" + PortalTypes.RoadAccountMessage + "\"",
+    "\"" + PortalTypes.RoadEventMessage + "\"",
+    "\"" + PortalTypes.RoadMessage + "\" ",
+    "\"" + PortalTypes.RoadReportRequest + "\""
+].join(' OR ');
+var ValidationStates;
+(function (ValidationStates) {
+    ValidationStates["Processed"] = "processed";
+    ValidationStates["Rejected"] = "rejected";
+    // TODO: submitted does not work yet
+    // Submitted = 'submitted'
+})(ValidationStates || (ValidationStates = {}));
+var queryValidationStates = Object.keys(ValidationStates)
+    .map(function (key) { return ValidationStates[key]; }).map(function (val) { return "\"" + val + "\""; }).join(' OR ');
 var database = 'clearroad';
 var jsonIdRec = function (keyValueSpace, key, value, deep) {
     if (deep === void 0) { deep = 0; }
@@ -93,16 +122,6 @@ var ClearRoad = /** @class */ (function () {
             };
         }
         this.useLocalStorage = localStorageOptions.type === 'indexeddb';
-        // only retrieve the data since xxx
-        var queryMaxDate = '';
-        if (options.maxDate) {
-            var from = new Date(options.maxDate);
-            queryMaxDate = " AND modification_date: >= \"" + from.toJSON() + "\"";
-        }
-        var query = 'portal_type:(' +
-            '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
-            ' OR "Billing Period Message" OR "Road Report Request")' +
-            ' AND grouping_reference:"data"' + queryMaxDate;
         var localSubStorage = {
             type: 'query',
             sub_storage: {
@@ -120,7 +139,14 @@ var ClearRoad = /** @class */ (function () {
         var signatureSubStorage = {
             type: this.useLocalStorage ? 'indexeddb' : 'memory'
         };
+        // only retrieve the data since xxx
+        var queryMaxDate = '';
+        if (options.maxDate) {
+            var from = new Date(options.maxDate);
+            queryMaxDate = " AND modification_date: >= \"" + from.toJSON() + "\"";
+        }
         var refKey = 'source_reference';
+        var query = queryPortalType + ":(" + queryPortalTypes + ") AND grouping_reference:\"data\"" + queryMaxDate;
         this.messagesStorage = jIO.createJIO({
             type: 'replicate',
             parallel_operation_amount: 1,
@@ -161,10 +187,7 @@ var ClearRoad = /** @class */ (function () {
             }
         });
         refKey = 'destination_reference';
-        query = 'portal_type:(' +
-            '"Road Account Message" OR "Road Event Message" OR "Road Message" ' +
-            'OR "Billing Period Message" OR "Road Report Request")' +
-            ' AND validation_state:("processed" OR "rejected")' + queryMaxDate;
+        query = queryPortalType + ":(" + queryPortalTypes + ") AND validation_state:(" + queryValidationStates + ")" + queryMaxDate;
         this.ingestionReportStorage = jIO.createJIO({
             type: 'replicate',
             parallel_operation_amount: 1,
@@ -205,7 +228,11 @@ var ClearRoad = /** @class */ (function () {
             }
         });
         refKey = 'source_reference';
-        query = 'portal_type:("Road Account" OR "Road Event" OR "Road Transaction")' + queryMaxDate;
+        query = queryPortalType + ":(" + [
+            "\"" + PortalTypes.RoadAccount + "\"",
+            "\"" + PortalTypes.RoadEvent + "\"",
+            "\"" + PortalTypes.RoadTransaction + "\""
+        ].join('OR') + ')' + queryMaxDate;
         this.directoryStorage = jIO.createJIO({
             type: 'replicate',
             parallel_operation_amount: 1,
@@ -246,7 +273,7 @@ var ClearRoad = /** @class */ (function () {
             }
         });
         refKey = 'reference';
-        query = 'portal_type:("File")' + queryMaxDate;
+        query = queryPortalType + ":(\"" + PortalTypes.File + "\")" + queryMaxDate;
         var mappingStorageWithEnclosure = merge(mappingSubStorage, {
             attachment_list: ['data'],
             attachment: {
@@ -326,19 +353,19 @@ var ClearRoad = /** @class */ (function () {
         var _this = this;
         var options = merge({}, data);
         switch (data.portal_type) {
-            case 'Road Account Message':
+            case PortalTypes.RoadAccountMessage:
                 options.parent_relative_url = 'road_account_message_module';
                 break;
-            case 'Road Event Message':
+            case PortalTypes.RoadEventMessage:
                 options.parent_relative_url = 'road_event_message_module';
                 break;
-            case 'Road Message':
+            case PortalTypes.RoadMessage:
                 options.parent_relative_url = 'road_message_module';
                 break;
-            case 'Billing Period Message':
+            case PortalTypes.BillingPeriodMessage:
                 options.parent_relative_url = 'billing_period_message_module';
                 break;
-            case 'Road Report Request':
+            case PortalTypes.RoadReportRequest:
                 options.parent_relative_url = 'road_report_request_module';
                 break;
         }
@@ -391,7 +418,7 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.getReportFromRequest = function (sourceReference) {
         var _this = this;
         return this.allDocs({
-            query: 'portal_type:"File"',
+            query: queryPortalType + ":\"" + PortalTypes.File + "\"",
             select_list: ['source_reference', 'reference']
         }).push(function (result) {
             var report = result.data.rows.find(function (row) { return row.value.source_reference === sourceReference; });

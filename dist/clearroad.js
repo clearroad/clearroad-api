@@ -1,6 +1,35 @@
 import RSVP from 'rsvp';
 import Rusha from 'rusha';
 require('../lib/jio.js');
+const queryPortalType = 'portal_type';
+var PortalTypes;
+(function (PortalTypes) {
+    PortalTypes["BillingPeriodMessage"] = "Billing Period Message";
+    PortalTypes["File"] = "File";
+    PortalTypes["RoadAccount"] = "Road Account";
+    PortalTypes["RoadAccountMessage"] = "Road Account Message";
+    PortalTypes["RoadEvent"] = "Road Event";
+    PortalTypes["RoadEventMessage"] = "Road Event Message";
+    PortalTypes["RoadMessage"] = "Road Message";
+    PortalTypes["RoadReportRequest"] = "Road Report Request";
+    PortalTypes["RoadTransaction"] = "Road Transaction";
+})(PortalTypes || (PortalTypes = {}));
+const queryPortalTypes = [
+    `"${PortalTypes.BillingPeriodMessage}"`,
+    `"${PortalTypes.RoadAccountMessage}"`,
+    `"${PortalTypes.RoadEventMessage}"`,
+    `"${PortalTypes.RoadMessage}" `,
+    `"${PortalTypes.RoadReportRequest}"`
+].join(' OR ');
+var ValidationStates;
+(function (ValidationStates) {
+    ValidationStates["Processed"] = "processed";
+    ValidationStates["Rejected"] = "rejected";
+    // TODO: submitted does not work yet
+    // Submitted = 'submitted'
+})(ValidationStates || (ValidationStates = {}));
+const queryValidationStates = Object.keys(ValidationStates)
+    .map(key => ValidationStates[key]).map(val => `"${val}"`).join(' OR ');
 const database = 'clearroad';
 const jsonIdRec = (keyValueSpace, key, value, deep = 0) => {
     let res;
@@ -84,16 +113,6 @@ export class ClearRoad {
             };
         }
         this.useLocalStorage = localStorageOptions.type === 'indexeddb';
-        // only retrieve the data since xxx
-        let queryMaxDate = '';
-        if (options.maxDate) {
-            const from = new Date(options.maxDate);
-            queryMaxDate = ` AND modification_date: >= "${from.toJSON()}"`;
-        }
-        let query = 'portal_type:(' +
-            '"Road Account Message" OR "Road Event Message" OR "Road Message"' +
-            ' OR "Billing Period Message" OR "Road Report Request")' +
-            ' AND grouping_reference:"data"' + queryMaxDate;
         const localSubStorage = {
             type: 'query',
             sub_storage: {
@@ -111,7 +130,14 @@ export class ClearRoad {
         const signatureSubStorage = {
             type: this.useLocalStorage ? 'indexeddb' : 'memory'
         };
+        // only retrieve the data since xxx
+        let queryMaxDate = '';
+        if (options.maxDate) {
+            const from = new Date(options.maxDate);
+            queryMaxDate = ` AND modification_date: >= "${from.toJSON()}"`;
+        }
         let refKey = 'source_reference';
+        let query = `${queryPortalType}:(${queryPortalTypes}) AND grouping_reference:"data"${queryMaxDate}`;
         this.messagesStorage = jIO.createJIO({
             type: 'replicate',
             parallel_operation_amount: 1,
@@ -152,10 +178,7 @@ export class ClearRoad {
             }
         });
         refKey = 'destination_reference';
-        query = 'portal_type:(' +
-            '"Road Account Message" OR "Road Event Message" OR "Road Message" ' +
-            'OR "Billing Period Message" OR "Road Report Request")' +
-            ' AND validation_state:("processed" OR "rejected")' + queryMaxDate;
+        query = `${queryPortalType}:(${queryPortalTypes}) AND validation_state:(${queryValidationStates})${queryMaxDate}`;
         this.ingestionReportStorage = jIO.createJIO({
             type: 'replicate',
             parallel_operation_amount: 1,
@@ -196,7 +219,11 @@ export class ClearRoad {
             }
         });
         refKey = 'source_reference';
-        query = 'portal_type:("Road Account" OR "Road Event" OR "Road Transaction")' + queryMaxDate;
+        query = `${queryPortalType}:(` + [
+            `"${PortalTypes.RoadAccount}"`,
+            `"${PortalTypes.RoadEvent}"`,
+            `"${PortalTypes.RoadTransaction}"`
+        ].join('OR') + ')' + queryMaxDate;
         this.directoryStorage = jIO.createJIO({
             type: 'replicate',
             parallel_operation_amount: 1,
@@ -237,7 +264,7 @@ export class ClearRoad {
             }
         });
         refKey = 'reference';
-        query = 'portal_type:("File")' + queryMaxDate;
+        query = `${queryPortalType}:("${PortalTypes.File}")${queryMaxDate}`;
         const mappingStorageWithEnclosure = merge(mappingSubStorage, {
             attachment_list: ['data'],
             attachment: {
@@ -316,19 +343,19 @@ export class ClearRoad {
     post(data) {
         const options = merge({}, data);
         switch (data.portal_type) {
-            case 'Road Account Message':
+            case PortalTypes.RoadAccountMessage:
                 options.parent_relative_url = 'road_account_message_module';
                 break;
-            case 'Road Event Message':
+            case PortalTypes.RoadEventMessage:
                 options.parent_relative_url = 'road_event_message_module';
                 break;
-            case 'Road Message':
+            case PortalTypes.RoadMessage:
                 options.parent_relative_url = 'road_message_module';
                 break;
-            case 'Billing Period Message':
+            case PortalTypes.BillingPeriodMessage:
                 options.parent_relative_url = 'billing_period_message_module';
                 break;
-            case 'Road Report Request':
+            case PortalTypes.RoadReportRequest:
                 options.parent_relative_url = 'road_report_request_module';
                 break;
         }
@@ -378,7 +405,7 @@ export class ClearRoad {
      */
     getReportFromRequest(sourceReference) {
         return this.allDocs({
-            query: 'portal_type:"File"',
+            query: `${queryPortalType}:"${PortalTypes.File}"`,
             select_list: ['source_reference', 'reference']
         }).push(result => {
             const report = result.data.rows.find(row => row.value.source_reference === sourceReference);
