@@ -1,5 +1,5 @@
 const Rusha = require('rusha');
-const { jIO } = require('jio');
+const jIO = require('jio');
 const { all } = require('rsvp');
 import { validateDefinition } from './definitions/index';
 import { PortalTypes } from './message-types';

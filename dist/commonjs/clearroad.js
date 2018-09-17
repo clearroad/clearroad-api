@@ -12,7 +12,7 @@ var __assign = (this && this.__assign) || function () {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Rusha = require('rusha');
-var jIO = require('jio').jIO;
+var jIO = require('jio');
 var all = require('rsvp').all;
 var index_1 = require("./definitions/index");
 var message_types_1 = require("./message-types");

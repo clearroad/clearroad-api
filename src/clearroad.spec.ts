@@ -1,5 +1,5 @@
 /* tslint:disable: no-console */
-import { jIO } from 'jio';
+import * as jIO from 'jio';
 import { ClearRoad, ValidationStates, dateToISO } from './clearroad';
 import { postData } from './definitions/interfaces';
 import { PortalTypes } from './message-types';
