@@ -591,21 +591,41 @@ html, body {
 
   .center-column,
   .full-column {
-    + pre {
+    + pre,
+    + aside {
       position: static;
       float: none;
       clear: none;
-      margin: 0 $main-padding $main-padding;
       left: 0;
+    }
+
+    + aside {
+      margin-right: 0;
+    }
+
+    + pre {
+      margin: 0 $main-padding $main-padding;
     }
   }
 
-  .center-column + pre {
-    width: calc(50% - #{$main-padding});
+  .center-column {
+    + aside {
+      width: 50%;
+    }
+
+    + pre {
+      width: calc(50% - #{$main-padding});
+    }
   }
 
-  .full-column + pre {
-    width: calc(100% - #{$main-padding});
+  .full-column {
+    + aside {
+      width: 100%;
+    }
+
+    + pre {
+      width: calc(100% - #{$main-padding});
+    }
   }
 }
 
