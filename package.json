@@ -35,6 +35,7 @@
     "ajv": "^6.5.4",
     "jio": "git+https://lab.nexedi.com/mebibou/jio.git#node",
     "jsonschema": "^1.2.4",
+    "rsvp": "git+https://lab.nexedi.com/nexedi/rsvp.js.git",
     "rusha": "0.8.2"
   },
   "devDependencies": {

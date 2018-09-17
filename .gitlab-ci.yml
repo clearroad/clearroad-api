@@ -1,21 +1,12 @@
-image: atlassianlabs/docker-node-jdk-chrome-firefox
+image: weltn24/up-docker-node-chrome-headless
 
 cache:
   paths:
-    - dist/
-    - guide/
     - node_modules/
 
 stages:
-  - build
   - test
   - deploy
-
-build:
-  stage: build
-  script:
-    - npm install
-    - npm run build
 
 test:
   stage: test
@@ -31,6 +22,8 @@ deploy:
   environment:
     name: $CI_COMMIT_REF_NAME
   script:
+    - npm install
+    - npm run build
     - TARGET=$CI_COMMIT_REF_NAME npm run deploy
   only:
     - master

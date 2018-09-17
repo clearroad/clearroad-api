@@ -13,7 +13,7 @@ const typescriptOptions = {
   typescript: require('typescript'),
   importHelpers: true
 };
-const libs = ['jIO', 'RSVP', 'Rusha', 'Ajv'].join(', ');
+const libs = ['jIO', 'RSVP', 'Rusha', 'Ajv'];
 
 const iife = {
   input: main,
@@ -21,11 +21,11 @@ const iife = {
     file: 'dist/iife/clearroad.js',
     format: 'iife',
     name: 'bundle',
-    banner: `(function(${libs}) {
+    banner: `(function(${libs.join(', ')}) {
 `,
     footer: `
   window.ClearRoad = bundle.ClearRoad;
-})(${libs});
+})(${libs.map(lib => `window.${lib}`).join(', ')});
     `
   }],
   plugins: [

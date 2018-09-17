@@ -12,7 +12,7 @@
     document.getElementById('result').innerHTML = ''; // cleanup logs
 
     var url = document.querySelector("[name='url']").value;
-    var accessToken = document.querySelector("[name='token']").value || null;
+    var accessToken = document.querySelector("[name='token']").value || undefined;
     var typeAccessToken = document.querySelector("[name='type_token']").value || null;
     window.cr = new ClearRoad(url, accessToken, {
       localStorage: {
