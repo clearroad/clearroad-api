@@ -1,5 +1,8 @@
 dist/iife/
+guide/
 legacy/
+test/
+*.spec.ts
 .*
 CHANGELOG.md
 commitlint.config.js
