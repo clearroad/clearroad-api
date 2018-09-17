@@ -6,10 +6,11 @@
   "module": "dist/module/index.js",
   "typings": "dist/module/index.d.ts",
   "scripts": {
-    "build": "rimraf dist && rollup -c && npm run build:modules && npm run build:docs",
+    "build": "rimraf dist && rollup -c && npm run build:modules && npm run build:jio && npm run build:docs",
     "build:modules": "tsc -p tsconfig.commonjs.json && tsc -p tsconfig.build.json",
     "build:definitions": "node build-definitions.js; npm run lint:fix",
     "build:docs": "gulp docs",
+    "build:jio": "curl -s -o lib/jio.js https://lab.nexedi.com/mebibou/jio/raw/node-fix/dist/jio-latest.js",
     "lint": "tslint \"src/**/*.ts\"",
     "lint:fix": "tslint --fix \"src/**/*.ts\"",
     "deploy": "node deploy.js",
