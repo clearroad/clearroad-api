@@ -1,5 +1,15 @@
 # Contributing to this repository
 
+## Pull Requests
+
+Please make sure the following is done when submitting a pull request:
+
+1. Fork the repo and create your branch from `master`.
+2. If you've added code that should be tested, add tests.
+3. If you've changed APIs, update the documentation.
+4. Ensure the test suite passes.
+5. Make sure your code lints.
+
 ## <a name="commits"></a> Git Commit Guidelines
 
 We have very precise rules over how our git commit messages can be formatted.  This leads to **more
