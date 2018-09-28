@@ -1,0 +1,42 @@
+image: atlassianlabs/docker-node-jdk-chrome-firefox
+
+cache:
+  paths:
+    - dist/
+    - guide/
+    - node_modules/
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+
+test:
+  stage: test
+  script:
+    - npm test
+  artifacts:
+    paths:
+      - coverage/
+
+deploy:
+  stage: deploy
+  script:
+    - TARGET=$CI_BUILD_REF npm run deploy
+  only:
+    - master
+    - staging
+
+deploy-guide:
+  stage: deploy
+  script:
+    - cd guide
+    - ./deploy.sh
+  only:
+    - master
