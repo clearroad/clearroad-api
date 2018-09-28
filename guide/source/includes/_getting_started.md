@@ -3,7 +3,7 @@
 ## Step 1. Install the library as dependency
 
 We are using `npm` to install the `ClearRoad` api library.
-Open a terminal window in your project and nstall the dependency using the command:
+Open a terminal window in your project and install the dependency using the command:
 
 <div class="full-column"></div>
 ```shell
@@ -64,9 +64,9 @@ const cr = new ClearRoad(process.env.CLEARROAD_URL, process.env.CLEARROAD_ACCESS
 });
 ```
 
-The ClearRoad API is based on a synchronization process, which will effectively synchronize data from the API to a "local" storage. This local storage can be on a local server, on the browser, or on a remote server.
+The ClearRoad API is based on a synchronization process, which will effectively synchronize data from the ClearRoad Platform to a "local" storage. This local storage can be on a local server, on the browser, or on a remote server.
 
-By default, the api will use `indexeddb` as local storage. If you want to change the storage (or if you are using node and you need to), please refer to [the ClearRoad reference](#constructor).
+By default, the API will use `indexeddb` as local storage. To use another storage please refer to [the API reference](#constructor).
 
 ## Step 4. Retrieve messages
 

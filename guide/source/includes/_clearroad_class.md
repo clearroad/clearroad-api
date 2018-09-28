@@ -1,6 +1,6 @@
-# SDK reference
+# API reference
 
-The `ClearRoad` class contains a subset of functions from the [jio.js](https://jio.nexedi.com/) library, which uses [RSVP.js](https://lab.nexedi.com/nexedi/rsvp.js) to chain functions like Promises.
+The `ClearRoad` class contains a subset of functions from the underlying [jIO.js](https://jio.nexedi.com/) library, which uses [RSVP.js](https://lab.nexedi.com/nexedi/rsvp.js) to chain functions like `Promises`. Please refer to their documentation for more information.
 
 ## constructor
 
@@ -15,7 +15,7 @@ Initialise a new ClearRoad object to interact with the ERP5 storage.
 Property | Description
 --------- | -----------
 url | Url of the storage
-accessToken | Optional. Access token to authenticate on ERP5 (if necessary)
+accessToken | Optional. Access token to authenticate on the ClearRoad API (if necessary)
 options.localStorage.type | View [types](#local-storage-types) below
 options.localStorage.accessToken | Access token (if required)
 
@@ -29,8 +29,30 @@ gdrive | Storage data in a google drive account | type: string, accessToken: str
 
 ## post
 
-```javascript
+```javascript--browser
 cr.post({
+  key1: "value",
+  key2: JSON.stringify({
+    "subkey": "subvalue"
+  })
+}).then(function(id) {
+  // 'id' is the posted document 'source_reference'
+})
+```
+
+```javascript--browser-es6
+// 'id' is the posted document 'source_reference'
+const id = await cr.post({
+  key1: "value",
+  key2: JSON.stringify({
+    "subkey": "subvalue"
+  })
+});
+```
+
+```javascript--node
+// 'id' is the posted document 'source_reference'
+const id = await cr.post({
   key1: "value",
   key2: JSON.stringify({
     "subkey": "subvalue"
@@ -40,7 +62,7 @@ cr.post({
 
 `post(data)`
 
-Posts data in your local storage. Use the [sync method](#sync) then to synchronize the data to the ClearRoad API.
+Posts data in your local storage and return the `reference` of the new document. Then use the [sync method](#sync) to synchronize the data with the ClearRoad API.
 
 Property | Description
 --------- | -----------
@@ -54,11 +76,11 @@ cr.sync();
 
 `sync()`
 
-Similar to the `repair` method of `jio`, this will synchronize or repair the storage and all data within.
+Synchronizes the local storage with the ClearRoad Platform (will make sure both storage contain the same data).
 
 ## allDocs
 
-> Query the documents:
+> Query the documents from ClearRoad Platform:
 
 ```javascript--browser
 cr.allDocs({
@@ -126,7 +148,7 @@ Retrieve a list of documents.
 
 Property | Description
 --------- | -----------
-query | Refer to the [jio documentation](https://jio.nexedi.com/) in the **jIO Query Engine** section for details
+query | Refer to the [jIO documentation](https://jio.nexedi.com/) in the **jIO Query Engine** section for details
 limit (optional) | Limit the results. Leave empty for no limit, or `[min, max]` for paging
 sort_on (optional) | List of fields to sort on, each specifying the order with `ascending`/`descending`
 select_list | When provided, the response has a `value` containing the values of these keys for each document
@@ -150,7 +172,7 @@ const report = await cr.getReport('reference');
 
 `getReport(reference)`
 
-Retrieve the report with the given report `reference`. If you only have the `reference` of the request for a report, please use [getReportFromRequest](#getReportFromRequest) instead.
+Retrieve [the report](https://api.clearroadev.xyz/docs/#requesting-a-report) with the given report `reference`. If you only have the `reference` of the report request, please use [getReportFromRequest](#getReportFromRequest) instead.
 
 Property | Description
 --------- | -----------
