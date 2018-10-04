@@ -1,6 +1,7 @@
 import RSVP from 'rsvp';
 import Rusha from 'rusha';
 require('../lib/jio.js');
+import { validateDefinition } from './definitions/index';
 const queryPortalType = 'portal_type';
 var PortalTypes;
 (function (PortalTypes) {
@@ -341,6 +342,7 @@ export class ClearRoad {
      * @param data The message
      */
     post(data) {
+        validateDefinition(data.portal_type, data);
         const options = merge({}, data);
         switch (data.portal_type) {
             case PortalTypes.RoadAccountMessage:

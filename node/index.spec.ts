@@ -68,7 +68,7 @@ describe('ClearRoad', () => {
       stubs.push(putStub);
     });
 
-    describe('road account', () => {
+    describe('Road Account Message', () => {
       beforeEach(() => {
         portalType = 'Road Account Message';
       });
@@ -82,7 +82,6 @@ describe('ClearRoad', () => {
           cert_id: '1051',
           account_reference: 'USER000011',
           effective_date: '2017-01-02T14:21:20Z',
-          expiration_date: '',
           fuel_consumption: '12.0',
           fuel_taxable: '1',
           obu_reference: '123456789MRDID',
@@ -95,7 +94,7 @@ describe('ClearRoad', () => {
       });
     });
 
-    describe('road event', () => {
+    describe('Road Event Message', () => {
       beforeEach(() => {
         portalType = 'Road Event Message';
       });
@@ -103,7 +102,7 @@ describe('ClearRoad', () => {
       it('should put a message', async () => {
         const options = {
           portal_type: portalType,
-          request: JSON.stringify({
+          request: {
             vehicle_reference: '1GTG6BE38F1262119',
             obu_reference: '977298026d50a5b1795c6563',
             event_details: [{
@@ -113,7 +112,7 @@ describe('ClearRoad', () => {
               type: 5,
               date: '2018-01-03T00:00:00Z'
             }]
-          })
+          }
         };
         const data = await cr.post(options);
         expect(data.parent_relative_url).to.equal('road_event_message_module');
@@ -121,7 +120,7 @@ describe('ClearRoad', () => {
       });
     });
 
-    describe('road message', () => {
+    describe('Road Message', () => {
       beforeEach(() => {
         portalType = 'Road Message';
       });
@@ -129,7 +128,7 @@ describe('ClearRoad', () => {
       it('should put a message', async () => {
         const options = {
           portal_type: portalType,
-          request: JSON.stringify({
+          request: {
             description: 'Mileage data',
             vehicle_reference: '1GTG6BE38F1262119',
             obu_reference: '977298026d50a5b1795c6563',
@@ -148,7 +147,7 @@ describe('ClearRoad', () => {
               rule_id: 0,
               sub_rule_id: 1
             }]
-          })
+          }
         };
         const data = await cr.post(options);
         expect(data.parent_relative_url).to.equal('road_message_module');
@@ -156,7 +155,7 @@ describe('ClearRoad', () => {
       });
     });
 
-    describe('billing period', () => {
+    describe('Billing Period Message', () => {
       beforeEach(() => {
         portalType = 'Billing Period Message';
       });
@@ -174,7 +173,7 @@ describe('ClearRoad', () => {
       });
     });
 
-    describe('road report', () => {
+    describe('Road Report Request', () => {
       beforeEach(() => {
         portalType = 'Road Report Request';
       });

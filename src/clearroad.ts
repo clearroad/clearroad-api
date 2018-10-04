@@ -2,15 +2,12 @@ import RSVP from 'rsvp';
 import Rusha from 'rusha';
 require('../lib/jio.js');
 
+import { portalType } from './message-types';
+import { validateDefinition } from './definitions/index';
+
 declare var jIO;
 
 const queryPortalType = 'portal_type';
-
-export type portalType = 'Billing Period Message' |
-  'Road Account Message' |
-  'Road Event Message' |
-  'Road Message' |
-  'Road Report Request';
 
 enum PortalTypes {
   BillingPeriodMessage = 'Billing Period Message',
@@ -450,6 +447,8 @@ export class ClearRoad {
    * @param data The message
    */
   post(data: postData): IQueue {
+    validateDefinition(data.portal_type, data);
+
     const options: any = merge({}, data);
 
     switch (data.portal_type) {

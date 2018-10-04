@@ -4,6 +4,7 @@ require('../lib/jio.js');
 declare var jIO;
 
 import { ClearRoad } from './clearroad';
+import * as definitions from './definitions';
 
 const url = '//fake-url';
 
@@ -54,7 +55,13 @@ describe('ClearRoad', () => {
 
     beforeEach(() => {
       cr = new ClearRoad(url);
+      spyOn(definitions, 'validateDefinition');
       putSpy = spyOn((cr as any).messagesStorage, 'put').and.callFake((_id, data) => data);
+    });
+
+    it('should validate message', async () => {
+      await cr.post({});
+      expect(definitions.validateDefinition).toHaveBeenCalled();
     });
 
     describe('road account', () => {
@@ -71,7 +78,6 @@ describe('ClearRoad', () => {
           cert_id: '1051',
           account_reference: 'USER000011',
           effective_date: '2017-01-02T14:21:20Z',
-          expiration_date: '',
           fuel_consumption: '12.0',
           fuel_taxable: '1',
           obu_reference: '123456789MRDID',

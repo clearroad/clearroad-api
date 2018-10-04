@@ -36,6 +36,20 @@ console.log('sync done');
 
 Pushing data to ClearRoad is done by [posting it](#post) in a local storage and [synchronizing](#sync) that storage with the ClearRoad API.
 
+## Data format and validation
+
+> You can install [ajv](https://github.com/jessedc/ajv-cli) to test your JSON messages:
+
+```
+$ npm install -g ajv-cli
+// data samples can be found under the `node_modules/@clearroad/node/samples` folder
+$ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.json -d data.json
+```
+
+All of the data can be pushed to the ClearRoad Platform using the [post](#post) method. To validate the data format, we are using the [ajv library](https://github.com/epoberezkin/ajv).
+
+The list of valid data format can be found under the `node_modules/@clearroad/api/definitions` directory.
+
 ## Retrieving data from ClearRoad API
 
 > The storage must first be instantiated:
