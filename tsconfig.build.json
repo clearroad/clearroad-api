@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es6",
+    "module": "esNext",
     "declaration": true,
     "stripInternal": true,
     "emitDecoratorMetadata": true,
@@ -14,10 +15,10 @@
     "outDir": "dist"
   },
   "include": [
-    "./src/**.ts"
+    "./src/**/*.ts"
   ],
   "exclude": [
-    "./src/**.spec.ts",
+    "./src/**/*.spec.ts",
     "node_modules"
   ]
 }

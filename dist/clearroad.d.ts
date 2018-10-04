@@ -1,4 +1,4 @@
-export declare type portalType = 'Billing Period Message' | 'Road Account Message' | 'Road Event Message' | 'Road Message' | 'Road Report Request';
+import { portalType } from './message-types';
 declare enum PortalTypes {
     BillingPeriodMessage = "Billing Period Message",
     File = "File",

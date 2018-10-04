@@ -20,6 +20,7 @@ build:
 test:
   stage: test
   script:
+    - npm install
     - npm test
   artifacts:
     paths:

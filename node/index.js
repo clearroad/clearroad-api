@@ -7,6 +7,529 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var RSVP = _interopDefault(require('rsvp'));
 var Rusha = _interopDefault(require('rusha'));
 
+var json = {
+    type: 'object',
+    definitions: {
+        datetime: {
+            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
+            type: 'string',
+            examples: [
+                '2018-01-01T00:00:00Z'
+            ]
+        }
+    },
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    required: [
+        'reference',
+        'start_date',
+        'stop_date',
+        'portal_type'
+    ],
+    properties: {
+        reference: {
+            type: 'string',
+            title: 'Reference',
+            description: 'The reference given to the new billing period',
+            default: '',
+            examples: [
+                '2018Q1'
+            ]
+        },
+        start_date: {
+            $ref: '#/definitions/datetime',
+            title: 'Start Date',
+            description: 'The date, starting which, the billing period is going to be active. Should be in UTC.',
+            default: ''
+        },
+        stop_date: {
+            $ref: '#/definitions/datetime',
+            title: 'Stop Date',
+            description: 'The date, starting which, the billing period will become inactive. Should be UTC. If it is left empty, the billing period will never turn inactive, once activated.',
+            default: ''
+        },
+        portal_type: {
+            type: 'string',
+            title: 'Portal Type',
+            description: 'The type of message in the ClearRoad ERP5 instance. Only one type possible',
+            default: 'Billing Period Message',
+            enum: [
+                'Billing Period Message'
+            ],
+            examples: [
+                'Billing Period Message'
+            ]
+        }
+    }
+};
+
+var json$1 = {
+    type: 'object',
+    definitions: {
+        datetime: {
+            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
+            type: 'string',
+            examples: [
+                '2017-01-02T14:21:20Z'
+            ]
+        }
+    },
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    required: [
+        'account_manager',
+        'data_collector',
+        'condition',
+        'cert_id',
+        'account_reference',
+        'effective_date',
+        'fuel_consumption',
+        'fuel_taxable',
+        'obu_reference',
+        'vehicle_reference',
+        'product_line',
+        'portal_type'
+    ],
+    properties: {
+        account_manager: {
+            type: 'string',
+            title: 'The Account Manager Reference',
+            default: '',
+            description: 'The reference should be of an account manager that already exists in ERP5.',
+            examples: [
+                'testamref'
+            ]
+        },
+        data_collector: {
+            type: 'string',
+            title: 'The Data Collector Reference',
+            description: 'The reference should be of a data provider that already exists in ERP5.',
+            default: '',
+            examples: [
+                'testmpref'
+            ]
+        },
+        condition: {
+            type: 'string',
+            title: 'The Applicable Sale Trade Condition reference',
+            description: 'The reference should be of a sale trade condition that already exists in ERP5.',
+            default: '',
+            examples: [
+                'test-stc-1'
+            ]
+        },
+        cert_id: {
+            type: 'string',
+            title: 'The DOT certificate ID value',
+            default: '',
+            examples: [
+                '1051'
+            ]
+        },
+        account_reference: {
+            type: 'string',
+            title: 'The customer account reference ',
+            description: 'The reference of the road account to be defined.',
+            default: '',
+            examples: [
+                'USER000011'
+            ]
+        },
+        effective_date: {
+            $ref: '#/definitions/datetime',
+            title: 'The start date of the customer account.',
+            description: 'Could not be left empty.',
+            default: ''
+        },
+        expiration_date: {
+            $ref: '#/definitions/datetime',
+            title: 'The stop date of the customer account',
+            description: 'Could be left empty - the road account will have no expiration date.',
+            default: ''
+        },
+        fuel_consumption: {
+            type: 'string',
+            title: 'The EPA value of the vehicle',
+            default: '',
+            examples: [
+                '12.0'
+            ]
+        },
+        fuel_taxable: {
+            type: 'string',
+            title: 'Boolean defining if customer is subject to taxable fuel',
+            default: '',
+            examples: [
+                '1'
+            ]
+        },
+        obu_reference: {
+            type: 'string',
+            title: 'The On Board Unit reference',
+            description: 'An onject for this on board unit will be created in the ERP5 instance.',
+            default: '',
+            examples: [
+                '123456789MRDID'
+            ]
+        },
+        vehicle_reference: {
+            type: 'string',
+            title: 'The vehicle VIN Number ',
+            description: 'An onject for this vehicle will be created in the ERP5 instance.',
+            default: '',
+            examples: [
+                '2C1MR2295T6789740'
+            ]
+        },
+        product_line: {
+            type: 'string',
+            title: 'The reporting method the customer choosed to use',
+            default: '',
+            examples: [
+                'ruc_metrics'
+            ]
+        },
+        portal_type: {
+            type: 'string',
+            title: 'The type of the message.',
+            description: 'Only one type is possible.',
+            default: 'Road Account Message',
+            enum: [
+                'Road Account Message'
+            ],
+            examples: [
+                'Road Account Message'
+            ]
+        }
+    }
+};
+
+var json$2 = {
+    type: 'object',
+    definitions: {
+        datetime: {
+            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
+            type: 'string',
+            examples: [
+                '2017-01-02T14:21:20Z'
+            ]
+        }
+    },
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    required: [
+        'request',
+        'portal_type'
+    ],
+    properties: {
+        request: {
+            required: [
+                'vehicle_reference',
+                'obu_reference',
+                'event_details'
+            ],
+            type: 'object',
+            properties: {
+                vehicle_reference: {
+                    title: 'Vehicle Reference',
+                    type: 'string',
+                    description: 'The Vehicle Identification Number of the road account registration for which the event is reported',
+                    pattern: '^[0-9A-Z]{17}$',
+                    examples: [
+                        '1GTG6BE38F1262119'
+                    ]
+                },
+                obu_reference: {
+                    type: 'string',
+                    title: 'On Board Unit Reference',
+                    description: 'The On Board Unit reference of the road account registration for which the event is reported',
+                    pattern: '^[0-9a-z]{24}$',
+                    examples: [
+                        '977298026d50a5b1795c6563'
+                    ]
+                },
+                event_details: {
+                    title: 'Event Details',
+                    description: 'The details of the event that is reported',
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        required: [
+                            'type',
+                            'date'
+                        ],
+                        properties: {
+                            type: {
+                                type: 'integer',
+                                description: 'The ID of the event ',
+                                default: 0,
+                                examples: [
+                                    12
+                                ]
+                            },
+                            date: {
+                                $ref: '#/definitions/datetime',
+                                description: 'The datetime of the event. Should be a UTC time.',
+                                $comment: 'Should we accept the timezone in the pattern if the time is in UTC?'
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        portal_type: {
+            type: 'string',
+            title: 'Portal Type',
+            description: 'The type of the object in ClearRoad ERP5 instance. Only one possible value.',
+            default: 'Road Event Message',
+            enum: [
+                'Road Event Message'
+            ],
+            examples: [
+                'Road Event Message'
+            ]
+        }
+    }
+};
+
+var json$3 = {
+    type: 'object',
+    definitions: {
+        datetime: {
+            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
+            type: 'string',
+            examples: [
+                '2017-01-02T14:21:20Z'
+            ]
+        }
+    },
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    required: [
+        'request',
+        'portal_type'
+    ],
+    properties: {
+        request: {
+            type: 'object',
+            required: [
+                'description',
+                'vehicle_reference',
+                'obu_reference',
+                'type',
+                'transaction_date',
+                'mileage_details'
+            ],
+            properties: {
+                description: {
+                    type: 'string',
+                    title: 'Description',
+                    description: 'The description of the reported mileage',
+                    default: '',
+                    examples: [
+                        'Mileage data'
+                    ]
+                },
+                vehicle_reference: {
+                    title: 'Vehicle Reference',
+                    description: 'The Vehicle Identification Number of the vehicle for which the message is reported.',
+                    type: 'string',
+                    pattern: '^[0-9A-Z]{17}$',
+                    default: '',
+                    examples: [
+                        '1GTG6BE38F1262119'
+                    ]
+                },
+                obu_reference: {
+                    type: 'string',
+                    title: 'The On Board Unit Reference',
+                    description: 'The On Board Unit reference of the device for which the message is reported',
+                    default: '',
+                    pattern: '^[0-9a-z]{24}$',
+                    examples: [
+                        '977298026d50a5b1795c6563'
+                    ]
+                },
+                type: {
+                    type: 'string',
+                    description: 'The type of mileage : reported, adjustement... ',
+                    default: '',
+                    examples: [
+                        'MRP'
+                    ]
+                },
+                transaction_date: {
+                    $ref: '#/definitions/datetime',
+                    title: 'Transaction Date',
+                    description: 'The date at which miles were traveled. Should be in UTC.',
+                    default: ''
+                },
+                mileage_details: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        required: [],
+                        properties: {
+                            fuel_price: {
+                                type: 'number',
+                                title: 'Fuel Price',
+                                description: 'The price of the fuel consumed during the trip',
+                                default: 0,
+                                examples: [
+                                    -0.30000001192092896
+                                ]
+                            },
+                            fuel_quantity: {
+                                type: 'number',
+                                title: 'Fuel Quantity',
+                                description: 'The quantity of fuel consumed during the trip',
+                                default: 0,
+                                examples: [
+                                    0.14000000059604645
+                                ]
+                            },
+                            miles_price: {
+                                type: 'number',
+                                title: 'Miles Price',
+                                description: 'The price of the fuel per mile consumed during the trip.',
+                                default: 0,
+                                examples: [
+                                    0.014999999664723873
+                                ]
+                            },
+                            miles_quantity: {
+                                type: 'number',
+                                title: 'Miles Quantity',
+                                description: 'The number of miles traveled during the trip',
+                                default: 0,
+                                examples: [
+                                    3.700000047683716
+                                ]
+                            },
+                            rule_id: {
+                                type: 'integer',
+                                title: 'Rule ID',
+                                description: 'The Rule ID of the state where the trip is made. Each state has its own rule ID.',
+                                default: 0,
+                                examples: [
+                                    41
+                                ]
+                            },
+                            sub_rule_id: {
+                                type: 'integer',
+                                title: 'Sub Rule ID',
+                                description: '0 if the travel was on public roads, 1 if it was on private roads',
+                                default: 0,
+                                examples: [
+                                    1
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        portal_type: {
+            type: 'string',
+            title: 'Portal Type',
+            description: 'The type of message in the ClearRoad Platform. Only one type possible',
+            default: 'Road Message',
+            enum: [
+                'Road Message'
+            ],
+            examples: [
+                'Road Message'
+            ]
+        }
+    }
+};
+
+var json$4 = {
+    type: 'object',
+    definitions: {
+        datetime: {
+            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
+            type: 'string',
+            examples: [
+                '2017-01-02T14:21:20Z'
+            ]
+        }
+    },
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    required: [
+        'report_type',
+        'billing_period_reference',
+        'request_date',
+        'portal_type'
+    ],
+    properties: {
+        report_type: {
+            type: 'string',
+            title: 'Report Type',
+            description: 'The type of the requested report',
+            enum: [
+                'AccountBalance'
+            ],
+            $comment: 'So far there is only one type of request possible.',
+            examples: [
+                'AccountBalance'
+            ]
+        },
+        billing_period_reference: {
+            type: 'string',
+            title: 'Billing Period Reference',
+            description: 'The reference of the billing period. The billing period should already exist in the system.',
+            examples: [
+                '2018Q1'
+            ]
+        },
+        request_date: {
+            $ref: '#/definitions/datetime',
+            title: 'Request Date',
+            description: 'The datetime for which the request is made'
+        },
+        request: {
+            type: 'string',
+            title: 'Request',
+            description: ''
+        },
+        portal_type: {
+            type: 'string',
+            title: 'Portal Type',
+            description: 'The type of the object in the ClearRoad ERP5 instance. Only one possible value.',
+            default: 'Road Report Request',
+            enum: [
+                'Road Report Request'
+            ],
+            examples: [
+                'Road Report Request'
+            ]
+        }
+    }
+};
+
+var definitions = {
+    'Billing Period Message': json,
+    'Road Account Message': json$1,
+    'Road Event Message': json$2,
+    'Road Message': json$3,
+    'Road Report Request': json$4
+};
+
+var Ajv = require('ajv');
+var validateDefinition = function (type, data) {
+    var definition = definitions[type];
+    // check type
+    if (!definition) {
+        throw new Error("portal_type: \"" + type + "\" not found");
+    }
+    var ajv = new Ajv({
+        allErrors: true
+    });
+    var validate = ajv.compile(definition);
+    var valid = validate(data);
+    if (!valid) {
+        throw new Error("Validation schema failed:\n" + ajv.errorsText(validate.errors));
+    }
+    return valid;
+};
+
 var jIO = require('./lib/jio.js').jIO;
 var queryPortalType = 'portal_type';
 var PortalTypes;
@@ -351,6 +874,7 @@ var ClearRoad = /** @class */ (function () {
      */
     ClearRoad.prototype.post = function (data) {
         var _this = this;
+        validateDefinition(data.portal_type, data);
         var options = merge({}, data);
         switch (data.portal_type) {
             case PortalTypes.RoadAccountMessage:

@@ -19,6 +19,7 @@ const cjs = {
   external: [
     'rsvp',
     'rusha',
+    'ajv',
     jio
   ],
   input: main,
@@ -48,6 +49,7 @@ const node = {
   external: [
     'rsvp',
     'rusha',
+    'ajv',
     jio
   ],
   input: main,
@@ -84,16 +86,13 @@ const iife = {
 (function(jIO) {
 `,
     footer: `
-  for (var i in bundle) {
-    if (bundle.hasOwnProperty(i)) {
-      window[i] = bundle[i];
-    }
-  }
+  window.ClearRoad = bundle.ClearRoad;
 })(jIO);
     `,
     globals: {
       rsvp: 'RSVP',
-      rusha: 'Rusha'
+      rusha: 'Rusha',
+      ajv: 'Ajv'
     }
   }],
   plugins: [
@@ -116,7 +115,8 @@ export default window.Rusha;
     replace({
       delimiters: ['',''],
       values: {
-        "require('../lib/jio.js');": ''
+        "require('../lib/jio.js');": '',
+        "var Ajv = require('ajv');": 'var Ajv = window.Ajv;'
       }
     }),
     buble()

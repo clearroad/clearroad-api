@@ -1,0 +1,14 @@
+{
+  "request": {
+    "vehicle_reference": "1GTG6BE38F1262119",
+    "obu_reference": "977298026d50a5b1795c6563",
+    "event_details": [{
+      "type": 12,
+      "date": "2018-01-04T00:00:00Z"
+    }, {
+      "type": 5,
+      "date": "2018-01-03T00:00:00Z"
+    }]
+  },
+  "portal_type": "Road Event Message"
+}
