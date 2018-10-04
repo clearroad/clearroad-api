@@ -31,7 +31,7 @@ deploy:
     - TARGET=$CI_BUILD_REF npm run deploy
   only:
     - master
-    - staging
+    - develop
 
 deploy-guide:
   stage: deploy
