@@ -172,7 +172,7 @@ const report = await cr.getReport('reference');
 
 `getReport(reference)`
 
-Retrieve [the report](https://api.clearroadev.xyz/docs/#requesting-a-report) with the given report `reference`. If you only have the `reference` of the report request, please use [getReportFromRequest](#getReportFromRequest) instead.
+Retrieve [the report](https://api.clearroadlab.io/docs/#requesting-a-report) with the given report `reference`. If you only have the `reference` of the report request, please use [getReportFromRequest](#getReportFromRequest) instead.
 
 Property | Description
 --------- | -----------

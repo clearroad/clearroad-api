@@ -31,4 +31,4 @@ You can find the following samples using the ClearRoad API SDK with node:
 
 The full documentation for ClearRoad API SDK can be found on our [website](https://clearroad.github.io/clearroad-api/). The source for the documentation and website is in the [guide folder](./guide).
 
-The ClearRoad API SDK documentation only discusses the APIs of the SDK. For further documentation on use-cases of the API or to test out the API, refer to the [API Documentation](https://api.clearroadev.xyz/docs/).
+The ClearRoad API SDK documentation only discusses the APIs of the SDK. For further documentation on use-cases of the API or to test out the API, refer to the [API Documentation](https://api.clearroadlab.io/docs/).
