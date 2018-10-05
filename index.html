@@ -9,7 +9,7 @@
 
     <link href="images/favicon.ico" rel="icon" type="image/ico" />
 
-    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,300i,500,500i,700,700i" rel="stylesheet">
 
     <style>
       .highlight table td { padding: 5px; }
@@ -280,7 +280,7 @@
               </ul>
           </li>
           <li>
-            <a href="#sdk-reference" class="toc-h1 toc-link" data-title="SDK reference">SDK reference</a>
+            <a href="#api-reference" class="toc-h1 toc-link" data-title="API reference">API reference</a>
               <ul class="toc-list-h2">
                   <li>
                     <a href="#constructor" class="toc-h2 toc-link" data-title="constructor">constructor</a>
@@ -316,10 +316,10 @@
 
 <p>This document aims to provide complete steps on how to quickly get set-up to start building great applications using the ClearRoad API.</p>
 
-<p>All API interactions with ClearRoad are described in this document. The ClearRoad API is focused around the synchronization of data rather than a specification of API messages.</p>
+<p>All API interactions with ClearRoad are described in this document. The ClearRoad API is focused around the synchronization of data rather than a specification of API messages. To learn more about the ClearRoad API messages, please review the <a href="https://api.clearroadev.xyz/docs/">API documentation</a>.</p>
 <h1 id='quickstart'>QuickStart</h1><h2 id='step-1-install-the-library-as-dependency'>Step 1. Install the library as dependency</h2>
 <p>We are using <code>npm</code> to install the <code>ClearRoad</code> api library.
-Open a terminal window in your project and nstall the dependency using the command:</p>
+Open a terminal window in your project and install the dependency using the command:</p>
 
 <div class="full-column"></div>
 <pre class="highlight shell tab-shell"><code>npm i @clearroad/api -S
@@ -357,9 +357,9 @@ If you do not have an access token, you can request one on the <a href="https://
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
-<p>The ClearRoad API is based on a synchronization process, which will effectively synchronize data from the API to a &quot;local&quot; storage. This local storage can be on a local server, on the browser, or on a remote server.</p>
+<p>The ClearRoad API is based on a synchronization process, which will effectively synchronize data from the ClearRoad Platform to a &quot;local&quot; storage. This local storage can be on a local server, on the browser, or on a remote server.</p>
 
-<p>By default, the api will use <code>indexeddb</code> as local storage. If you want to change the storage (or if you are using node and you need to), please refer to <a href="#constructor">the ClearRoad reference</a>.</p>
+<p>By default, the API will use <code>indexeddb</code> as local storage. To use another storage please refer to <a href="#constructor">the API reference</a>.</p>
 <h2 id='step-4-retrieve-messages'>Step 4. Retrieve messages</h2><pre class="highlight javascript tab-javascript--browser"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'sync done'</span><span class="p">);</span>
@@ -446,8 +446,8 @@ If you do not have an access token, you can request one on the <a href="https://
 <span class="p">});</span>
 </code></pre>
 <p>After <a href="#pushing-data-to-clearroad-api">pushing data</a> to the API, you can retrieve it using the <a href="#alldocs">cr.allDocs</a> function.</p>
-<h1 id='sdk-reference'>SDK reference</h1>
-<p>The <code>ClearRoad</code> class contains a subset of functions from the <a href="https://jio.nexedi.com/">jio.js</a> library, which uses <a href="https://lab.nexedi.com/nexedi/rsvp.js">RSVP.js</a> to chain functions like Promises.</p>
+<h1 id='api-reference'>API reference</h1>
+<p>The <code>ClearRoad</code> class contains a subset of functions from the underlying <a href="https://jio.nexedi.com/">jIO.js</a> library, which uses <a href="https://lab.nexedi.com/nexedi/rsvp.js">RSVP.js</a> to chain functions like <code>Promises</code>. Please refer to their documentation for more information.</p>
 <h2 id='constructor'>constructor</h2><pre class="highlight javascript tab-javascript"><code><span class="k">new</span> <span class="nx">ClearRoad</span><span class="p">(</span><span class="s1">'apiUrl'</span><span class="p">,</span> <span class="s1">'accessToken'</span><span class="p">);</span>
 </code></pre>
 <p><code>new ClearRoad(url, accessToken, options)</code></p>
@@ -466,7 +466,7 @@ If you do not have an access token, you can request one on the <a href="https://
 </tr>
 <tr>
 <td>accessToken</td>
-<td>Optional. Access token to authenticate on ERP5 (if necessary)</td>
+<td>Optional. Access token to authenticate on the ClearRoad API (if necessary)</td>
 </tr>
 <tr>
 <td>options.localStorage.type</td>
@@ -509,7 +509,23 @@ If you do not have an access token, you can request one on the <a href="https://
 <td>Yes</td>
 </tr>
 </tbody></table>
-<h2 id='post'>post</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
+<h2 id='post'>post</h2><pre class="highlight javascript tab-javascript--browser"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
+  <span class="na">key1</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">,</span>
+  <span class="na">key2</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+    <span class="s2">"subkey"</span><span class="p">:</span> <span class="s2">"subvalue"</span>
+  <span class="p">})</span>
+<span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// 'id' is the posted document 'source_reference'</span>
+<span class="p">})</span>
+</code></pre><pre class="highlight javascript tab-javascript--browser-es6"><code><span class="c1">// 'id' is the posted document 'source_reference'</span>
+<span class="kr">const</span> <span class="nx">id</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
+  <span class="na">key1</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">,</span>
+  <span class="na">key2</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+    <span class="s2">"subkey"</span><span class="p">:</span> <span class="s2">"subvalue"</span>
+  <span class="p">})</span>
+<span class="p">});</span>
+</code></pre><pre class="highlight javascript tab-javascript--node"><code><span class="c1">// 'id' is the posted document 'source_reference'</span>
+<span class="kr">const</span> <span class="nx">id</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
   <span class="na">key1</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">,</span>
   <span class="na">key2</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
     <span class="s2">"subkey"</span><span class="p">:</span> <span class="s2">"subvalue"</span>
@@ -518,7 +534,7 @@ If you do not have an access token, you can request one on the <a href="https://
 </code></pre>
 <p><code>post(data)</code></p>
 
-<p>Posts data in your local storage. Use the <a href="#sync">sync method</a> then to synchronize the data to the ClearRoad API.</p>
+<p>Posts data in your local storage and return the <code>reference</code> of the new document. Then use the <a href="#sync">sync method</a> to synchronize the data with the ClearRoad API.</p>
 
 <table><thead>
 <tr>
@@ -535,10 +551,10 @@ If you do not have an access token, you can request one on the <a href="https://
 </code></pre>
 <p><code>sync()</code></p>
 
-<p>Similar to the <code>repair</code> method of <code>jio</code>, this will synchronize or repair the storage and all data within.</p>
+<p>Synchronizes the local storage with the ClearRoad Platform (will make sure both storage contain the same data).</p>
 <h2 id='alldocs'>allDocs</h2>
 <blockquote>
-<p>Query the documents:</p>
+<p>Query the documents from ClearRoad Platform:</p>
 </blockquote>
 <pre class="highlight javascript tab-javascript--browser"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">({</span>
   <span class="na">query</span><span class="p">:</span> <span class="nx">query_object</span><span class="p">,</span>
@@ -603,7 +619,7 @@ If you do not have an access token, you can request one on the <a href="https://
 </thead><tbody>
 <tr>
 <td>query</td>
-<td>Refer to the <a href="https://jio.nexedi.com/">jio documentation</a> in the <strong>jIO Query Engine</strong> section for details</td>
+<td>Refer to the <a href="https://jio.nexedi.com/">jIO documentation</a> in the <strong>jIO Query Engine</strong> section for details</td>
 </tr>
 <tr>
 <td>limit (optional)</td>
@@ -630,7 +646,7 @@ If you do not have an access token, you can request one on the <a href="https://
 </code></pre>
 <p><code>getReport(reference)</code></p>
 
-<p>Retrieve the report with the given report <code>reference</code>. If you only have the <code>reference</code> of the request for a report, please use <a href="#getReportFromRequest">getReportFromRequest</a> instead.</p>
+<p>Retrieve <a href="https://api.clearroadev.xyz/docs/#requesting-a-report">the report</a> with the given report <code>reference</code>. If you only have the <code>reference</code> of the report request, please use <a href="#getReportFromRequest">getReportFromRequest</a> instead.</p>
 
 <table><thead>
 <tr>
