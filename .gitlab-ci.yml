@@ -32,11 +32,3 @@ deploy:
   only:
     - master
     - develop
-
-deploy-guide:
-  stage: deploy
-  script:
-    - cd guide
-    - ./deploy.sh
-  only:
-    - master
