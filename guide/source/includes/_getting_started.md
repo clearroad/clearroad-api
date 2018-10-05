@@ -14,6 +14,7 @@ If you want to include the files directly in your page, you can include via our 
 
 <div class="full-column"></div>
 ```html
+<script src="https://clearroadlab.azureedge.net/lib/ajv.js"></script>
 <script src="https://clearroadlab.azureedge.net/lib/rsvp.js"></script>
 <script src="https://clearroadlab.azureedge.net/lib/jio.js"></script>
 <script src="https://clearroadlab.azureedge.net/api/clearroad.js"></script>
