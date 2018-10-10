@@ -1,6 +1,4 @@
 /* tslint:disable: no-console */
-require('../lib/jio.js');
-
 declare var jIO;
 
 import { ClearRoad } from './clearroad';

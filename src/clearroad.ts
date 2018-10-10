@@ -1,6 +1,6 @@
 import RSVP from 'rsvp';
 import Rusha from 'rusha';
-require('../lib/jio.js');
+require('../node/lib/jio.js');
 
 import { portalType } from './message-types';
 import { validateDefinition } from './definitions/index';
