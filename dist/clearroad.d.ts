@@ -1,4 +1,6 @@
 import { portalType } from './message-types';
+import { IQueue } from './queue';
+import { IJioQueryOptions } from './storage';
 declare enum PortalTypes {
     BillingPeriodMessage = "Billing Period Message",
     File = "File",
@@ -10,10 +12,6 @@ declare enum PortalTypes {
     RoadReportRequest = "Road Report Request",
     RoadTransaction = "Road Transaction"
 }
-export interface IQueue {
-    push: (onFullfilled?: Function, onRejected?: Function) => IQueue;
-}
-export declare type Queue = () => IQueue;
 export declare type storageName = 'messages' | 'ingestion-reports' | 'directories' | 'reports';
 export declare type localStorageType = 'indexeddb' | 'dropbox' | 'gdrive';
 export interface IOptions {
@@ -25,13 +23,6 @@ export interface IOptions {
 }
 export interface IAttachmentOptions {
     format: 'text' | 'json' | 'blob' | 'data_url' | 'array_buffer';
-}
-export interface IQueryOptions {
-    query: string;
-    limit?: [number, number];
-    sort_on?: Array<[string, 'ascending' | 'descending']>;
-    select_list?: string[];
-    include_docs?: boolean;
 }
 export declare type syncProgressCallback = (type: storageName) => void;
 export interface IPostData {
@@ -104,7 +95,7 @@ export declare class ClearRoad {
      * Query for documents in the local storage. Make sure `.sync()` is called before.
      * @param options Query options. If none set, return all documents.
      */
-    allDocs(options?: IQueryOptions): IQueue;
+    allDocs(options?: IJioQueryOptions): IQueue;
     /**
      * Get a report using the Report Request reference
      * @param sourceReference The reference of the Report Request

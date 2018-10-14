@@ -4,6 +4,8 @@ require('../node/lib/jio.js');
 
 import { portalType } from './message-types';
 import { validateDefinition } from './definitions/index';
+import { IQueue } from './queue';
+import { IJioProxyStorage, IJioQueryOptions } from './storage';
 
 declare var jIO;
 
@@ -39,12 +41,6 @@ enum ValidationStates {
 const queryValidationStates = Object.keys(ValidationStates)
   .map(key => ValidationStates[key]).map(val => `"${val}"`).join(' OR ');
 
-export interface IQueue {
-  push: (onFullfilled?: Function, onRejected?: Function) => IQueue;
-}
-
-export type Queue = () => IQueue;
-
 export type storageName = 'messages' | 'ingestion-reports' | 'directories' | 'reports';
 
 export type localStorageType = 'indexeddb' | 'dropbox' | 'gdrive';
@@ -58,14 +54,6 @@ export interface IOptions {
 
 export interface IAttachmentOptions {
   format: 'text' | 'json' | 'blob' | 'data_url' | 'array_buffer';
-}
-
-export interface IQueryOptions {
-  query: string;
-  limit?: [number, number];
-  sort_on?: Array<[string, 'ascending' | 'descending']>;
-  select_list?: string[];
-  include_docs?: boolean;
 }
 
 export type syncProgressCallback = (type: storageName) => void;
@@ -176,10 +164,10 @@ const merge = (obj1, obj2) => {
 };
 
 export class ClearRoad {
-  private messagesStorage: any;
-  private ingestionReportStorage: any;
-  private directoryStorage: any;
-  private reportStorage: any;
+  private messagesStorage: IJioProxyStorage;
+  private ingestionReportStorage: IJioProxyStorage;
+  private directoryStorage: IJioProxyStorage;
+  private reportStorage: IJioProxyStorage;
   private useLocalStorage = false;
 
   /**
@@ -509,7 +497,7 @@ export class ClearRoad {
    * Query for documents in the local storage. Make sure `.sync()` is called before.
    * @param options Query options. If none set, return all documents.
    */
-  allDocs(options?: IQueryOptions): IQueue {
+  allDocs(options?: IJioQueryOptions): IQueue {
     return this.messagesStorage.allDocs(options);
   }
 
