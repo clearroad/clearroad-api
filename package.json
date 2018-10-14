@@ -3,8 +3,8 @@
   "version": "1.2.0",
   "description": "",
   "main": "dist/commonjs/clearroad.js",
-  "module": "dist/clearroad.js",
-  "typings": "dist/clearroad.d.ts",
+  "module": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "build": "rimraf dist && rollup -c && tsc -p tsconfig.build.json",
     "build:definitions": "node definitions.js; npm run lint:fix",
