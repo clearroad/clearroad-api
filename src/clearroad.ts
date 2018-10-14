@@ -1,13 +1,11 @@
 import RSVP from 'rsvp';
 import Rusha from 'rusha';
-require('../node/lib/jio.js');
+const jIO = require('../node/lib/jio.js').jIO;
 
 import { portalType } from './message-types';
 import { validateDefinition } from './definitions/index';
 import { IQueue } from './queue';
 import { IJioProxyStorage, IJioQueryOptions } from './storage';
-
-declare var jIO;
 
 const queryPortalType = 'portal_type';
 
@@ -46,7 +44,7 @@ export type storageName = 'messages' | 'ingestion-reports' | 'directories' | 're
 export type localStorageType = 'indexeddb' | 'dropbox' | 'gdrive';
 export interface IOptions {
   localStorage?: {
-    type: localStorageType;
+    type: localStorageType|string;
     accessToken?: string;
   };
   maxDate?: Date|number|string;
@@ -163,7 +161,10 @@ const merge = (obj1, obj2) => {
   return obj3;
 };
 
+const joinQueries = (queries: string[], joinType = 'AND') => queries.filter(query => !!query).join(` ${joinType} `);
+
 export class ClearRoad {
+  private localStorageType: string;
   private messagesStorage: IJioProxyStorage;
   private ingestionReportStorage: IJioProxyStorage;
   private directoryStorage: IJioProxyStorage;
@@ -176,53 +177,128 @@ export class ClearRoad {
    * @param accessToken ClearRoad API access token (required when using Node)
    * @param options Override default options
    */
-  constructor(url: string, accessToken?: string, options: IOptions = {}) {
+  constructor(
+    private url: string,
+    private accessToken?: string,
+    private options: IOptions = {}
+  ) {
     if (!options.localStorage || !options.localStorage.type) {
       options.localStorage = {
         type: 'indexeddb'
       };
     }
 
-    let localStorageOptions = options.localStorage;
-    if (localStorageOptions.type === 'dropbox' || localStorageOptions.type === 'gdrive') {
-      localStorageOptions = {
+    this.localStorageType = options.localStorage.type;
+
+    if (this.localStorageType === 'dropbox' || this.localStorageType === 'gdrive') {
+      options.localStorage = {
         type: 'drivetojiomapping',
         sub_storage: {
-          type: localStorageOptions.type,
-          access_token: localStorageOptions.accessToken
+          type: this.localStorageType,
+          access_token: options.localStorage.accessToken
         }
       } as any;
     }
-
-    this.useLocalStorage = localStorageOptions.type === 'indexeddb';
-
-    const localSubStorage = {
-      type: 'query',
-      sub_storage: {
-        type: 'indexeddb',
-        database
-      }
-    };
-    const mappingSubStorage = {
-      type: 'mapping',
-      sub_storage: {
-        type: 'query',
-        sub_storage: localStorageOptions
-      }
-    };
-    const signatureSubStorage = {
-      type: this.useLocalStorage ? 'indexeddb' : 'memory'
-    };
-
-    // only retrieve the data since xxx
-    let queryMaxDate = '';
-    if (options.maxDate) {
-      const from = new Date(options.maxDate);
-      queryMaxDate = ` AND modification_date: >= "${from.toJSON()}"`;
+    else {
+      this.useLocalStorage = true;
     }
 
-    let refKey = 'source_reference';
-    let query = `${queryPortalType}:(${queryPortalTypes}) AND grouping_reference:"data"${queryMaxDate}`;
+    this.initMessagesStorage();
+    this.initIngestionReportStorage();
+    this.initDirectoryStorage();
+    this.initReportStorage();
+  }
+
+  /**
+   * @internal
+   */
+  private queryMaxDate() {
+    // only retrieve the data since xxx
+    if (this.options.maxDate) {
+      const from = new Date(this.options.maxDate);
+      return `modification_date: >= "${from.toJSON()}"`;
+    }
+    return '';
+  }
+
+  /**
+   * @internal
+   */
+  private localSubStorage(key: string) {
+    switch (this.localStorageType) {
+      case 'dropbox':
+      case 'gdrive':
+        return {
+          type: 'mapping',
+          sub_storage: {
+            type: 'query',
+            sub_storage: this.options.localStorage!
+          },
+          mapping_dict: {
+            portal_type: ['equalSubProperty', key]
+          }
+        };
+      case 'memory':
+        return {
+          type: 'query',
+          sub_storage: {
+            type: 'memory'
+          }
+        };
+      case 'indexeddb':
+        return {
+          type: 'query',
+          sub_storage: {
+            type: 'indexeddb',
+            database
+          }
+        };
+      default:
+        return merge({}, this.options.localStorage!);
+    }
+  }
+
+  /**
+   * @internal
+   */
+  private signatureSubStorage(db: string) {
+    switch (this.localStorageType) {
+      case 'dropbox':
+      case 'gdrive':
+      case 'memory':
+        return {
+          type: 'query',
+          sub_storage: {
+            type: 'memory'
+          }
+        };
+      case 'indexeddb':
+        return {
+          type: 'query',
+          sub_storage: {
+            type: 'indexeddb',
+            database: db
+          }
+        };
+      default:
+        return merge(this.options.localStorage!, {
+          database: db
+        });
+    }
+  }
+
+  /**
+   * @internal
+   */
+  private initMessagesStorage() {
+    const refKey = 'source_reference';
+    const query = joinQueries([
+      `${queryPortalType}:(${queryPortalTypes})`,
+      'grouping_reference:"data"',
+      this.queryMaxDate()
+    ]);
+    const signatureStorage = this.signatureSubStorage(`${database}-messages-signatures`);
+    const localStorage = this.localSubStorage(refKey);
 
     this.messagesStorage = jIO.createJIO({
       type: 'replicate',
@@ -230,12 +306,7 @@ export class ClearRoad {
       use_remote_post: false,
       conflict_handling: 1,
       signature_hash_key: refKey,
-      signature_sub_storage: {
-        type: 'query',
-        sub_storage: merge(signatureSubStorage, {
-          database: `${database}-messages-signatures`
-        })
-      },
+      signature_sub_storage: signatureStorage,
       query: {
         query,
         sort_on: [['modification_date', 'descending']],
@@ -247,25 +318,32 @@ export class ClearRoad {
       check_remote_modification: false, // ERP5 does not modify the message
       check_remote_creation: true, // we want message back in case we delete our local db
       check_remote_deletion: false, // ERP5 does not delete message
-      local_sub_storage: this.useLocalStorage ? localSubStorage : merge(mappingSubStorage, {
-        mapping_dict: {
-          portal_type: ['equalSubProperty', refKey]
-        }
-      }),
+      local_sub_storage: localStorage,
       remote_sub_storage: {
         type: 'mapping',
         id: ['equalSubProperty', refKey],
         sub_storage: {
           type: 'erp5',
-          url,
+          url: this.url,
           default_view_reference: 'jio_view',
-          access_token: accessToken
+          access_token: this.accessToken
         }
       }
     });
+  }
 
-    refKey = 'destination_reference';
-    query = `${queryPortalType}:(${queryPortalTypes}) AND validation_state:(${queryValidationStates})${queryMaxDate}`;
+  /**
+   * @internal
+   */
+  private initIngestionReportStorage() {
+    const refKey = 'destination_reference';
+    const query = joinQueries([
+      `${queryPortalType}:(${queryPortalTypes})`,
+      `validation_state:(${queryValidationStates})`,
+      this.queryMaxDate()
+    ]);
+    const signatureStorage = this.signatureSubStorage(`${database}-ingestion-signatures`);
+    const localStorage = this.localSubStorage(refKey);
 
     this.ingestionReportStorage = jIO.createJIO({
       type: 'replicate',
@@ -273,12 +351,7 @@ export class ClearRoad {
       use_remote_post: false,
       conflict_handling: 1,
       signature_hash_key: refKey,
-      signature_sub_storage: {
-        type: 'query',
-        sub_storage: merge(signatureSubStorage, {
-          database: `${database}-ingestion-signatures`
-        })
-      },
+      signature_sub_storage: signatureStorage,
       query: {
         query,
         sort_on: [['modification_date', 'descending']],
@@ -290,29 +363,32 @@ export class ClearRoad {
       check_remote_modification: false, // there is no modification, only creation of report
       check_remote_creation: true,
       check_remote_deletion: false,
-      local_sub_storage: this.useLocalStorage ? localSubStorage : merge(mappingSubStorage, {
-        mapping_dict: {
-          portal_type: ['equalSubProperty', refKey]
-        }
-      }),
+      local_sub_storage: localStorage,
       remote_sub_storage: {
         type: 'mapping',
         id: ['equalSubProperty', refKey],
         sub_storage: {
           type: 'erp5',
-          url,
+          url: this.url,
           default_view_reference: 'jio_ingestion_report_view',
-          access_token: accessToken
+          access_token: this.accessToken
         }
       }
     });
+  }
 
-    refKey = 'source_reference';
-    query = `${queryPortalType}:(` + [
+  /**
+   * @internal
+   */
+  private initDirectoryStorage() {
+    const refKey = 'source_reference';
+    const query = joinQueries([`${queryPortalType}:(` + [
       `"${PortalTypes.RoadAccount}"`,
       `"${PortalTypes.RoadEvent}"`,
       `"${PortalTypes.RoadTransaction}"`
-    ].join('OR') + ')' + queryMaxDate;
+    ].join(' OR ') + ')', this.queryMaxDate()]);
+    const signatureStorage = this.signatureSubStorage(`${database}-directory-signatures`);
+    const localStorage = this.localSubStorage(refKey);
 
     this.directoryStorage = jIO.createJIO({
       type: 'replicate',
@@ -320,12 +396,7 @@ export class ClearRoad {
       use_remote_post: false,
       conflict_handling: 1,
       signature_hash_key: refKey,
-      signature_sub_storage: {
-        type: 'query',
-        sub_storage: merge(signatureSubStorage, {
-          database: `${database}-directory-signatures`
-        })
-      },
+      signature_sub_storage: signatureStorage,
       query: {
         query,
         sort_on: [['modification_date', 'descending']],
@@ -337,27 +408,33 @@ export class ClearRoad {
       check_remote_modification: false,
       check_remote_creation: true,
       check_remote_deletion: false,
-      local_sub_storage: this.useLocalStorage ? localSubStorage : merge(mappingSubStorage, {
-        mapping_dict: {
-          portal_type: ['equalSubProperty', refKey]
-        }
-      }),
+      local_sub_storage: localStorage,
       remote_sub_storage: {
         type: 'mapping',
         id: ['equalSubProperty', refKey],
         sub_storage: {
           type: 'erp5',
-          url,
+          url: this.url,
           default_view_reference: 'jio_directory_view',
-          access_token: accessToken
+          access_token: this.accessToken
         }
       }
     });
+  }
 
-    refKey = 'reference';
-    query = `${queryPortalType}:("${PortalTypes.File}")${queryMaxDate}`;
+  /**
+   * @internal
+   */
+  private initReportStorage() {
+    const refKey = 'reference';
+    const query = joinQueries([
+      `${queryPortalType}:("${PortalTypes.File}")`,
+      this.queryMaxDate()
+    ]);
+    const signatureStorage = this.signatureSubStorage(`${database}-files-signatures`);
+    const localStorage = this.localSubStorage(refKey);
 
-    const mappingStorageWithEnclosure = merge(mappingSubStorage, {
+    const mappingStorageWithEnclosure = merge(localStorage, {
       attachment_list: ['data'],
       attachment: {
         data: {
@@ -373,12 +450,7 @@ export class ClearRoad {
       use_remote_post: false,
       conflict_handling: 1,
       signature_hash_key: 'source_reference',
-      signature_sub_storage: this.useLocalStorage ? {
-        type: 'query',
-        sub_storage: merge(signatureSubStorage, {
-          database: `${database}-files-signatures`
-        })
-      } : merge(mappingStorageWithEnclosure, {
+      signature_sub_storage: this.useLocalStorage ? signatureStorage : merge(mappingStorageWithEnclosure, {
         mapping_dict: {
           portal_type: ['equalSubProperty', 'source_reference']
         }
@@ -400,7 +472,7 @@ export class ClearRoad {
       check_local_attachment_creation: false,
       check_local_attachment_modification: false,
       check_local_attachment_deletion: false,
-      local_sub_storage: this.useLocalStorage ? localSubStorage : merge(mappingStorageWithEnclosure, {
+      local_sub_storage: this.useLocalStorage ? localStorage : merge(mappingStorageWithEnclosure, {
         mapping_dict: {
           portal_type: ['equalSubProperty', refKey]
         }
@@ -412,18 +484,18 @@ export class ClearRoad {
         attachment: {
           data: {
             get: {
-              uri_template: `${url}/{+id}/Base_downloadWithCors`
+              uri_template: `${this.url}/{+id}/Base_downloadWithCors`
             },
             put: {
-              erp5_put_template: `${url}/{+id}/Base_edit`
+              erp5_put_template: `${this.url}/{+id}/Base_edit`
             }
           }
         },
         sub_storage: {
           type: 'erp5',
-          url,
+          url: this.url,
           default_view_reference: 'jio_report_view',
-          access_token: accessToken
+          access_token: this.accessToken
         }
       }
     });
