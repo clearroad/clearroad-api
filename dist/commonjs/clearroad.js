@@ -14,7 +14,7 @@ var json = {
             pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
             type: 'string',
             examples: [
-                '2018-01-01T00:00:00Z'
+                '2018-04-01T00:00:00Z'
             ]
         }
     },
@@ -28,29 +28,22 @@ var json = {
     properties: {
         reference: {
             type: 'string',
-            title: 'Reference',
-            description: 'The reference given to the new billing period',
-            default: '',
+            description: 'The reference given to the new billing period which will be used to reference it in the future.',
             examples: [
                 '2018Q1'
             ]
         },
         start_date: {
-            $ref: '#/definitions/datetime',
-            title: 'Start Date',
             description: 'The date, starting which, the billing period is going to be active. Should be in UTC.',
-            default: ''
+            $ref: '#/definitions/datetime'
         },
         stop_date: {
-            $ref: '#/definitions/datetime',
-            title: 'Stop Date',
             description: 'The date, starting which, the billing period will become inactive. Should be UTC. If it is left empty, the billing period will never turn inactive, once activated.',
-            default: ''
+            $ref: '#/definitions/datetime'
         },
         portal_type: {
             type: 'string',
-            title: 'Portal Type',
-            description: 'The type of message in the ClearRoad ERP5 instance. Only one type possible',
+            description: 'The type of message in the ClearRoad Platform. Only one value is possible',
             default: 'Billing Period Message',
             enum: [
                 'Billing Period Message'
@@ -69,7 +62,7 @@ var json$1 = {
             pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
             type: 'string',
             examples: [
-                '2017-01-02T14:21:20Z'
+                '2018-04-01T00:00:00Z'
             ]
         }
     },
@@ -91,106 +84,93 @@ var json$1 = {
     properties: {
         account_manager: {
             type: 'string',
-            title: 'The Account Manager Reference',
-            default: '',
-            description: 'The reference should be of an account manager that already exists in ERP5.',
+            description: 'The reference should be of an account manager that already exists in ClearRoad Platform.',
             examples: [
                 'testamref'
             ]
         },
         data_collector: {
             type: 'string',
-            title: 'The Data Collector Reference',
-            description: 'The reference should be of a data provider that already exists in ERP5.',
-            default: '',
+            description: 'The reference should be of a data provider that already exists in ClearRoad Platform.',
             examples: [
                 'testmpref'
             ]
         },
         condition: {
             type: 'string',
-            title: 'The Applicable Sale Trade Condition reference',
-            description: 'The reference should be of a sale trade condition that already exists in ERP5.',
-            default: '',
+            description: 'Sale Trade Condition to apply. The reference should be of an object that already exists in ClearRoad Platform.',
             examples: [
                 'test-stc-1'
             ]
         },
         cert_id: {
             type: 'string',
-            title: 'The DOT certificate ID value',
-            default: '',
+            description: 'The DOT certificate ID value',
             examples: [
                 '1051'
             ]
         },
         account_reference: {
             type: 'string',
-            title: 'The customer account reference ',
             description: 'The reference of the road account to be defined.',
-            default: '',
             examples: [
                 'USER000011'
             ]
         },
         effective_date: {
             $ref: '#/definitions/datetime',
-            title: 'The start date of the customer account.',
-            description: 'Could not be left empty.',
-            default: ''
+            description: 'The start date of the customer account. Could not be left empty. Should be in UTC.'
         },
         expiration_date: {
             $ref: '#/definitions/datetime',
-            title: 'The stop date of the customer account',
-            description: 'Could be left empty - the road account will have no expiration date.',
-            default: ''
+            description: 'The stop date of the customer account. Could be left empty - the road account will have no expiration date. Should be in UTC.'
         },
         fuel_consumption: {
             type: 'string',
-            title: 'The EPA value of the vehicle',
-            default: '',
+            description: 'Combined EPA Miles Per Gallon (MPG) rating for the vehicle.',
             examples: [
                 '12.0'
             ]
         },
         fuel_taxable: {
             type: 'string',
-            title: 'Boolean defining if customer is subject to taxable fuel',
-            default: '',
+            description: 'Boolean defining if customer is subject to taxable fuel.',
             examples: [
                 '1'
             ]
         },
         obu_reference: {
             type: 'string',
-            title: 'The On Board Unit reference',
-            description: 'An onject for this on board unit will be created in the ERP5 instance.',
-            default: '',
+            description: 'An object for this on board unit will be created in the ClearRoad platform if it is nor already present.',
+            pattern: '^[0-9a-z]{24}$',
             examples: [
-                '123456789MRDID'
+                '977298026d50a5b1795c6563'
             ]
         },
         vehicle_reference: {
             type: 'string',
-            title: 'The vehicle VIN Number ',
-            description: 'An onject for this vehicle will be created in the ERP5 instance.',
-            default: '',
+            description: 'An onject for this vehicle will be created in the ClearRoad Platform if it is not already present.',
+            pattern: '^[0-9A-Z]{17}$',
             examples: [
                 '2C1MR2295T6789740'
             ]
         },
         product_line: {
             type: 'string',
-            title: 'The reporting method the customer choosed to use',
-            default: '',
+            description: 'The reporting method the customer choosed to use.',
+            enum: [
+                'odometer_message_no_transaction',
+                'odometer_message_transaction',
+                'ruc_metrics',
+                'service'
+            ],
             examples: [
                 'ruc_metrics'
             ]
         },
         portal_type: {
             type: 'string',
-            title: 'The type of the message.',
-            description: 'Only one type is possible.',
+            description: 'The type of the message in the ClearRoad Platform. Only one value is possible.',
             default: 'Road Account Message',
             enum: [
                 'Road Account Message'
@@ -209,7 +189,7 @@ var json$2 = {
             pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
             type: 'string',
             examples: [
-                '2017-01-02T14:21:20Z'
+                '2018-04-01T00:00:00Z'
             ]
         }
     },
@@ -228,7 +208,6 @@ var json$2 = {
             type: 'object',
             properties: {
                 vehicle_reference: {
-                    title: 'Vehicle Reference',
                     type: 'string',
                     description: 'The Vehicle Identification Number of the road account registration for which the event is reported',
                     pattern: '^[0-9A-Z]{17}$',
@@ -238,7 +217,6 @@ var json$2 = {
                 },
                 obu_reference: {
                     type: 'string',
-                    title: 'On Board Unit Reference',
                     description: 'The On Board Unit reference of the road account registration for which the event is reported',
                     pattern: '^[0-9a-z]{24}$',
                     examples: [
@@ -246,8 +224,7 @@ var json$2 = {
                     ]
                 },
                 event_details: {
-                    title: 'Event Details',
-                    description: 'The details of the event that is reported',
+                    description: 'The details of the event that is reported.',
                     type: 'array',
                     items: {
                         type: 'object',
@@ -258,7 +235,7 @@ var json$2 = {
                         properties: {
                             type: {
                                 type: 'integer',
-                                description: 'The ID of the event ',
+                                description: 'The ID of the event. Every type has it own ID.',
                                 default: 0,
                                 examples: [
                                     12
@@ -266,8 +243,7 @@ var json$2 = {
                             },
                             date: {
                                 $ref: '#/definitions/datetime',
-                                description: 'The datetime of the event. Should be a UTC time.',
-                                $comment: 'Should we accept the timezone in the pattern if the time is in UTC?'
+                                description: 'The datetime of the event. Should be a UTC time.'
                             }
                         }
                     }
@@ -276,8 +252,7 @@ var json$2 = {
         },
         portal_type: {
             type: 'string',
-            title: 'Portal Type',
-            description: 'The type of the object in ClearRoad ERP5 instance. Only one possible value.',
+            description: 'The type of the object in ClearRoad Platform. Only one value is possible.',
             default: 'Road Event Message',
             enum: [
                 'Road Event Message'
@@ -296,7 +271,7 @@ var json$3 = {
             pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
             type: 'string',
             examples: [
-                '2017-01-02T14:21:20Z'
+                '2018-04-01T00:00:00Z'
             ]
         }
     },
@@ -319,28 +294,22 @@ var json$3 = {
             properties: {
                 description: {
                     type: 'string',
-                    title: 'Description',
                     description: 'The description of the reported mileage',
-                    default: '',
                     examples: [
                         'Mileage data'
                     ]
                 },
                 vehicle_reference: {
-                    title: 'Vehicle Reference',
                     description: 'The Vehicle Identification Number of the vehicle for which the message is reported.',
                     type: 'string',
                     pattern: '^[0-9A-Z]{17}$',
-                    default: '',
                     examples: [
                         '1GTG6BE38F1262119'
                     ]
                 },
                 obu_reference: {
                     type: 'string',
-                    title: 'The On Board Unit Reference',
                     description: 'The On Board Unit reference of the device for which the message is reported',
-                    default: '',
                     pattern: '^[0-9a-z]{24}$',
                     examples: [
                         '977298026d50a5b1795c6563'
@@ -348,28 +317,23 @@ var json$3 = {
                 },
                 type: {
                     type: 'string',
-                    description: 'The type of mileage : reported, adjustement... ',
-                    default: '',
+                    description: 'A value to indicate the type of message. Can be one of: ADJ: Adjusted mileage transaction, CRE: Credit transaction, FEE: Fees transaction, INV: Invoicing transaction, MRP: Reported mileage transaction',
                     examples: [
                         'MRP'
                     ]
                 },
                 transaction_date: {
-                    $ref: '#/definitions/datetime',
-                    title: 'Transaction Date',
-                    description: 'The date at which miles were traveled. Should be in UTC.',
-                    default: ''
+                    description: 'The date at which mileage was traveled. Should be in UTC.',
+                    $ref: '#/definitions/datetime'
                 },
                 mileage_details: {
                     type: 'array',
                     items: {
                         type: 'object',
-                        required: [],
                         properties: {
                             fuel_price: {
                                 type: 'number',
-                                title: 'Fuel Price',
-                                description: 'The price of the fuel consumed during the trip',
+                                description: 'The price of the fuel consumed at the transaction date.',
                                 default: 0,
                                 examples: [
                                     -0.30000001192092896
@@ -377,8 +341,7 @@ var json$3 = {
                             },
                             fuel_quantity: {
                                 type: 'number',
-                                title: 'Fuel Quantity',
-                                description: 'The quantity of fuel consumed during the trip',
+                                description: 'The quantity of fuel consumed at the transaction date.',
                                 default: 0,
                                 examples: [
                                     0.14000000059604645
@@ -386,8 +349,7 @@ var json$3 = {
                             },
                             miles_price: {
                                 type: 'number',
-                                title: 'Miles Price',
-                                description: 'The price of the fuel per mile consumed during the trip.',
+                                description: 'The price of miles traveled.',
                                 default: 0,
                                 examples: [
                                     0.014999999664723873
@@ -395,8 +357,7 @@ var json$3 = {
                             },
                             miles_quantity: {
                                 type: 'number',
-                                title: 'Miles Quantity',
-                                description: 'The number of miles traveled during the trip',
+                                description: 'The number of miles traveled.',
                                 default: 0,
                                 examples: [
                                     3.700000047683716
@@ -404,8 +365,7 @@ var json$3 = {
                             },
                             rule_id: {
                                 type: 'integer',
-                                title: 'Rule ID',
-                                description: 'The Rule ID of the state where the trip is made. Each state has its own rule ID.',
+                                description: 'An identifier associated with a geographic area, or zone, in which a specific rate per mile will be assessed for miles traveled.  FIPS codes are used to identify states.',
                                 default: 0,
                                 examples: [
                                     41
@@ -413,7 +373,6 @@ var json$3 = {
                             },
                             sub_rule_id: {
                                 type: 'integer',
-                                title: 'Sub Rule ID',
                                 description: '0 if the travel was on public roads, 1 if it was on private roads',
                                 default: 0,
                                 examples: [
@@ -427,7 +386,6 @@ var json$3 = {
         },
         portal_type: {
             type: 'string',
-            title: 'Portal Type',
             description: 'The type of message in the ClearRoad Platform. Only one type possible',
             default: 'Road Message',
             enum: [
@@ -447,7 +405,7 @@ var json$4 = {
             pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
             type: 'string',
             examples: [
-                '2017-01-02T14:21:20Z'
+                '2018-04-01T00:00:00Z'
             ]
         }
     },
@@ -461,38 +419,32 @@ var json$4 = {
     properties: {
         report_type: {
             type: 'string',
-            title: 'Report Type',
-            description: 'The type of the requested report',
+            description: 'The type of the requested report.',
             enum: [
                 'AccountBalance'
             ],
-            $comment: 'So far there is only one type of request possible.',
             examples: [
                 'AccountBalance'
             ]
         },
         billing_period_reference: {
             type: 'string',
-            title: 'Billing Period Reference',
-            description: 'The reference of the billing period. The billing period should already exist in the system.',
+            description: 'The reference of the billing period. The billing period should already exist in the ClearRoad Platform.',
             examples: [
                 '2018Q1'
             ]
         },
         request_date: {
-            $ref: '#/definitions/datetime',
-            title: 'Request Date',
-            description: 'The datetime for which the request is made'
+            description: 'The datetime for which the request is made. Should be in UTC.',
+            $ref: '#/definitions/datetime'
         },
         request: {
             type: 'string',
-            title: 'Request',
-            description: ''
+            description: 'Used to give specific parameters to report if needed. This filed could be left empty for an AccountBalance report.'
         },
         portal_type: {
             type: 'string',
-            title: 'Portal Type',
-            description: 'The type of the object in the ClearRoad ERP5 instance. Only one possible value.',
+            description: 'The type of the object in the ClearRoad Platform. Only one possible value.',
             default: 'Road Report Request',
             enum: [
                 'Road Report Request'

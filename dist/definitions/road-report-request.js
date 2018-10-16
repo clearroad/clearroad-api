@@ -5,7 +5,7 @@ const json = {
             pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
             type: 'string',
             examples: [
-                '2017-01-02T14:21:20Z'
+                '2018-04-01T00:00:00Z'
             ]
         }
     },
@@ -19,38 +19,32 @@ const json = {
     properties: {
         report_type: {
             type: 'string',
-            title: 'Report Type',
-            description: 'The type of the requested report',
+            description: 'The type of the requested report.',
             enum: [
                 'AccountBalance'
             ],
-            $comment: 'So far there is only one type of request possible.',
             examples: [
                 'AccountBalance'
             ]
         },
         billing_period_reference: {
             type: 'string',
-            title: 'Billing Period Reference',
-            description: 'The reference of the billing period. The billing period should already exist in the system.',
+            description: 'The reference of the billing period. The billing period should already exist in the ClearRoad Platform.',
             examples: [
                 '2018Q1'
             ]
         },
         request_date: {
-            $ref: '#/definitions/datetime',
-            title: 'Request Date',
-            description: 'The datetime for which the request is made'
+            description: 'The datetime for which the request is made. Should be in UTC.',
+            $ref: '#/definitions/datetime'
         },
         request: {
             type: 'string',
-            title: 'Request',
-            description: ''
+            description: 'Used to give specific parameters to report if needed. This filed could be left empty for an AccountBalance report.'
         },
         portal_type: {
             type: 'string',
-            title: 'Portal Type',
-            description: 'The type of the object in the ClearRoad ERP5 instance. Only one possible value.',
+            description: 'The type of the object in the ClearRoad Platform. Only one possible value.',
             default: 'Road Report Request',
             enum: [
                 'Road Report Request'
