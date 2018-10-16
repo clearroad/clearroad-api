@@ -1,6 +1,10 @@
+.nyc_output/
+coverage/
 dist/iife/
 guide/
 legacy/
+lib/
+src/
 test/
 *.spec.ts
 .*
