@@ -1,3 +1,4 @@
+declare const jIO: any;
 import { portalType } from './message-types';
 import { IQueue } from './queue';
 import { IJioQueryOptions } from './storage';
@@ -112,4 +113,4 @@ export declare class ClearRoad {
      */
     getReport(reference: string): IQueue;
 }
-export {};
+export { jIO };
