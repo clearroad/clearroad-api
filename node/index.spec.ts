@@ -84,7 +84,7 @@ describe('ClearRoad', () => {
           effective_date: '2017-01-02T14:21:20Z',
           fuel_consumption: '12.0',
           fuel_taxable: '1',
-          obu_reference: '123456789MRDID',
+          obu_reference: '977298026d50a5b1795c6563',
           vehicle_reference: '2C1MR2295T6789740',
           product_line: 'ruc_metrics'
         };
