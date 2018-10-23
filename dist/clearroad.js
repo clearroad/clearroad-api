@@ -1,7 +1,7 @@
-import RSVP from 'rsvp';
 import Rusha from 'rusha';
 const jIO = require('../node/lib/jio.js').jIO;
 import { validateDefinition } from './definitions/index';
+import { getQueue } from './queue';
 import { defaultAttachmentName } from './storage';
 const queryPortalType = 'portal_type';
 export var PortalTypes;
@@ -440,8 +440,7 @@ export class ClearRoad {
         const reference = rusha.digestFromString(dataAsString);
         options.source_reference = reference;
         options.destination_reference = reference;
-        const queue = new RSVP.Queue();
-        return queue.push(() => {
+        return getQueue().push(() => {
             return this.messagesStorage.put(options.source_reference, options);
         });
     }
@@ -452,8 +451,7 @@ export class ClearRoad {
      * @param progress Function to get notified of progress. There are 4 storages to sync.
      */
     sync(progress = () => { }) {
-        const queue = new RSVP.Queue();
-        return queue
+        return getQueue()
             .push(() => {
             return this.messagesStorage.repair().push(() => progress('messages'));
         })
@@ -496,8 +494,7 @@ export class ClearRoad {
      * @param reference The reference of the Report
      */
     getReport(reference) {
-        const queue = new RSVP.Queue();
-        return queue
+        return getQueue()
             .push(() => {
             return this.reportStorage.getAttachment(reference, defaultAttachmentName);
         })

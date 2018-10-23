@@ -1,6 +1,9 @@
 /* tslint:disable: no-console */
 import * as jioImport from '../node/lib/jio.js';
-import { ClearRoad, PortalTypes, IPostBillingPeriodMessage, IPostRoadMessage, IPostRoadReportRequest, IPostRoadAccountMessage, IPostRoadEventMessage } from './clearroad';
+import {
+  ClearRoad, PortalTypes,
+  IPostBillingPeriodMessage, IPostRoadMessage, IPostRoadReportRequest, IPostRoadAccountMessage, IPostRoadEventMessage
+} from './clearroad';
 import * as definitions from './definitions';
 
 const url = '//fake-url';

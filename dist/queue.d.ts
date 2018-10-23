@@ -18,3 +18,5 @@ export interface IQueue<T> extends Promise<T> {
     push<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | IQueueLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | IQueueLike<TResult2>) | undefined | null): IQueue<TResult1 | TResult2>;
 }
 export declare type Queue = <T>() => IQueue<T>;
+export declare const getQueue: <T>() => IQueue<T>;
+export declare const promiseToQueue: <T>(promise: Promise<T>) => IQueue<T>;

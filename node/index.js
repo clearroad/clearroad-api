@@ -482,6 +482,8 @@ var validateDefinition = function (type, data) {
     return valid;
 };
 
+var getQueue = function () { return new RSVP.Queue(); };
+
 /**
  * If the storage only support one attachment type,
  * use this one.
@@ -931,8 +933,7 @@ var ClearRoad = /** @class */ (function () {
         var reference = rusha.digestFromString(dataAsString);
         options.source_reference = reference;
         options.destination_reference = reference;
-        var queue = new RSVP.Queue();
-        return queue.push(function () {
+        return getQueue().push(function () {
             return _this.messagesStorage.put(options.source_reference, options);
         });
     };
@@ -945,8 +946,7 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.sync = function (progress) {
         var _this = this;
         if (progress === void 0) { progress = function () { }; }
-        var queue = new RSVP.Queue();
-        return queue
+        return getQueue()
             .push(function () {
             return _this.messagesStorage.repair().push(function () { return progress('messages'); });
         })
@@ -991,8 +991,7 @@ var ClearRoad = /** @class */ (function () {
      */
     ClearRoad.prototype.getReport = function (reference) {
         var _this = this;
-        var queue = new RSVP.Queue();
-        return queue
+        return getQueue()
             .push(function () {
             return _this.reportStorage.getAttachment(reference, defaultAttachmentName);
         })
