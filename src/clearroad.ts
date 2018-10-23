@@ -5,7 +5,7 @@ const jIO = require('../node/lib/jio.js').jIO;
 import { portalType } from './message-types';
 import { validateDefinition } from './definitions/index';
 import { IQueue } from './queue';
-import { IJioProxyStorage, IJioQueryOptions } from './storage';
+import { IJioProxyStorage, IJioQueryOptions, defaultAttachmentName } from './storage';
 
 const queryPortalType = 'portal_type';
 
@@ -435,7 +435,7 @@ export class ClearRoad {
     const localStorage = this.localSubStorage(refKey);
 
     const mappingStorageWithEnclosure = merge(localStorage, {
-      attachment_list: ['data'],
+      attachment_list: [defaultAttachmentName],
       attachment: {
         data: {
           get: {uri_template: 'enclosure'},
@@ -480,7 +480,7 @@ export class ClearRoad {
       remote_sub_storage: {
         type: 'mapping',
         id: ['equalSubProperty', refKey],
-        attachment_list: ['data'],
+        attachment_list: [defaultAttachmentName],
         attachment: {
           data: {
             get: {
@@ -529,7 +529,7 @@ export class ClearRoad {
         break;
     }
 
-    options.grouping_reference = 'data';
+    options.grouping_reference = defaultAttachmentName;
     const dataAsString = jsonId(options);
     const rusha = new Rusha();
     const reference = rusha.digestFromString(dataAsString);
@@ -596,11 +596,19 @@ export class ClearRoad {
    * @param reference The reference of the Report
    */
   getReport(reference: string): IQueue {
-    if (this.useLocalStorage) {
-      return this.reportStorage.getAttachment(reference, 'data');
-    }
-
-    return this.reportStorage.allAttachments(reference);
+    const queue = new (RSVP as any).Queue() as IQueue;
+    return queue
+      .push(() => {
+        return this.reportStorage.getAttachment(reference, defaultAttachmentName);
+      })
+      .push(data => {
+        return {
+          [defaultAttachmentName]: data
+        };
+      }, () => {
+        return this.reportStorage.allAttachments(reference);
+      })
+      .push(attachment => attachment[defaultAttachmentName]);
   }
 }
 

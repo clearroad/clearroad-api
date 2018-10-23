@@ -390,24 +390,25 @@ describe('ClearRoad', () => {
 
     beforeEach(() => {
       cr = new ClearRoad(url);
-      getAttachmentSpy = spyOn((cr as any).reportStorage, 'getAttachment').and.callFake(options => options);
-      allAttachmentsSpy = spyOn((cr as any).reportStorage, 'allAttachments').and.callFake(options => options);
+      allAttachmentsSpy = spyOn((cr as any).reportStorage, 'allAttachments').and.returnValue({});
     });
 
-    describe('not using local storage', () => {
+    describe('getAttachment success', () => {
       beforeEach(() => {
-        cr.useLocalStorage = false;
+        getAttachmentSpy = spyOn((cr as any).reportStorage, 'getAttachment').and.returnValue({});
       });
 
       it('should get the report', async () => {
         await cr.getReport(id);
-        expect(allAttachmentsSpy).toHaveBeenCalledWith(id);
+        expect(allAttachmentsSpy).not.toHaveBeenCalledWith(id);
       });
     });
 
-    describe('using local storage', () => {
+    describe('getAttachment fails', () => {
       beforeEach(() => {
-        cr.useLocalStorage = true;
+        getAttachmentSpy = spyOn((cr as any).reportStorage, 'getAttachment').and.callFake(() => {
+          throw new Error('undefined');
+        });
       });
 
       it('should get the report', async () => {

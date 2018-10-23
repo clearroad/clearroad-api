@@ -1,5 +1,11 @@
 import { IQueue } from './queue';
 
+/**
+ * If the storage only support one attachment type,
+ * use this one.
+ */
+export const defaultAttachmentName = 'data';
+
 export interface IJioQueryOptions {
   /**
    * Search with a query.
@@ -34,9 +40,9 @@ export interface IJioStorage {
   put: (id: string, data: any) => IQueue;
   remove: (id: string) => IQueue;
 
-  getAttachment: (id: string, action: string, options?: any) => IQueue;
+  getAttachment: (id: string, name: string, options?: any) => IQueue;
   putAttachment: (id: string, name: string, blob: Blob) => IQueue;
-  removeAttachment: (id: string) => IQueue;
+  removeAttachment: (id: string, name: string) => IQueue;
   allAttachments: (id: string) => IQueue;
 
   hasCapacity: (name: string) => boolean;

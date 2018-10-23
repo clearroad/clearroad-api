@@ -482,6 +482,12 @@ var validateDefinition = function (type, data) {
     return valid;
 };
 
+/**
+ * If the storage only support one attachment type,
+ * use this one.
+ */
+var defaultAttachmentName = 'data';
+
 var jIO = require('./lib/jio.js').jIO;
 var queryPortalType = 'portal_type';
 var PortalTypes;
@@ -827,7 +833,7 @@ var ClearRoad = /** @class */ (function () {
         var signatureStorage = this.signatureSubStorage(database + "-files-signatures");
         var localStorage = this.localSubStorage(refKey);
         var mappingStorageWithEnclosure = merge(localStorage, {
-            attachment_list: ['data'],
+            attachment_list: [defaultAttachmentName],
             attachment: {
                 data: {
                     get: { uri_template: 'enclosure' },
@@ -871,7 +877,7 @@ var ClearRoad = /** @class */ (function () {
             remote_sub_storage: {
                 type: 'mapping',
                 id: ['equalSubProperty', refKey],
-                attachment_list: ['data'],
+                attachment_list: [defaultAttachmentName],
                 attachment: {
                     data: {
                         get: {
@@ -917,7 +923,7 @@ var ClearRoad = /** @class */ (function () {
                 options.parent_relative_url = 'road_report_request_module';
                 break;
         }
-        options.grouping_reference = 'data';
+        options.grouping_reference = defaultAttachmentName;
         var dataAsString = jsonId(options);
         var rusha = new Rusha();
         var reference = rusha.digestFromString(dataAsString);
@@ -982,10 +988,21 @@ var ClearRoad = /** @class */ (function () {
      * @param reference The reference of the Report
      */
     ClearRoad.prototype.getReport = function (reference) {
-        if (this.useLocalStorage) {
-            return this.reportStorage.getAttachment(reference, 'data');
-        }
-        return this.reportStorage.allAttachments(reference);
+        var _this = this;
+        var queue = new RSVP.Queue();
+        return queue
+            .push(function () {
+            return _this.reportStorage.getAttachment(reference, defaultAttachmentName);
+        })
+            .push(function (data) {
+            var _a;
+            return _a = {},
+                _a[defaultAttachmentName] = data,
+                _a;
+        }, function () {
+            return _this.reportStorage.allAttachments(reference);
+        })
+            .push(function (attachment) { return attachment[defaultAttachmentName]; });
     };
     return ClearRoad;
 }());

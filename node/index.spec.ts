@@ -242,26 +242,28 @@ describe('ClearRoad', () => {
 
     beforeEach(() => {
       cr = new ClearRoad(url, null, {});
-      getAttachmentStub = sinon.stub((cr as any).reportStorage, 'getAttachment').callsFake(options => options);
-      stubs.push(getAttachmentStub);
-      allAttachmentsStub = sinon.stub((cr as any).reportStorage, 'allAttachments').callsFake(options => options);
+      allAttachmentsStub = sinon.stub((cr as any).reportStorage, 'allAttachments').returns({});
       stubs.push(allAttachmentsStub);
     });
 
-    describe('not using local storage', () => {
+    describe('getAttachment success', () => {
       beforeEach(() => {
-        cr.useLocalStorage = false;
+        getAttachmentStub = sinon.stub((cr as any).reportStorage, 'getAttachment').returns({});
+        stubs.push(getAttachmentStub);
       });
 
       it('should get the report', async () => {
         await cr.getReport(id);
-        expect(allAttachmentsStub.called).to.equal(true);
+        expect(allAttachmentsStub.called).not.to.equal(true);
       });
     });
 
-    describe('using local storage', () => {
+    describe('getAttachment fails', () => {
       beforeEach(() => {
-        cr.useLocalStorage = true;
+        getAttachmentStub = sinon.stub((cr as any).reportStorage, 'getAttachment').callsFake(() => {
+          throw new Error('undefined');
+        });
+        stubs.push(getAttachmentStub);
       });
 
       it('should get the report', async () => {

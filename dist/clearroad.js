@@ -2,6 +2,7 @@ import RSVP from 'rsvp';
 import Rusha from 'rusha';
 const jIO = require('../node/lib/jio.js').jIO;
 import { validateDefinition } from './definitions/index';
+import { defaultAttachmentName } from './storage';
 const queryPortalType = 'portal_type';
 var PortalTypes;
 (function (PortalTypes) {
@@ -341,7 +342,7 @@ export class ClearRoad {
         const signatureStorage = this.signatureSubStorage(`${database}-files-signatures`);
         const localStorage = this.localSubStorage(refKey);
         const mappingStorageWithEnclosure = merge(localStorage, {
-            attachment_list: ['data'],
+            attachment_list: [defaultAttachmentName],
             attachment: {
                 data: {
                     get: { uri_template: 'enclosure' },
@@ -385,7 +386,7 @@ export class ClearRoad {
             remote_sub_storage: {
                 type: 'mapping',
                 id: ['equalSubProperty', refKey],
-                attachment_list: ['data'],
+                attachment_list: [defaultAttachmentName],
                 attachment: {
                     data: {
                         get: {
@@ -430,7 +431,7 @@ export class ClearRoad {
                 options.parent_relative_url = 'road_report_request_module';
                 break;
         }
-        options.grouping_reference = 'data';
+        options.grouping_reference = defaultAttachmentName;
         const dataAsString = jsonId(options);
         const rusha = new Rusha();
         const reference = rusha.digestFromString(dataAsString);
@@ -492,10 +493,19 @@ export class ClearRoad {
      * @param reference The reference of the Report
      */
     getReport(reference) {
-        if (this.useLocalStorage) {
-            return this.reportStorage.getAttachment(reference, 'data');
-        }
-        return this.reportStorage.allAttachments(reference);
+        const queue = new RSVP.Queue();
+        return queue
+            .push(() => {
+            return this.reportStorage.getAttachment(reference, defaultAttachmentName);
+        })
+            .push(data => {
+            return {
+                [defaultAttachmentName]: data
+            };
+        }, () => {
+            return this.reportStorage.allAttachments(reference);
+        })
+            .push(attachment => attachment[defaultAttachmentName]);
     }
 }
 export { jIO };
