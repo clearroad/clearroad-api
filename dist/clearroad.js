@@ -32,7 +32,6 @@ var ValidationStates;
 })(ValidationStates || (ValidationStates = {}));
 const queryValidationStates = Object.keys(ValidationStates)
     .map(key => ValidationStates[key]).map(val => `"${val}"`).join(' OR ');
-const database = 'clearroad';
 const jsonIdRec = (keyValueSpace, key, value, deep = 0) => {
     let res;
     if (value && typeof value.toJSON === 'function') {
@@ -121,6 +120,7 @@ export class ClearRoad {
         else {
             this.useLocalStorage = true;
         }
+        this.databaseName = options.localStorage.database || 'clearroad';
         this.initMessagesStorage();
         this.initIngestionReportStorage();
         this.initDirectoryStorage();
@@ -166,7 +166,7 @@ export class ClearRoad {
                     type: 'query',
                     sub_storage: {
                         type: 'indexeddb',
-                        database
+                        database: this.databaseName
                     }
                 };
             default:
@@ -211,7 +211,7 @@ export class ClearRoad {
             'grouping_reference:"data"',
             this.queryMaxDate()
         ]);
-        const signatureStorage = this.signatureSubStorage(`${database}-messages-signatures`);
+        const signatureStorage = this.signatureSubStorage(`${this.databaseName}-messages-signatures`);
         const localStorage = this.localSubStorage(refKey);
         this.messagesStorage = jIO.createJIO({
             type: 'replicate',
@@ -254,7 +254,7 @@ export class ClearRoad {
             `validation_state:(${queryValidationStates})`,
             this.queryMaxDate()
         ]);
-        const signatureStorage = this.signatureSubStorage(`${database}-ingestion-signatures`);
+        const signatureStorage = this.signatureSubStorage(`${this.databaseName}-ingestion-signatures`);
         const localStorage = this.localSubStorage(refKey);
         this.ingestionReportStorage = jIO.createJIO({
             type: 'replicate',
@@ -297,7 +297,7 @@ export class ClearRoad {
                 `"${PortalTypes.RoadEvent}"`,
                 `"${PortalTypes.RoadTransaction}"`
             ].join(' OR ') + ')', this.queryMaxDate()]);
-        const signatureStorage = this.signatureSubStorage(`${database}-directory-signatures`);
+        const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signatures`);
         const localStorage = this.localSubStorage(refKey);
         this.directoryStorage = jIO.createJIO({
             type: 'replicate',
@@ -339,7 +339,7 @@ export class ClearRoad {
             `${queryPortalType}:("${PortalTypes.File}")`,
             this.queryMaxDate()
         ]);
-        const signatureStorage = this.signatureSubStorage(`${database}-files-signatures`);
+        const signatureStorage = this.signatureSubStorage(`${this.databaseName}-files-signatures`);
         const localStorage = this.localSubStorage(refKey);
         const mappingStorageWithEnclosure = merge(localStorage, {
             attachment_list: [defaultAttachmentName],

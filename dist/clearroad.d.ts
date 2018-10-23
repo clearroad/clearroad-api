@@ -19,6 +19,10 @@ export interface IOptions {
     localStorage?: {
         type: localStorageType | string;
         accessToken?: string;
+        /**
+         * Primary database name. Default to 'clearroad'
+         */
+        database?: string;
     };
     maxDate?: Date | number | string;
 }
@@ -70,6 +74,7 @@ export declare class ClearRoad {
     private url;
     private accessToken?;
     private options;
+    private databaseName;
     private localStorageType;
     private messagesStorage;
     private ingestionReportStorage;

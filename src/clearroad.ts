@@ -46,6 +46,10 @@ export interface IOptions {
   localStorage?: {
     type: localStorageType|string;
     accessToken?: string;
+    /**
+     * Primary database name. Default to 'clearroad'
+     */
+    database?: string;
   };
   maxDate?: Date|number|string;
 }
@@ -97,8 +101,6 @@ export interface IPostRoadMessage extends IPostData {
 }
 export type postData = IPostRoadAccountMessage | IPostBillingPeriodMessage | IPostRoadReportRequest |
   IPostRoadEventMessage | IPostRoadMessage;
-
-const database = 'clearroad';
 
 const jsonIdRec = (keyValueSpace: string, key: string | number, value: any, deep = 0) => {
   let res;
@@ -164,6 +166,7 @@ const merge = (obj1, obj2) => {
 const joinQueries = (queries: string[], joinType = 'AND') => queries.filter(query => !!query).join(` ${joinType} `);
 
 export class ClearRoad {
+  private databaseName: string;
   private localStorageType: string;
   private messagesStorage: IJioProxyStorage;
   private ingestionReportStorage: IJioProxyStorage;
@@ -202,6 +205,8 @@ export class ClearRoad {
     else {
       this.useLocalStorage = true;
     }
+
+    this.databaseName = options.localStorage!.database || 'clearroad';
 
     this.initMessagesStorage();
     this.initIngestionReportStorage();
@@ -250,7 +255,7 @@ export class ClearRoad {
           type: 'query',
           sub_storage: {
             type: 'indexeddb',
-            database
+            database: this.databaseName
           }
         };
       default:
@@ -297,7 +302,7 @@ export class ClearRoad {
       'grouping_reference:"data"',
       this.queryMaxDate()
     ]);
-    const signatureStorage = this.signatureSubStorage(`${database}-messages-signatures`);
+    const signatureStorage = this.signatureSubStorage(`${this.databaseName}-messages-signatures`);
     const localStorage = this.localSubStorage(refKey);
 
     this.messagesStorage = jIO.createJIO({
@@ -342,7 +347,7 @@ export class ClearRoad {
       `validation_state:(${queryValidationStates})`,
       this.queryMaxDate()
     ]);
-    const signatureStorage = this.signatureSubStorage(`${database}-ingestion-signatures`);
+    const signatureStorage = this.signatureSubStorage(`${this.databaseName}-ingestion-signatures`);
     const localStorage = this.localSubStorage(refKey);
 
     this.ingestionReportStorage = jIO.createJIO({
@@ -387,7 +392,7 @@ export class ClearRoad {
       `"${PortalTypes.RoadEvent}"`,
       `"${PortalTypes.RoadTransaction}"`
     ].join(' OR ') + ')', this.queryMaxDate()]);
-    const signatureStorage = this.signatureSubStorage(`${database}-directory-signatures`);
+    const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signatures`);
     const localStorage = this.localSubStorage(refKey);
 
     this.directoryStorage = jIO.createJIO({
@@ -431,7 +436,7 @@ export class ClearRoad {
       `${queryPortalType}:("${PortalTypes.File}")`,
       this.queryMaxDate()
     ]);
-    const signatureStorage = this.signatureSubStorage(`${database}-files-signatures`);
+    const signatureStorage = this.signatureSubStorage(`${this.databaseName}-files-signatures`);
     const localStorage = this.localSubStorage(refKey);
 
     const mappingStorageWithEnclosure = merge(localStorage, {

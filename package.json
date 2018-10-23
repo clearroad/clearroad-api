@@ -1,6 +1,6 @@
 {
   "name": "@clearroad/api",
-  "version": "1.2.0-rc.4",
+  "version": "1.2.0-rc.5",
   "description": "",
   "main": "dist/commonjs/clearroad.js",
   "module": "dist/index.js",

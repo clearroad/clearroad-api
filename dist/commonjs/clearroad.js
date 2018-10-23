@@ -518,7 +518,6 @@ var ValidationStates;
 })(ValidationStates || (ValidationStates = {}));
 var queryValidationStates = Object.keys(ValidationStates)
     .map(function (key) { return ValidationStates[key]; }).map(function (val) { return "\"" + val + "\""; }).join(' OR ');
-var database = 'clearroad';
 var jsonIdRec = function (keyValueSpace, key, value, deep) {
     if (deep === void 0) { deep = 0; }
     var res;
@@ -612,6 +611,7 @@ var ClearRoad = /** @class */ (function () {
         else {
             this.useLocalStorage = true;
         }
+        this.databaseName = options.localStorage.database || 'clearroad';
         this.initMessagesStorage();
         this.initIngestionReportStorage();
         this.initDirectoryStorage();
@@ -657,7 +657,7 @@ var ClearRoad = /** @class */ (function () {
                     type: 'query',
                     sub_storage: {
                         type: 'indexeddb',
-                        database: database
+                        database: this.databaseName
                     }
                 };
             default:
@@ -702,7 +702,7 @@ var ClearRoad = /** @class */ (function () {
             'grouping_reference:"data"',
             this.queryMaxDate()
         ]);
-        var signatureStorage = this.signatureSubStorage(database + "-messages-signatures");
+        var signatureStorage = this.signatureSubStorage(this.databaseName + "-messages-signatures");
         var localStorage = this.localSubStorage(refKey);
         this.messagesStorage = jIO.createJIO({
             type: 'replicate',
@@ -745,7 +745,7 @@ var ClearRoad = /** @class */ (function () {
             "validation_state:(" + queryValidationStates + ")",
             this.queryMaxDate()
         ]);
-        var signatureStorage = this.signatureSubStorage(database + "-ingestion-signatures");
+        var signatureStorage = this.signatureSubStorage(this.databaseName + "-ingestion-signatures");
         var localStorage = this.localSubStorage(refKey);
         this.ingestionReportStorage = jIO.createJIO({
             type: 'replicate',
@@ -788,7 +788,7 @@ var ClearRoad = /** @class */ (function () {
                 "\"" + PortalTypes.RoadEvent + "\"",
                 "\"" + PortalTypes.RoadTransaction + "\""
             ].join(' OR ') + ')', this.queryMaxDate()]);
-        var signatureStorage = this.signatureSubStorage(database + "-directory-signatures");
+        var signatureStorage = this.signatureSubStorage(this.databaseName + "-directory-signatures");
         var localStorage = this.localSubStorage(refKey);
         this.directoryStorage = jIO.createJIO({
             type: 'replicate',
@@ -830,7 +830,7 @@ var ClearRoad = /** @class */ (function () {
             queryPortalType + ":(\"" + PortalTypes.File + "\")",
             this.queryMaxDate()
         ]);
-        var signatureStorage = this.signatureSubStorage(database + "-files-signatures");
+        var signatureStorage = this.signatureSubStorage(this.databaseName + "-files-signatures");
         var localStorage = this.localSubStorage(refKey);
         var mappingStorageWithEnclosure = merge(localStorage, {
             attachment_list: [defaultAttachmentName],
