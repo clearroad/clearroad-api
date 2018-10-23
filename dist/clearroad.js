@@ -4,17 +4,13 @@ const jIO = require('../node/lib/jio.js').jIO;
 import { validateDefinition } from './definitions/index';
 import { defaultAttachmentName } from './storage';
 const queryPortalType = 'portal_type';
-var PortalTypes;
+export var PortalTypes;
 (function (PortalTypes) {
     PortalTypes["BillingPeriodMessage"] = "Billing Period Message";
-    PortalTypes["File"] = "File";
-    PortalTypes["RoadAccount"] = "Road Account";
     PortalTypes["RoadAccountMessage"] = "Road Account Message";
-    PortalTypes["RoadEvent"] = "Road Event";
     PortalTypes["RoadEventMessage"] = "Road Event Message";
     PortalTypes["RoadMessage"] = "Road Message";
     PortalTypes["RoadReportRequest"] = "Road Report Request";
-    PortalTypes["RoadTransaction"] = "Road Transaction";
 })(PortalTypes || (PortalTypes = {}));
 const queryPortalTypes = [
     `"${PortalTypes.BillingPeriodMessage}"`,
@@ -23,6 +19,13 @@ const queryPortalTypes = [
     `"${PortalTypes.RoadMessage}" `,
     `"${PortalTypes.RoadReportRequest}"`
 ].join(' OR ');
+var InternalPortalTypes;
+(function (InternalPortalTypes) {
+    InternalPortalTypes["File"] = "File";
+    InternalPortalTypes["RoadAccount"] = "Road Account";
+    InternalPortalTypes["RoadEvent"] = "Road Event";
+    InternalPortalTypes["RoadTransaction"] = "Road Transaction";
+})(InternalPortalTypes || (InternalPortalTypes = {}));
 var ValidationStates;
 (function (ValidationStates) {
     ValidationStates["Processed"] = "processed";
@@ -208,7 +211,7 @@ export class ClearRoad {
         const refKey = 'source_reference';
         const query = joinQueries([
             `${queryPortalType}:(${queryPortalTypes})`,
-            'grouping_reference:"data"',
+            `grouping_reference:"${defaultAttachmentName}"`,
             this.queryMaxDate()
         ]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-messages-signatures`);
@@ -293,9 +296,9 @@ export class ClearRoad {
     initDirectoryStorage() {
         const refKey = 'source_reference';
         const query = joinQueries([`${queryPortalType}:(` + [
-                `"${PortalTypes.RoadAccount}"`,
-                `"${PortalTypes.RoadEvent}"`,
-                `"${PortalTypes.RoadTransaction}"`
+                `"${InternalPortalTypes.RoadAccount}"`,
+                `"${InternalPortalTypes.RoadEvent}"`,
+                `"${InternalPortalTypes.RoadTransaction}"`
             ].join(' OR ') + ')', this.queryMaxDate()]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signatures`);
         const localStorage = this.localSubStorage(refKey);
@@ -336,7 +339,7 @@ export class ClearRoad {
     initReportStorage() {
         const refKey = 'reference';
         const query = joinQueries([
-            `${queryPortalType}:("${PortalTypes.File}")`,
+            `${queryPortalType}:("${InternalPortalTypes.File}")`,
             this.queryMaxDate()
         ]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-files-signatures`);
@@ -477,7 +480,7 @@ export class ClearRoad {
      */
     getReportFromRequest(sourceReference) {
         return this.allDocs({
-            query: `${queryPortalType}:"${PortalTypes.File}"`,
+            query: `${queryPortalType}:"${InternalPortalTypes.File}"`,
             select_list: ['source_reference', 'reference']
         }).push(result => {
             const report = result.data.rows.find(row => row.value.source_reference === sourceReference);
@@ -498,9 +501,9 @@ export class ClearRoad {
             .push(() => {
             return this.reportStorage.getAttachment(reference, defaultAttachmentName);
         })
-            .push(data => {
+            .push(report => {
             return {
-                [defaultAttachmentName]: data
+                [defaultAttachmentName]: report
             };
         }, () => {
             return this.reportStorage.allAttachments(reference);

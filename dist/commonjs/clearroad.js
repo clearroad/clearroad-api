@@ -490,25 +490,27 @@ var defaultAttachmentName = 'data';
 
 var jIO = require('../../node/lib/jio.js').jIO;
 var queryPortalType = 'portal_type';
-var PortalTypes;
 (function (PortalTypes) {
     PortalTypes["BillingPeriodMessage"] = "Billing Period Message";
-    PortalTypes["File"] = "File";
-    PortalTypes["RoadAccount"] = "Road Account";
     PortalTypes["RoadAccountMessage"] = "Road Account Message";
-    PortalTypes["RoadEvent"] = "Road Event";
     PortalTypes["RoadEventMessage"] = "Road Event Message";
     PortalTypes["RoadMessage"] = "Road Message";
     PortalTypes["RoadReportRequest"] = "Road Report Request";
-    PortalTypes["RoadTransaction"] = "Road Transaction";
-})(PortalTypes || (PortalTypes = {}));
+})(exports.PortalTypes || (exports.PortalTypes = {}));
 var queryPortalTypes = [
-    "\"" + PortalTypes.BillingPeriodMessage + "\"",
-    "\"" + PortalTypes.RoadAccountMessage + "\"",
-    "\"" + PortalTypes.RoadEventMessage + "\"",
-    "\"" + PortalTypes.RoadMessage + "\" ",
-    "\"" + PortalTypes.RoadReportRequest + "\""
+    "\"" + exports.PortalTypes.BillingPeriodMessage + "\"",
+    "\"" + exports.PortalTypes.RoadAccountMessage + "\"",
+    "\"" + exports.PortalTypes.RoadEventMessage + "\"",
+    "\"" + exports.PortalTypes.RoadMessage + "\" ",
+    "\"" + exports.PortalTypes.RoadReportRequest + "\""
 ].join(' OR ');
+var InternalPortalTypes;
+(function (InternalPortalTypes) {
+    InternalPortalTypes["File"] = "File";
+    InternalPortalTypes["RoadAccount"] = "Road Account";
+    InternalPortalTypes["RoadEvent"] = "Road Event";
+    InternalPortalTypes["RoadTransaction"] = "Road Transaction";
+})(InternalPortalTypes || (InternalPortalTypes = {}));
 var ValidationStates;
 (function (ValidationStates) {
     ValidationStates["Processed"] = "processed";
@@ -699,7 +701,7 @@ var ClearRoad = /** @class */ (function () {
         var refKey = 'source_reference';
         var query = joinQueries([
             queryPortalType + ":(" + queryPortalTypes + ")",
-            'grouping_reference:"data"',
+            "grouping_reference:\"" + defaultAttachmentName + "\"",
             this.queryMaxDate()
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-messages-signatures");
@@ -784,9 +786,9 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.initDirectoryStorage = function () {
         var refKey = 'source_reference';
         var query = joinQueries([queryPortalType + ":(" + [
-                "\"" + PortalTypes.RoadAccount + "\"",
-                "\"" + PortalTypes.RoadEvent + "\"",
-                "\"" + PortalTypes.RoadTransaction + "\""
+                "\"" + InternalPortalTypes.RoadAccount + "\"",
+                "\"" + InternalPortalTypes.RoadEvent + "\"",
+                "\"" + InternalPortalTypes.RoadTransaction + "\""
             ].join(' OR ') + ')', this.queryMaxDate()]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-directory-signatures");
         var localStorage = this.localSubStorage(refKey);
@@ -827,7 +829,7 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.initReportStorage = function () {
         var refKey = 'reference';
         var query = joinQueries([
-            queryPortalType + ":(\"" + PortalTypes.File + "\")",
+            queryPortalType + ":(\"" + InternalPortalTypes.File + "\")",
             this.queryMaxDate()
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-files-signatures");
@@ -907,19 +909,19 @@ var ClearRoad = /** @class */ (function () {
         validateDefinition(data.portal_type, data);
         var options = merge({}, data);
         switch (data.portal_type) {
-            case PortalTypes.RoadAccountMessage:
+            case exports.PortalTypes.RoadAccountMessage:
                 options.parent_relative_url = 'road_account_message_module';
                 break;
-            case PortalTypes.RoadEventMessage:
+            case exports.PortalTypes.RoadEventMessage:
                 options.parent_relative_url = 'road_event_message_module';
                 break;
-            case PortalTypes.RoadMessage:
+            case exports.PortalTypes.RoadMessage:
                 options.parent_relative_url = 'road_message_module';
                 break;
-            case PortalTypes.BillingPeriodMessage:
+            case exports.PortalTypes.BillingPeriodMessage:
                 options.parent_relative_url = 'billing_period_message_module';
                 break;
-            case PortalTypes.RoadReportRequest:
+            case exports.PortalTypes.RoadReportRequest:
                 options.parent_relative_url = 'road_report_request_module';
                 break;
         }
@@ -972,7 +974,7 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.getReportFromRequest = function (sourceReference) {
         var _this = this;
         return this.allDocs({
-            query: queryPortalType + ":\"" + PortalTypes.File + "\"",
+            query: queryPortalType + ":\"" + InternalPortalTypes.File + "\"",
             select_list: ['source_reference', 'reference']
         }).push(function (result) {
             var report = result.data.rows.find(function (row) { return row.value.source_reference === sourceReference; });
@@ -994,10 +996,10 @@ var ClearRoad = /** @class */ (function () {
             .push(function () {
             return _this.reportStorage.getAttachment(reference, defaultAttachmentName);
         })
-            .push(function (data) {
+            .push(function (report) {
             var _a;
             return _a = {},
-                _a[defaultAttachmentName] = data,
+                _a[defaultAttachmentName] = report,
                 _a;
         }, function () {
             return _this.reportStorage.allAttachments(reference);

@@ -9,16 +9,12 @@ import { IJioProxyStorage, IJioQueryOptions, defaultAttachmentName } from './sto
 
 const queryPortalType = 'portal_type';
 
-enum PortalTypes {
+export enum PortalTypes {
   BillingPeriodMessage = 'Billing Period Message',
-  File = 'File',
-  RoadAccount = 'Road Account',
   RoadAccountMessage = 'Road Account Message',
-  RoadEvent = 'Road Event',
   RoadEventMessage = 'Road Event Message',
   RoadMessage = 'Road Message',
-  RoadReportRequest = 'Road Report Request',
-  RoadTransaction = 'Road Transaction'
+  RoadReportRequest = 'Road Report Request'
 }
 
 const queryPortalTypes = [
@@ -28,6 +24,13 @@ const queryPortalTypes = [
   `"${PortalTypes.RoadMessage}" `,
   `"${PortalTypes.RoadReportRequest}"`
 ].join(' OR ');
+
+enum InternalPortalTypes {
+  File = 'File',
+  RoadAccount = 'Road Account',
+  RoadEvent = 'Road Event',
+  RoadTransaction = 'Road Transaction'
+}
 
 enum ValidationStates {
   Processed = 'processed',
@@ -299,7 +302,7 @@ export class ClearRoad {
     const refKey = 'source_reference';
     const query = joinQueries([
       `${queryPortalType}:(${queryPortalTypes})`,
-      'grouping_reference:"data"',
+      `grouping_reference:"${defaultAttachmentName}"`,
       this.queryMaxDate()
     ]);
     const signatureStorage = this.signatureSubStorage(`${this.databaseName}-messages-signatures`);
@@ -388,9 +391,9 @@ export class ClearRoad {
   private initDirectoryStorage() {
     const refKey = 'source_reference';
     const query = joinQueries([`${queryPortalType}:(` + [
-      `"${PortalTypes.RoadAccount}"`,
-      `"${PortalTypes.RoadEvent}"`,
-      `"${PortalTypes.RoadTransaction}"`
+      `"${InternalPortalTypes.RoadAccount}"`,
+      `"${InternalPortalTypes.RoadEvent}"`,
+      `"${InternalPortalTypes.RoadTransaction}"`
     ].join(' OR ') + ')', this.queryMaxDate()]);
     const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signatures`);
     const localStorage = this.localSubStorage(refKey);
@@ -433,7 +436,7 @@ export class ClearRoad {
   private initReportStorage() {
     const refKey = 'reference';
     const query = joinQueries([
-      `${queryPortalType}:("${PortalTypes.File}")`,
+      `${queryPortalType}:("${InternalPortalTypes.File}")`,
       this.queryMaxDate()
     ]);
     const signatureStorage = this.signatureSubStorage(`${this.databaseName}-files-signatures`);
@@ -584,7 +587,7 @@ export class ClearRoad {
    */
   getReportFromRequest(sourceReference: string) {
     return this.allDocs({
-      query: `${queryPortalType}:"${PortalTypes.File}"`,
+      query: `${queryPortalType}:"${InternalPortalTypes.File}"`,
       select_list: ['source_reference', 'reference']
     }).push(result => {
       const report = result.data.rows.find(row => row.value.source_reference === sourceReference);
@@ -606,9 +609,9 @@ export class ClearRoad {
       .push(() => {
         return this.reportStorage.getAttachment(reference, defaultAttachmentName);
       })
-      .push(data => {
+      .push(report => {
         return {
-          [defaultAttachmentName]: data
+          [defaultAttachmentName]: report
         };
       }, () => {
         return this.reportStorage.allAttachments(reference);

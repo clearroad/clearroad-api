@@ -2,16 +2,12 @@ declare const jIO: any;
 import { portalType } from './message-types';
 import { IQueue } from './queue';
 import { IJioQueryOptions } from './storage';
-declare enum PortalTypes {
+export declare enum PortalTypes {
     BillingPeriodMessage = "Billing Period Message",
-    File = "File",
-    RoadAccount = "Road Account",
     RoadAccountMessage = "Road Account Message",
-    RoadEvent = "Road Event",
     RoadEventMessage = "Road Event Message",
     RoadMessage = "Road Message",
-    RoadReportRequest = "Road Report Request",
-    RoadTransaction = "Road Transaction"
+    RoadReportRequest = "Road Report Request"
 }
 export declare type storageName = 'messages' | 'ingestion-reports' | 'directories' | 'reports';
 export declare type localStorageType = 'indexeddb' | 'dropbox' | 'gdrive';
