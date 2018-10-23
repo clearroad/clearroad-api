@@ -1,6 +1,6 @@
 /* tslint:disable: no-console */
 import * as jioImport from '../node/lib/jio.js';
-import { ClearRoad } from './clearroad';
+import { ClearRoad, PortalTypes, IPostBillingPeriodMessage, IPostRoadMessage, IPostRoadReportRequest, IPostRoadAccountMessage, IPostRoadEventMessage } from './clearroad';
 import * as definitions from './definitions';
 
 const url = '//fake-url';
@@ -203,8 +203,7 @@ describe('ClearRoad', () => {
   });
 
   describe('.post', () => {
-    let cr;
-    let portalType;
+    let cr: ClearRoad;
     let putSpy: jasmine.Spy;
 
     beforeEach(() => {
@@ -214,44 +213,37 @@ describe('ClearRoad', () => {
     });
 
     it('should validate message', async () => {
-      await cr.post({});
+      await cr.post({} as any);
       expect(definitions.validateDefinition).toHaveBeenCalled();
     });
 
     describe('road account', () => {
-      beforeEach(() => {
-        portalType = 'Road Account Message';
-      });
-
       it('should put a message', async () => {
-        const options = {
-          portal_type: portalType,
+        const options: IPostRoadAccountMessage = {
+          portal_type: PortalTypes.RoadAccountMessage,
           account_manager: 'testamref',
           data_collector: 'testmpref',
           condition: 'test-stc-1',
           cert_id: '1051',
           account_reference: 'USER000011',
           effective_date: '2017-01-02T14:21:20Z',
+          expiration_date: '',
           fuel_consumption: '12.0',
           fuel_taxable: '1',
           obu_reference: '123456789MRDID',
           vehicle_reference: '2C1MR2295T6789740',
           product_line: 'ruc_metrics'
         };
-        const data = await cr.post(options);
+        const data: any = await cr.post(options);
         expect(data.parent_relative_url).toEqual('road_account_message_module');
         expect(putSpy).toHaveBeenCalled();
       });
     });
 
     describe('road event', () => {
-      beforeEach(() => {
-        portalType = 'Road Event Message';
-      });
-
       it('should put a message', async () => {
-        const options = {
-          portal_type: portalType,
+        const options: IPostRoadEventMessage = {
+          portal_type: PortalTypes.RoadEventMessage,
           request: JSON.stringify({
             vehicle_reference: '1GTG6BE38F1262119',
             obu_reference: '977298026d50a5b1795c6563',
@@ -264,20 +256,16 @@ describe('ClearRoad', () => {
             }]
           })
         };
-        const data = await cr.post(options);
+        const data: any = await cr.post(options);
         expect(data.parent_relative_url).toEqual('road_event_message_module');
         expect(putSpy).toHaveBeenCalled();
       });
     });
 
     describe('road message', () => {
-      beforeEach(() => {
-        portalType = 'Road Message';
-      });
-
       it('should put a message', async () => {
-        const options = {
-          portal_type: portalType,
+        const options: IPostRoadMessage = {
+          portal_type: PortalTypes.RoadMessage,
           request: JSON.stringify({
             description: 'Mileage data',
             vehicle_reference: '1GTG6BE38F1262119',
@@ -299,43 +287,35 @@ describe('ClearRoad', () => {
             }]
           })
         };
-        const data = await cr.post(options);
+        const data: any = await cr.post(options);
         expect(data.parent_relative_url).toEqual('road_message_module');
         expect(putSpy).toHaveBeenCalled();
       });
     });
 
     describe('billing period', () => {
-      beforeEach(() => {
-        portalType = 'Billing Period Message';
-      });
-
       it('should put a message', async () => {
-        const options = {
-          portal_type: portalType,
+        const options: IPostBillingPeriodMessage = {
+          portal_type: PortalTypes.BillingPeriodMessage,
           reference: '2018Q1',
           start_date: '2018-01-01T00:00:00Z',
           stop_date: '2018-04-01T00:00:00Z'
         };
-        const data = await cr.post(options);
+        const data: any = await cr.post(options);
         expect(data.parent_relative_url).toEqual('billing_period_message_module');
         expect(putSpy).toHaveBeenCalled();
       });
     });
 
     describe('road report', () => {
-      beforeEach(() => {
-        portalType = 'Road Report Request';
-      });
-
       it('should put a message', async () => {
-        const options = {
-          portal_type: portalType,
+        const options: IPostRoadReportRequest = {
+          portal_type: PortalTypes.RoadReportRequest,
           report_type: 'AccountBalance',
           billing_period_reference: '2018Q1',
           request_date: '2018-07-13T00:00:00Z'
         };
-        const data = await cr.post(options);
+        const data: any = await cr.post(options);
         expect(data.parent_relative_url).toEqual('road_report_request_module');
         expect(putSpy).toHaveBeenCalled();
       });
@@ -343,7 +323,7 @@ describe('ClearRoad', () => {
   });
 
   describe('.sync', () => {
-    let cr;
+    let cr: ClearRoad;
     let repairSpy: jasmine.Spy;
 
     beforeEach(() => {
@@ -368,7 +348,7 @@ describe('ClearRoad', () => {
   });
 
   describe('.allDocs', () => {
-    let cr;
+    let cr: ClearRoad;
     let querySpy: jasmine.Spy;
 
     beforeEach(() => {
@@ -377,13 +357,15 @@ describe('ClearRoad', () => {
     });
 
     it('should query the messages', async () => {
-      await cr.allDocs({});
+      await cr.allDocs({
+        query: ''
+      });
       expect(querySpy).toHaveBeenCalled();
     });
   });
 
   describe('.getReport', () => {
-    let cr;
+    let cr: ClearRoad;
     let getAttachmentSpy: jasmine.Spy;
     let allAttachmentsSpy: jasmine.Spy;
     const id = 'reportId';
@@ -419,7 +401,7 @@ describe('ClearRoad', () => {
   });
 
   describe('.getReportFromRequest', () => {
-    let cr;
+    let cr: ClearRoad;
     let getReportSpy: jasmine.Spy;
     const id = 'reportId';
     const result: any = {

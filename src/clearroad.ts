@@ -5,7 +5,10 @@ const jIO = require('../node/lib/jio.js').jIO;
 import { portalType } from './message-types';
 import { validateDefinition } from './definitions/index';
 import { IQueue } from './queue';
-import { IJioProxyStorage, IJioQueryOptions, defaultAttachmentName } from './storage';
+import {
+  IJioProxyStorage, IJioQueryOptions,
+  defaultAttachmentName
+} from './storage';
 
 const queryPortalType = 'portal_type';
 
@@ -92,7 +95,7 @@ export interface IPostRoadReportRequest extends IPostData {
   report_type: string;
   billing_period_reference: string;
   request_date: string;
-  request: string;
+  request?: string;
 }
 export interface IPostRoadEventMessage extends IPostData {
   portal_type: PortalTypes.RoadEventMessage;
@@ -514,7 +517,7 @@ export class ClearRoad {
    * If not currently connected, messages will be put in the local storage and sent later when using `.sync()`
    * @param data The message
    */
-  post(data: postData): IQueue {
+  post(data: postData) {
     validateDefinition(data.portal_type, data);
 
     const options: any = merge({}, data);
@@ -544,7 +547,7 @@ export class ClearRoad {
     options.source_reference = reference;
     options.destination_reference = reference;
 
-    const queue = new (RSVP as any).Queue() as IQueue;
+    const queue = new (RSVP as any).Queue() as IQueue<string>;
     return queue.push(() => {
       return this.messagesStorage.put(options.source_reference, options);
     });
@@ -556,8 +559,8 @@ export class ClearRoad {
    *  - retrieve API data in your local storage
    * @param progress Function to get notified of progress. There are 4 storages to sync.
    */
-  sync(progress: syncProgressCallback = () => {}): IQueue {
-    const queue = new (RSVP as any).Queue() as IQueue;
+  sync(progress: syncProgressCallback = () => {}) {
+    const queue = new (RSVP as any).Queue() as IQueue<void>;
     return queue
       .push(() => {
         return this.messagesStorage.repair().push(() => progress('messages'));
@@ -577,7 +580,7 @@ export class ClearRoad {
    * Query for documents in the local storage. Make sure `.sync()` is called before.
    * @param options Query options. If none set, return all documents.
    */
-  allDocs(options?: IJioQueryOptions): IQueue {
+  allDocs(options?: IJioQueryOptions) {
     return this.messagesStorage.allDocs(options);
   }
 
@@ -585,7 +588,7 @@ export class ClearRoad {
    * Get a report using the Report Request reference
    * @param sourceReference The reference of the Report Request
    */
-  getReportFromRequest(sourceReference: string) {
+  getReportFromRequest(sourceReference: string): IQueue<any> {
     return this.allDocs({
       query: `${queryPortalType}:"${InternalPortalTypes.File}"`,
       select_list: ['source_reference', 'reference']
@@ -603,8 +606,8 @@ export class ClearRoad {
    * If you do not have the Report reference, use `getReportFromRequest` with the Report Request reference instead.
    * @param reference The reference of the Report
    */
-  getReport(reference: string): IQueue {
-    const queue = new (RSVP as any).Queue() as IQueue;
+  getReport(reference: string) {
+    const queue = new (RSVP as any).Queue() as IQueue<any>;
     return queue
       .push(() => {
         return this.reportStorage.getAttachment(reference, defaultAttachmentName);

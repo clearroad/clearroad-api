@@ -55,7 +55,7 @@ export interface IPostRoadReportRequest extends IPostData {
     report_type: string;
     billing_period_reference: string;
     request_date: string;
-    request: string;
+    request?: string;
 }
 export interface IPostRoadEventMessage extends IPostData {
     portal_type: PortalTypes.RoadEventMessage;
@@ -89,29 +89,29 @@ export declare class ClearRoad {
      * If not currently connected, messages will be put in the local storage and sent later when using `.sync()`
      * @param data The message
      */
-    post(data: postData): IQueue;
+    post(data: postData): IQueue<string>;
     /**
      * Synchronize local data and API data:
      *  - send local data to API if not present yet
      *  - retrieve API data in your local storage
      * @param progress Function to get notified of progress. There are 4 storages to sync.
      */
-    sync(progress?: syncProgressCallback): IQueue;
+    sync(progress?: syncProgressCallback): IQueue<void>;
     /**
      * Query for documents in the local storage. Make sure `.sync()` is called before.
      * @param options Query options. If none set, return all documents.
      */
-    allDocs(options?: IJioQueryOptions): IQueue;
+    allDocs(options?: IJioQueryOptions): IQueue<import("src/storage").IJioQueryResults>;
     /**
      * Get a report using the Report Request reference
      * @param sourceReference The reference of the Report Request
      */
-    getReportFromRequest(sourceReference: string): IQueue;
+    getReportFromRequest(sourceReference: string): IQueue<any>;
     /**
      * Get a report using the reference.
      * If you do not have the Report reference, use `getReportFromRequest` with the Report Request reference instead.
      * @param reference The reference of the Report
      */
-    getReport(reference: string): IQueue;
+    getReport(reference: string): IQueue<any>;
 }
 export { jIO };

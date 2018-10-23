@@ -31,21 +31,38 @@ export interface IJioQueryOptions {
      */
     include_docs?: boolean;
 }
+export interface IJioQueryResultRow {
+    id: string;
+    doc?: any;
+    value?: any;
+}
+export interface IJioQueryResults {
+    data: {
+        /**
+         * Contains the result
+         */
+        rows: IJioQueryResultRow[];
+        /**
+         * The total number of results
+         */
+        total_rows: number;
+    };
+}
 export interface IJioStorage {
-    get: (id: string) => IQueue;
-    post: (data: any) => IQueue;
-    put: (id: string, data: any) => IQueue;
-    remove: (id: string) => IQueue;
-    getAttachment: (id: string, name: string, options?: any) => IQueue;
-    putAttachment: (id: string, name: string, blob: Blob) => IQueue;
-    removeAttachment: (id: string, name: string) => IQueue;
-    allAttachments: (id: string) => IQueue;
+    get: (id: string) => IQueue<any>;
+    post: (data: any) => IQueue<string>;
+    put: (id: string, data: any) => IQueue<string>;
+    remove: (id: string) => IQueue<string>;
+    getAttachment: (id: string, name: string, options?: any) => IQueue<any>;
+    putAttachment: (id: string, name: string, blob: Blob) => IQueue<any>;
+    removeAttachment: (id: string, name: string) => IQueue<string>;
+    allAttachments: (id: string) => IQueue<any>;
     hasCapacity: (name: string) => boolean;
-    buildQuery: (options?: IJioQueryOptions) => IQueue;
+    buildQuery: (options?: IJioQueryOptions) => IQueue<IJioQueryResultRow[]>;
 }
 export interface IJioProxyStorage extends IJioStorage {
-    allDocs: (options?: IJioQueryOptions) => IQueue;
-    repair: () => IQueue;
+    allDocs: (options?: IJioQueryOptions) => IQueue<IJioQueryResults>;
+    repair: () => IQueue<void>;
 }
 declare type operator = 'AND' | 'OR' | 'NOT';
 declare type comparison = '!=' | '<' | '<=' | '>' | '>=';
