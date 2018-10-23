@@ -1,5 +1,6 @@
-import Rusha from 'rusha';
+const Rusha = require('rusha');
 const jIO = require('../node/lib/jio.js').jIO;
+export { jIO };
 import { validateDefinition } from './definitions/index';
 import { getQueue } from './queue';
 import { defaultAttachmentName } from './storage';
@@ -508,5 +509,4 @@ export class ClearRoad {
             .push(attachment => attachment[defaultAttachmentName]);
     }
 }
-export { jIO };
 //# sourceMappingURL=clearroad.js.map

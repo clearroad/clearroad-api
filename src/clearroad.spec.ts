@@ -211,16 +211,16 @@ describe('ClearRoad', () => {
 
     beforeEach(() => {
       cr = new ClearRoad(url);
-      spyOn(definitions, 'validateDefinition');
       putSpy = spyOn((cr as any).messagesStorage, 'put').and.callFake((_id, data) => data);
     });
 
     it('should validate message', async () => {
+      spyOn(definitions, 'validateDefinition');
       await cr.post({} as any);
       expect(definitions.validateDefinition).toHaveBeenCalled();
     });
 
-    describe('road account', () => {
+    describe(PortalTypes.RoadAccountMessage, () => {
       it('should put a message', async () => {
         const options: IPostRoadAccountMessage = {
           portal_type: PortalTypes.RoadAccountMessage,
@@ -230,10 +230,9 @@ describe('ClearRoad', () => {
           cert_id: '1051',
           account_reference: 'USER000011',
           effective_date: '2017-01-02T14:21:20Z',
-          expiration_date: '',
           fuel_consumption: '12.0',
           fuel_taxable: '1',
-          obu_reference: '123456789MRDID',
+          obu_reference: '977298026d50a5b1795c6563',
           vehicle_reference: '2C1MR2295T6789740',
           product_line: 'ruc_metrics'
         };
@@ -243,11 +242,11 @@ describe('ClearRoad', () => {
       });
     });
 
-    describe('road event', () => {
+    describe(PortalTypes.RoadEventMessage, () => {
       it('should put a message', async () => {
         const options: IPostRoadEventMessage = {
           portal_type: PortalTypes.RoadEventMessage,
-          request: JSON.stringify({
+          request: {
             vehicle_reference: '1GTG6BE38F1262119',
             obu_reference: '977298026d50a5b1795c6563',
             event_details: [{
@@ -257,7 +256,7 @@ describe('ClearRoad', () => {
               type: 5,
               date: '2018-01-03T00:00:00Z'
             }]
-          })
+          }
         };
         const data: any = await cr.post(options);
         expect(data.parent_relative_url).toEqual('road_event_message_module');
@@ -265,11 +264,11 @@ describe('ClearRoad', () => {
       });
     });
 
-    describe('road message', () => {
+    describe(PortalTypes.RoadMessage, () => {
       it('should put a message', async () => {
         const options: IPostRoadMessage = {
           portal_type: PortalTypes.RoadMessage,
-          request: JSON.stringify({
+          request: {
             description: 'Mileage data',
             vehicle_reference: '1GTG6BE38F1262119',
             obu_reference: '977298026d50a5b1795c6563',
@@ -288,7 +287,7 @@ describe('ClearRoad', () => {
               rule_id: 0,
               sub_rule_id: 1
             }]
-          })
+          }
         };
         const data: any = await cr.post(options);
         expect(data.parent_relative_url).toEqual('road_message_module');
@@ -296,7 +295,7 @@ describe('ClearRoad', () => {
       });
     });
 
-    describe('billing period', () => {
+    describe(PortalTypes.BillingPeriodMessage, () => {
       it('should put a message', async () => {
         const options: IPostBillingPeriodMessage = {
           portal_type: PortalTypes.BillingPeriodMessage,
@@ -310,7 +309,7 @@ describe('ClearRoad', () => {
       });
     });
 
-    describe('road report', () => {
+    describe(PortalTypes.RoadReportRequest, () => {
       it('should put a message', async () => {
         const options: IPostRoadReportRequest = {
           portal_type: PortalTypes.RoadReportRequest,

@@ -1,4 +1,5 @@
 declare const jIO: any;
+export { jIO };
 import { portalType } from './message-types';
 import { IQueue } from './queue';
 import { IJioQueryOptions } from './storage';
@@ -37,7 +38,7 @@ export interface IPostRoadAccountMessage extends IPostData {
     cert_id: string;
     account_reference: string;
     effective_date: string;
-    expiration_date: string;
+    expiration_date?: string;
     fuel_consumption: string;
     fuel_taxable: string;
     obu_reference: string;
@@ -59,11 +60,11 @@ export interface IPostRoadReportRequest extends IPostData {
 }
 export interface IPostRoadEventMessage extends IPostData {
     portal_type: PortalTypes.RoadEventMessage;
-    request: string;
+    request: any;
 }
 export interface IPostRoadMessage extends IPostData {
     portal_type: PortalTypes.RoadMessage;
-    request: string;
+    request: any;
 }
 export declare type postData = IPostRoadAccountMessage | IPostBillingPeriodMessage | IPostRoadReportRequest | IPostRoadEventMessage | IPostRoadMessage;
 export declare class ClearRoad {
@@ -83,7 +84,7 @@ export declare class ClearRoad {
      * @param accessToken ClearRoad API access token (required when using Node)
      * @param options Override default options
      */
-    constructor(url: string, accessToken?: string, options?: IOptions);
+    constructor(url: string, accessToken?: string | undefined, options?: IOptions);
     /**
      * Post a message to the ClearRoad API.
      * If not currently connected, messages will be put in the local storage and sent later when using `.sync()`
@@ -114,4 +115,3 @@ export declare class ClearRoad {
      */
     getReport(reference: string): IQueue<any>;
 }
-export { jIO };

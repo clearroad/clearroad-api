@@ -1,5 +1,9 @@
-import Rusha from 'rusha';
+const Rusha = require('rusha');
 const jIO = require('../node/lib/jio.js').jIO;
+
+export {
+  jIO
+};
 
 import { portalType } from './message-types';
 import { validateDefinition } from './definitions/index';
@@ -76,7 +80,7 @@ export interface IPostRoadAccountMessage extends IPostData {
   cert_id: string;
   account_reference: string;
   effective_date: string;
-  expiration_date: string;
+  expiration_date?: string;
   fuel_consumption: string;
   fuel_taxable: string;
   obu_reference: string;
@@ -98,11 +102,11 @@ export interface IPostRoadReportRequest extends IPostData {
 }
 export interface IPostRoadEventMessage extends IPostData {
   portal_type: PortalTypes.RoadEventMessage;
-  request: string;
+  request: any;
 }
 export interface IPostRoadMessage extends IPostData {
   portal_type: PortalTypes.RoadMessage;
-  request: string;
+  request: any;
 }
 export type postData = IPostRoadAccountMessage | IPostBillingPeriodMessage | IPostRoadReportRequest |
   IPostRoadEventMessage | IPostRoadMessage;
@@ -618,7 +622,3 @@ export class ClearRoad {
       .push(attachment => attachment[defaultAttachmentName]);
   }
 }
-
-export {
-  jIO
-};

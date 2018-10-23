@@ -1,510 +1,26 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var RSVP = _interopDefault(require('rsvp'));
-var Rusha = _interopDefault(require('rusha'));
-
-var json = {
-    type: 'object',
-    definitions: {
-        datetime: {
-            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
-            type: 'string',
-            examples: [
-                '2018-04-01T00:00:00Z'
-            ]
-        }
-    },
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    required: [
-        'reference',
-        'start_date',
-        'stop_date',
-        'portal_type'
-    ],
-    properties: {
-        reference: {
-            type: 'string',
-            description: 'The reference given to the new billing period which will be used to reference it in the future.',
-            examples: [
-                '2018Q1'
-            ]
-        },
-        start_date: {
-            description: 'The date, starting which, the billing period is going to be active. Should be in UTC.',
-            $ref: '#/definitions/datetime'
-        },
-        stop_date: {
-            description: 'The date, starting which, the billing period will become inactive. Should be UTC. If it is left empty, the billing period will never turn inactive, once activated.',
-            $ref: '#/definitions/datetime'
-        },
-        portal_type: {
-            type: 'string',
-            description: 'The type of message in the ClearRoad Platform. Only one value is possible',
-            default: 'Billing Period Message',
-            enum: [
-                'Billing Period Message'
-            ],
-            examples: [
-                'Billing Period Message'
-            ]
-        }
-    }
-};
-
-var json$1 = {
-    type: 'object',
-    definitions: {
-        datetime: {
-            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
-            type: 'string',
-            examples: [
-                '2018-04-01T00:00:00Z'
-            ]
-        }
-    },
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    required: [
-        'account_manager',
-        'data_collector',
-        'condition',
-        'cert_id',
-        'account_reference',
-        'effective_date',
-        'fuel_consumption',
-        'fuel_taxable',
-        'obu_reference',
-        'vehicle_reference',
-        'product_line',
-        'portal_type'
-    ],
-    properties: {
-        account_manager: {
-            type: 'string',
-            description: 'The reference should be of an account manager that already exists in ClearRoad Platform.',
-            examples: [
-                'testamref'
-            ]
-        },
-        data_collector: {
-            type: 'string',
-            description: 'The reference should be of a data provider that already exists in ClearRoad Platform.',
-            examples: [
-                'testmpref'
-            ]
-        },
-        condition: {
-            type: 'string',
-            description: 'Sale Trade Condition to apply. The reference should be of an object that already exists in ClearRoad Platform.',
-            examples: [
-                'test-stc-1'
-            ]
-        },
-        cert_id: {
-            type: 'string',
-            description: 'The DOT certificate ID value',
-            examples: [
-                '1051'
-            ]
-        },
-        account_reference: {
-            type: 'string',
-            description: 'The reference of the road account to be defined.',
-            examples: [
-                'USER000011'
-            ]
-        },
-        effective_date: {
-            $ref: '#/definitions/datetime',
-            description: 'The start date of the customer account. Could not be left empty. Should be in UTC.'
-        },
-        expiration_date: {
-            $ref: '#/definitions/datetime',
-            description: 'The stop date of the customer account. Could be left empty - the road account will have no expiration date. Should be in UTC.'
-        },
-        fuel_consumption: {
-            type: 'string',
-            description: 'Combined EPA Miles Per Gallon (MPG) rating for the vehicle.',
-            examples: [
-                '12.0'
-            ]
-        },
-        fuel_taxable: {
-            type: 'string',
-            description: 'Boolean defining if customer is subject to taxable fuel.',
-            examples: [
-                '1'
-            ]
-        },
-        obu_reference: {
-            type: 'string',
-            description: 'An object for this on board unit will be created in the ClearRoad platform if it is nor already present.',
-            pattern: '^[0-9a-z]{24}$',
-            examples: [
-                '977298026d50a5b1795c6563'
-            ]
-        },
-        vehicle_reference: {
-            type: 'string',
-            description: 'An onject for this vehicle will be created in the ClearRoad Platform if it is not already present.',
-            pattern: '^[0-9A-Z]{17}$',
-            examples: [
-                '2C1MR2295T6789740'
-            ]
-        },
-        product_line: {
-            type: 'string',
-            description: 'The reporting method the customer choosed to use.',
-            enum: [
-                'odometer_message_no_transaction',
-                'odometer_message_transaction',
-                'ruc_metrics',
-                'service'
-            ],
-            examples: [
-                'ruc_metrics'
-            ]
-        },
-        portal_type: {
-            type: 'string',
-            description: 'The type of the message in the ClearRoad Platform. Only one value is possible.',
-            default: 'Road Account Message',
-            enum: [
-                'Road Account Message'
-            ],
-            examples: [
-                'Road Account Message'
-            ]
-        }
-    }
-};
-
-var json$2 = {
-    type: 'object',
-    definitions: {
-        datetime: {
-            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
-            type: 'string',
-            examples: [
-                '2018-04-01T00:00:00Z'
-            ]
-        }
-    },
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    required: [
-        'request',
-        'portal_type'
-    ],
-    properties: {
-        request: {
-            required: [
-                'vehicle_reference',
-                'obu_reference',
-                'event_details'
-            ],
-            type: 'object',
-            properties: {
-                vehicle_reference: {
-                    type: 'string',
-                    description: 'The Vehicle Identification Number of the road account registration for which the event is reported',
-                    pattern: '^[0-9A-Z]{17}$',
-                    examples: [
-                        '1GTG6BE38F1262119'
-                    ]
-                },
-                obu_reference: {
-                    type: 'string',
-                    description: 'The On Board Unit reference of the road account registration for which the event is reported',
-                    pattern: '^[0-9a-z]{24}$',
-                    examples: [
-                        '977298026d50a5b1795c6563'
-                    ]
-                },
-                event_details: {
-                    description: 'The details of the event that is reported.',
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        required: [
-                            'type',
-                            'date'
-                        ],
-                        properties: {
-                            type: {
-                                type: 'integer',
-                                description: 'The ID of the event. Every type has it own ID.',
-                                default: 0,
-                                examples: [
-                                    12
-                                ]
-                            },
-                            date: {
-                                $ref: '#/definitions/datetime',
-                                description: 'The datetime of the event. Should be a UTC time.'
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        portal_type: {
-            type: 'string',
-            description: 'The type of the object in ClearRoad Platform. Only one value is possible.',
-            default: 'Road Event Message',
-            enum: [
-                'Road Event Message'
-            ],
-            examples: [
-                'Road Event Message'
-            ]
-        }
-    }
-};
-
-var json$3 = {
-    type: 'object',
-    definitions: {
-        datetime: {
-            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
-            type: 'string',
-            examples: [
-                '2018-04-01T00:00:00Z'
-            ]
-        }
-    },
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    required: [
-        'request',
-        'portal_type'
-    ],
-    properties: {
-        request: {
-            type: 'object',
-            required: [
-                'description',
-                'vehicle_reference',
-                'obu_reference',
-                'type',
-                'transaction_date',
-                'mileage_details'
-            ],
-            properties: {
-                description: {
-                    type: 'string',
-                    description: 'The description of the reported mileage',
-                    examples: [
-                        'Mileage data'
-                    ]
-                },
-                vehicle_reference: {
-                    description: 'The Vehicle Identification Number of the vehicle for which the message is reported.',
-                    type: 'string',
-                    pattern: '^[0-9A-Z]{17}$',
-                    examples: [
-                        '1GTG6BE38F1262119'
-                    ]
-                },
-                obu_reference: {
-                    type: 'string',
-                    description: 'The On Board Unit reference of the device for which the message is reported',
-                    pattern: '^[0-9a-z]{24}$',
-                    examples: [
-                        '977298026d50a5b1795c6563'
-                    ]
-                },
-                type: {
-                    type: 'string',
-                    description: 'A value to indicate the type of message. Can be one of: ADJ: Adjusted mileage transaction, CRE: Credit transaction, FEE: Fees transaction, INV: Invoicing transaction, MRP: Reported mileage transaction',
-                    examples: [
-                        'MRP'
-                    ]
-                },
-                transaction_date: {
-                    description: 'The date at which mileage was traveled. Should be in UTC.',
-                    $ref: '#/definitions/datetime'
-                },
-                mileage_details: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            fuel_price: {
-                                type: 'number',
-                                description: 'The price of the fuel consumed at the transaction date.',
-                                default: 0,
-                                examples: [
-                                    -0.30000001192092896
-                                ]
-                            },
-                            fuel_quantity: {
-                                type: 'number',
-                                description: 'The quantity of fuel consumed at the transaction date.',
-                                default: 0,
-                                examples: [
-                                    0.14000000059604645
-                                ]
-                            },
-                            miles_price: {
-                                type: 'number',
-                                description: 'The price of miles traveled.',
-                                default: 0,
-                                examples: [
-                                    0.014999999664723873
-                                ]
-                            },
-                            miles_quantity: {
-                                type: 'number',
-                                description: 'The number of miles traveled.',
-                                default: 0,
-                                examples: [
-                                    3.700000047683716
-                                ]
-                            },
-                            rule_id: {
-                                type: 'integer',
-                                description: 'An identifier associated with a geographic area, or zone, in which a specific rate per mile will be assessed for miles traveled.  FIPS codes are used to identify states.',
-                                default: 0,
-                                examples: [
-                                    41
-                                ]
-                            },
-                            sub_rule_id: {
-                                type: 'integer',
-                                description: '0 if the travel was on public roads, 1 if it was on private roads',
-                                default: 0,
-                                examples: [
-                                    1
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        portal_type: {
-            type: 'string',
-            description: 'The type of message in the ClearRoad Platform. Only one type possible',
-            default: 'Road Message',
-            enum: [
-                'Road Message'
-            ],
-            examples: [
-                'Road Message'
-            ]
-        }
-    }
-};
-
-var json$4 = {
-    type: 'object',
-    definitions: {
-        datetime: {
-            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
-            type: 'string',
-            examples: [
-                '2018-04-01T00:00:00Z'
-            ]
-        }
-    },
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    required: [
-        'report_type',
-        'billing_period_reference',
-        'request_date',
-        'portal_type'
-    ],
-    properties: {
-        report_type: {
-            type: 'string',
-            description: 'The type of the requested report.',
-            enum: [
-                'AccountBalance'
-            ],
-            examples: [
-                'AccountBalance'
-            ]
-        },
-        billing_period_reference: {
-            type: 'string',
-            description: 'The reference of the billing period. The billing period should already exist in the ClearRoad Platform.',
-            examples: [
-                '2018Q1'
-            ]
-        },
-        request_date: {
-            description: 'The datetime for which the request is made. Should be in UTC.',
-            $ref: '#/definitions/datetime'
-        },
-        request: {
-            type: 'string',
-            description: 'Used to give specific parameters to report if needed. This filed could be left empty for an AccountBalance report.'
-        },
-        portal_type: {
-            type: 'string',
-            description: 'The type of the object in the ClearRoad Platform. Only one possible value.',
-            default: 'Road Report Request',
-            enum: [
-                'Road Report Request'
-            ],
-            examples: [
-                'Road Report Request'
-            ]
-        }
-    }
-};
-
-var definitions = {
-    'Billing Period Message': json,
-    'Road Account Message': json$1,
-    'Road Event Message': json$2,
-    'Road Message': json$3,
-    'Road Report Request': json$4
-};
-
-var Ajv = require('ajv');
-var validateDefinition = function (type, data) {
-    var definition = definitions[type];
-    // check type
-    if (!definition) {
-        throw new Error("portal_type: \"" + type + "\" not found");
-    }
-    var ajv = new Ajv({
-        allErrors: true
-    });
-    var validate = ajv.compile(definition);
-    var valid = validate(data);
-    if (!valid) {
-        throw new Error("Validation schema failed:\n" + ajv.errorsText(validate.errors));
-    }
-    return valid;
-};
-
-var getQueue = function () { return new RSVP.Queue(); };
-
-/**
- * If the storage only support one attachment type,
- * use this one.
- */
-var defaultAttachmentName = 'data';
-
-var jIO = require('../../node/lib/jio.js').jIO;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Rusha = require('rusha');
+var jIO = require('../node/lib/jio.js').jIO;
+exports.jIO = jIO;
+var index_1 = require("./definitions/index");
+var queue_1 = require("./queue");
+var storage_1 = require("./storage");
 var queryPortalType = 'portal_type';
+var PortalTypes;
 (function (PortalTypes) {
     PortalTypes["BillingPeriodMessage"] = "Billing Period Message";
     PortalTypes["RoadAccountMessage"] = "Road Account Message";
     PortalTypes["RoadEventMessage"] = "Road Event Message";
     PortalTypes["RoadMessage"] = "Road Message";
     PortalTypes["RoadReportRequest"] = "Road Report Request";
-})(exports.PortalTypes || (exports.PortalTypes = {}));
+})(PortalTypes = exports.PortalTypes || (exports.PortalTypes = {}));
 var queryPortalTypes = [
-    "\"" + exports.PortalTypes.BillingPeriodMessage + "\"",
-    "\"" + exports.PortalTypes.RoadAccountMessage + "\"",
-    "\"" + exports.PortalTypes.RoadEventMessage + "\"",
-    "\"" + exports.PortalTypes.RoadMessage + "\" ",
-    "\"" + exports.PortalTypes.RoadReportRequest + "\""
+    "\"" + PortalTypes.BillingPeriodMessage + "\"",
+    "\"" + PortalTypes.RoadAccountMessage + "\"",
+    "\"" + PortalTypes.RoadEventMessage + "\"",
+    "\"" + PortalTypes.RoadMessage + "\" ",
+    "\"" + PortalTypes.RoadReportRequest + "\""
 ].join(' OR ');
 var InternalPortalTypes;
 (function (InternalPortalTypes) {
@@ -703,7 +219,7 @@ var ClearRoad = /** @class */ (function () {
         var refKey = 'source_reference';
         var query = joinQueries([
             queryPortalType + ":(" + queryPortalTypes + ")",
-            "grouping_reference:\"" + defaultAttachmentName + "\"",
+            "grouping_reference:\"" + storage_1.defaultAttachmentName + "\"",
             this.queryMaxDate()
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-messages-signatures");
@@ -837,7 +353,7 @@ var ClearRoad = /** @class */ (function () {
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-files-signatures");
         var localStorage = this.localSubStorage(refKey);
         var mappingStorageWithEnclosure = merge(localStorage, {
-            attachment_list: [defaultAttachmentName],
+            attachment_list: [storage_1.defaultAttachmentName],
             attachment: {
                 data: {
                     get: { uri_template: 'enclosure' },
@@ -881,7 +397,7 @@ var ClearRoad = /** @class */ (function () {
             remote_sub_storage: {
                 type: 'mapping',
                 id: ['equalSubProperty', refKey],
-                attachment_list: [defaultAttachmentName],
+                attachment_list: [storage_1.defaultAttachmentName],
                 attachment: {
                     data: {
                         get: {
@@ -908,32 +424,32 @@ var ClearRoad = /** @class */ (function () {
      */
     ClearRoad.prototype.post = function (data) {
         var _this = this;
-        validateDefinition(data.portal_type, data);
+        index_1.validateDefinition(data.portal_type, data);
         var options = merge({}, data);
         switch (data.portal_type) {
-            case exports.PortalTypes.RoadAccountMessage:
+            case PortalTypes.RoadAccountMessage:
                 options.parent_relative_url = 'road_account_message_module';
                 break;
-            case exports.PortalTypes.RoadEventMessage:
+            case PortalTypes.RoadEventMessage:
                 options.parent_relative_url = 'road_event_message_module';
                 break;
-            case exports.PortalTypes.RoadMessage:
+            case PortalTypes.RoadMessage:
                 options.parent_relative_url = 'road_message_module';
                 break;
-            case exports.PortalTypes.BillingPeriodMessage:
+            case PortalTypes.BillingPeriodMessage:
                 options.parent_relative_url = 'billing_period_message_module';
                 break;
-            case exports.PortalTypes.RoadReportRequest:
+            case PortalTypes.RoadReportRequest:
                 options.parent_relative_url = 'road_report_request_module';
                 break;
         }
-        options.grouping_reference = defaultAttachmentName;
+        options.grouping_reference = storage_1.defaultAttachmentName;
         var dataAsString = jsonId(options);
         var rusha = new Rusha();
         var reference = rusha.digestFromString(dataAsString);
         options.source_reference = reference;
         options.destination_reference = reference;
-        return getQueue().push(function () {
+        return queue_1.getQueue().push(function () {
             return _this.messagesStorage.put(options.source_reference, options);
         });
     };
@@ -946,7 +462,7 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.sync = function (progress) {
         var _this = this;
         if (progress === void 0) { progress = function () { }; }
-        return getQueue()
+        return queue_1.getQueue()
             .push(function () {
             return _this.messagesStorage.repair().push(function () { return progress('messages'); });
         })
@@ -991,22 +507,20 @@ var ClearRoad = /** @class */ (function () {
      */
     ClearRoad.prototype.getReport = function (reference) {
         var _this = this;
-        return getQueue()
+        return queue_1.getQueue()
             .push(function () {
-            return _this.reportStorage.getAttachment(reference, defaultAttachmentName);
+            return _this.reportStorage.getAttachment(reference, storage_1.defaultAttachmentName);
         })
             .push(function (report) {
             var _a;
             return _a = {},
-                _a[defaultAttachmentName] = report,
+                _a[storage_1.defaultAttachmentName] = report,
                 _a;
         }, function () {
             return _this.reportStorage.allAttachments(reference);
         })
-            .push(function (attachment) { return attachment[defaultAttachmentName]; });
+            .push(function (attachment) { return attachment[storage_1.defaultAttachmentName]; });
     };
     return ClearRoad;
 }());
-
-exports.jIO = jIO;
 exports.ClearRoad = ClearRoad;

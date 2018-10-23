@@ -1,54 +1,25 @@
 {
   "name": "@clearroad/api",
-  "version": "1.2.0-rc.9",
+  "version": "1.2.0-rc.10",
   "description": "",
-  "main": "dist/commonjs/clearroad.js",
-  "module": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "dist/commonjs/index.js",
+  "module": "dist/module/index.js",
+  "typings": "dist/module/index.d.ts",
   "scripts": {
-    "build": "rimraf dist && rollup -c && tsc -p tsconfig.build.json",
-    "build:definitions": "node definitions.js; npm run lint:fix",
+    "build": "rimraf dist && npm run build:libs && rollup -c && npm run build:modules",
+    "build:libs": "mkdir -p dist/node/lib && cp -R node/lib/*.js dist/node/lib/",
+    "build:modules": "tsc -p tsconfig.commonjs.json && tsc -p tsconfig.build.json",
+    "build:definitions": "node build-definitions.js; npm run lint:fix",
     "lint": "tslint \"src/**/*.ts\"",
     "lint:fix": "tslint --fix \"src/**/*.ts\"",
     "deploy": "node deploy.js",
-    "test": "rimraf coverage && npm run test:web && npm run test:node",
-    "test:web": "karma start karma.conf.ts",
+    "test": "rimraf coverage && karma start karma.conf.ts",
     "test:watch": "karma start karma.conf.ts --no-single-run",
-    "test:node": "nyc mocha",
     "test:samples": "node samples/test.js",
     "start": "http-server -o --cors",
     "release": "standard-version",
     "postrelease": "git push origin master --follow-tags",
     "commitmsg": "commitlint -e $GIT_PARAMS"
-  },
-  "nyc": {
-    "check-coverage": true,
-    "per-file": true,
-    "statements": 75,
-    "branches": 65,
-    "functions": 75,
-    "lines": 75,
-    "include": [
-      "node/**/*.js"
-    ],
-    "exclude": [
-      "node/lib/*.js",
-      "node/**/*.spec.ts"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "reporter": [
-      "text-summary",
-      "html",
-      "lcov"
-    ],
-    "sourceMap": true,
-    "instrument": true,
-    "report-dir": "./coverage/node"
   },
   "keywords": [
     "clearroad",
@@ -75,15 +46,10 @@
   "devDependencies": {
     "@commitlint/cli": "^7.0.0",
     "@commitlint/config-conventional": "^7.0.1",
-    "@types/chai": "^4.1.4",
     "@types/jasmine": "~2.8.6",
     "@types/jasminewd2": "~2.0.3",
-    "@types/mocha": "^5.2.5",
     "@types/node": "~8.9.4",
-    "@types/rsvp": "^4.0.2",
-    "@types/sinon": "^5.0.2",
     "azure-storage": "^2.10.0",
-    "chai": "^4.1.2",
     "dotenv": "^6.0.0",
     "http-server": "^0.11.1",
     "husky": "^0.14.3",
@@ -97,8 +63,6 @@
     "karma-typescript": "^3.0.13",
     "karma-typescript-es6-transform": "^1.0.4",
     "lodash.clonedeep": "^4.5.0",
-    "mocha": "^5.2.0",
-    "nyc": "^12.0.2",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "rimraf": "^2.6.2",
@@ -111,8 +75,6 @@
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-typescript": "^0.8.1",
     "rollup-plugin-uglify": "^4.0.0",
-    "sinon": "^6.1.5",
-    "source-map-support": "^0.5.9",
     "standard-version": "^4.4.0",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",

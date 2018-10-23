@@ -1,9 +1,9 @@
-.nyc_output/
 coverage/
 dist/iife/
 guide/
 legacy/
 lib/
+node/
 src/
 test/
 *.spec.ts
@@ -11,7 +11,7 @@ test/
 CHANGELOG.md
 commitlint.config.js
 CONTRIBUTING.md
-definitions.js
+build-definitions.js
 deploy.js
 karma.conf.*
 rollup.config.js

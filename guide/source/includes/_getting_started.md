@@ -34,7 +34,7 @@ const cr = new ClearRoad('apiUrl', 'accessToken');
 ```
 
 ```javascript--node
-const ClearRoad = require('@clearroad/api/node').ClearRoad;
+const ClearRoad = require('@clearroad/api').ClearRoad;
 const cr = new ClearRoad('apiUrl', 'accessToken');
 ```
 
@@ -44,6 +44,12 @@ If you do not have an access token, you can request one on the [developer platfo
 ## Step 3. Choose a local storage
 
 ```javascript--browser
+const cr = new ClearRoad('apiUrl', 'accessToken', {
+  type: 'indexeddb'
+});
+```
+
+```javascript--browser-es6
 const cr = new ClearRoad('apiUrl', 'accessToken', {
   type: 'indexeddb'
 });
@@ -91,7 +97,9 @@ console.log(results);
 
 ```javascript--node
 await cr.sync();
+console.log('sync done');
 const results = await cr.allDocs();
+console.log(results);
 ```
 
 Now that you're all setup, you can start by synchronizing your local storage and then query the data.

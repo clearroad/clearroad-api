@@ -1,9 +1,7 @@
-import path from 'path';
 import typescript from 'rollup-plugin-typescript';
 import resolve from 'rollup-plugin-node-resolve';
 import replace from 'rollup-plugin-replace';
 import commonJS from 'rollup-plugin-commonjs';
-import builtins from 'rollup-plugin-node-builtins';
 import hypothetical from 'rollup-plugin-hypothetical';
 import buble from 'rollup-plugin-buble';
 import { uglify } from 'rollup-plugin-uglify';
@@ -13,69 +11,7 @@ const main = 'src/clearroad.ts';
 const typescriptOptions = {
   typescript: require('typescript')
 };
-const jio = path.resolve(__dirname, 'lib/jio.js');
-const requireJio = "var jIO = require('../node/lib/jio.js').jIO;";
-
-const cjs = {
-  external: [
-    'rsvp',
-    'rusha',
-    'ajv',
-    jio
-  ],
-  input: main,
-  output: {
-    file: 'dist/commonjs/clearroad.js',
-    format: 'cjs'
-  },
-  plugins: [
-    typescript(typescriptOptions),
-    builtins(),
-    commonJS({
-      include: [
-        'node_modules/**',
-        'lib/**'
-      ]
-    }),
-    replace({
-      delimiters: ['',''],
-      values: {
-        [requireJio]: "var jIO = require('../../node/lib/jio.js').jIO;"
-      }
-    })
-  ]
-};
-
-const node = {
-  external: [
-    'rsvp',
-    'rusha',
-    'ajv',
-    jio
-  ],
-  input: main,
-  output: {
-    file: 'node/index.js',
-    format: 'cjs'
-  },
-  plugins: [
-    typescript(typescriptOptions),
-    builtins(),
-    commonJS({
-      include: [
-        'node_modules/**',
-        'lib/**'
-      ]
-    }),
-    replace({
-      delimiters: ['',''],
-      values: {
-        [requireJio]: "var jIO = require('./lib/jio.js').jIO;"
-      }
-    }),
-    buble()
-  ]
-};
+const libs = ['jIO', 'RSVP', 'Rusha', 'Ajv'].join(', ');
 
 const iife = {
   input: main,
@@ -83,41 +19,28 @@ const iife = {
     file: 'dist/iife/clearroad.js',
     format: 'iife',
     name: 'bundle',
-    banner: `
-(function(jIO) {
+    banner: `(function(${libs}) {
 `,
-    footer: `
-  window.ClearRoad = bundle.ClearRoad;
-})(jIO);
-    `,
-    globals: {
-      rsvp: 'RSVP',
-      rusha: 'Rusha',
-      ajv: 'Ajv'
-    }
+    footer: `window.ClearRoad = bundle.ClearRoad;
+})(${libs});
+    `
   }],
   plugins: [
     typescript(typescriptOptions),
     hypothetical({
-      allowFallthrough: true,
-      files: {
-        rsvp: `
-export default window.RSVP;
-        `,
-        rusha: `
-export default window.Rusha;
-        `
-      }
+      allowFallthrough: true
     }),
     resolve(),
     commonJS({
       include: 'node_modules/**'
     }),
     replace({
-      delimiters: ['',''],
+      delimiters: ['', ''],
       values: {
-        [requireJio]: '',
-        "var Ajv = require('ajv');": 'var Ajv = window.Ajv;'
+        "var Queue = require('rsvp').Queue;": 'var Queue = RSVP.Queue;',
+        "var Rusha = require('rusha');": '',
+        "var jIO = require('../node/lib/jio.js').jIO;": '',
+        "var Ajv = require('ajv');": ''
       }
     }),
     buble()
@@ -129,8 +52,6 @@ iifeMinified.output[0].file = 'dist/iife/clearroad.min.js';
 iifeMinified.plugins.push(uglify());
 
 export default [
-  cjs,
-  node,
   iife,
   iifeMinified
 ];

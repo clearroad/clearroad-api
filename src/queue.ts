@@ -1,4 +1,4 @@
-import RSVP from 'rsvp';
+const { Queue } = require('rsvp');
 
 export declare type QueueConstructorLike = new <T>(executor: (resolve: (value?: T|IQueueLike<T>) => void, reject: (reason?: any) => void) => void) => IQueueLike<T>;
 
@@ -23,5 +23,5 @@ export interface IQueue<T> extends Promise<T> {
 }
 
 export type Queue = <T>() => IQueue<T>;
-export const getQueue = <T>() => new (RSVP as any).Queue() as IQueue<T>;
+export const getQueue = <T>() => new Queue() as IQueue<T>;
 export const promiseToQueue = <T>(promise: Promise<T>) => promise as IQueue<T>;

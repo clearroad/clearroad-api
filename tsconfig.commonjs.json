@@ -1,12 +1,8 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "target": "es6",
-    "module": "esNext",
     "baseUrl": ".",
-    "outDir": "dist/module",
-    "declaration": true,
-    "sourceMap": true
+    "outDir": "dist/commonjs"
   },
   "include": [
     "./src/**/*.ts"
