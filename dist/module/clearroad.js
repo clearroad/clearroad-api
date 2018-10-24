@@ -435,6 +435,10 @@ export class ClearRoad {
                 options.parent_relative_url = 'road_report_request_module';
                 break;
         }
+        // jIO only support string values
+        if ('request' in data) {
+            options.request = JSON.stringify(data.request);
+        }
         options.grouping_reference = defaultAttachmentName;
         const dataAsString = jsonId(options);
         const rusha = new Rusha();

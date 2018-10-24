@@ -54,7 +54,6 @@ var json = {
                             type: {
                                 type: 'integer',
                                 description: 'The ID of the event. Every type has it own ID.',
-                                default: 0,
                                 examples: [
                                     12
                                 ]

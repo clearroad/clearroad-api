@@ -260,6 +260,7 @@ describe('ClearRoad', () => {
         };
         const data: any = await cr.post(options);
         expect(data.parent_relative_url).toEqual('road_event_message_module');
+        expect(typeof data.request).toEqual('string');
         expect(putSpy).toHaveBeenCalled();
       });
     });
@@ -291,6 +292,7 @@ describe('ClearRoad', () => {
         };
         const data: any = await cr.post(options);
         expect(data.parent_relative_url).toEqual('road_message_module');
+        expect(typeof data.request).toEqual('string');
         expect(putSpy).toHaveBeenCalled();
       });
     });

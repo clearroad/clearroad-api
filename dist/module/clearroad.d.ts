@@ -41,7 +41,7 @@ export interface IPostRoadAccountMessage extends IPostData {
     expiration_date?: string;
     fuel_consumption: string;
     fuel_taxable: string;
-    obu_reference: string;
+    obu_reference?: string;
     vehicle_reference: string;
     product_line: string;
 }
@@ -60,11 +60,32 @@ export interface IPostRoadReportRequest extends IPostData {
 }
 export interface IPostRoadEventMessage extends IPostData {
     portal_type: PortalTypes.RoadEventMessage;
-    request: any;
+    request: {
+        vehicle_reference: string;
+        obu_reference: string;
+        event_details: Array<{
+            type: number;
+            date: string;
+        }>;
+    };
 }
 export interface IPostRoadMessage extends IPostData {
     portal_type: PortalTypes.RoadMessage;
-    request: any;
+    request: {
+        description: string;
+        vehicle_reference: string;
+        obu_reference: string;
+        type: string;
+        transaction_date: string;
+        mileage_details: Array<{
+            fuel_price?: number;
+            fuel_quantity: number;
+            miles_price?: number;
+            miles_quantity: number;
+            rule_id: number;
+            sub_rule_id: number;
+        }>;
+    };
 }
 export declare type postData = IPostRoadAccountMessage | IPostBillingPeriodMessage | IPostRoadReportRequest | IPostRoadEventMessage | IPostRoadMessage;
 export declare class ClearRoad {

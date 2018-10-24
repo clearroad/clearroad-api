@@ -52,7 +52,14 @@ const json: IDefinition = {
         },
         type: {
           type: 'string',
-          description: 'A value to indicate the type of message. Can be one of: ADJ: Adjusted mileage transaction, CRE: Credit transaction, FEE: Fees transaction, INV: Invoicing transaction, MRP: Reported mileage transaction',
+          description: 'A value to indicate the type of message.',
+          enum: [
+            'ADJ',
+            'CRE',
+            'FEE',
+            'INV',
+            'MRP'
+          ],
           examples: [
             'MRP'
           ]
@@ -65,6 +72,12 @@ const json: IDefinition = {
           type: 'array',
           items: {
             type: 'object',
+            required: [
+              'fuel_quantity',
+              'miles_quantity',
+              'rule_id',
+              'sub_rule_id'
+            ],
             properties: {
               fuel_price: {
                 type: 'number',

@@ -21,7 +21,6 @@ var json = {
         'effective_date',
         'fuel_consumption',
         'fuel_taxable',
-        'obu_reference',
         'vehicle_reference',
         'product_line',
         'portal_type'

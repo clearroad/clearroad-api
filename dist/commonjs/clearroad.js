@@ -443,6 +443,10 @@ var ClearRoad = /** @class */ (function () {
                 options.parent_relative_url = 'road_report_request_module';
                 break;
         }
+        // jIO only support string values
+        if ('request' in data) {
+            options.request = JSON.stringify(data.request);
+        }
         options.grouping_reference = storage_1.defaultAttachmentName;
         var dataAsString = jsonId(options);
         var rusha = new Rusha();
