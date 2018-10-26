@@ -50,9 +50,9 @@ export interface IJioQueryResults {
 }
 export interface IJioStorage {
     get: (id: string) => IQueue<any>;
-    post: (data: any) => IQueue<string>;
     put: (id: string, data: any) => IQueue<string>;
     remove: (id: string) => IQueue<string>;
+    post?: (data: any) => IQueue<string>;
     getAttachment: (id: string, name: string, options?: any) => IQueue<any>;
     putAttachment: (id: string, name: string, blob: Blob) => IQueue<any>;
     removeAttachment: (id: string, name: string) => IQueue<string>;
