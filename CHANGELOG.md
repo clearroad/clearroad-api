@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.0.0"></a>
+# [2.0.0](https://github.com/clearroad/clearroad-api/compare/v1.2.0...v2.0.0) (2018-10-30)
+
+
+### Bug Fixes
+
+* **clearroad:** export PortalTypes ([299678c](https://github.com/clearroad/clearroad-api/commit/299678c))
+* **clearroad:** fallback to allAttachments on error ([edb4f7d](https://github.com/clearroad/clearroad-api/commit/edb4f7d))
+* **clearroad:** handle request properties as objects ([4a33730](https://github.com/clearroad/clearroad-api/commit/4a33730))
+* **clearroad:** update jio lib when using require ([cafe36f](https://github.com/clearroad/clearroad-api/commit/cafe36f))
+* **definitions:** update descriptions and remove empty default ([2962510](https://github.com/clearroad/clearroad-api/commit/2962510))
+* **jio node:** handle responseType == 'blob' ([32f9d9f](https://github.com/clearroad/clearroad-api/commit/32f9d9f))
+* **xhr2:** support FormData ([68689d2](https://github.com/clearroad/clearroad-api/commit/68689d2))
+
+
+### Chores
+
+* **clearroad:** use commonjs bundle for node ([bd37ea6](https://github.com/clearroad/clearroad-api/commit/bd37ea6))
+
+
+### Features
+
+* **clearroad:** add jio storage definitions ([0e3035a](https://github.com/clearroad/clearroad-api/commit/0e3035a))
+* **clearroad:** handle additional storages ([7155337](https://github.com/clearroad/clearroad-api/commit/7155337))
+* **clearroad:** set options.database to override default db name ([baaffaf](https://github.com/clearroad/clearroad-api/commit/baaffaf))
+* **definitions:** add message definitions ([5d43147](https://github.com/clearroad/clearroad-api/commit/5d43147))
+
+
+### BREAKING CHANGES
+
+* **clearroad:** use require('@clearroad/api') for Node.js
+
+
+
 <a name="1.2.0"></a>
 # [1.2.0](https://github.com/clearroad/clearroad-api/compare/v1.1.1...v1.2.0) (2018-09-13)
 
