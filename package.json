@@ -33,14 +33,13 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "ajv": "^6.5.4",
-    "form-data": "^2.3.2",
     "jsonschema": "^1.2.4",
     "moment": "^2.21.0",
     "rsvp": "git+https://lab.nexedi.com/nexedi/rsvp.js.git",
     "rusha": "0.8.2",
     "urijs": "^1.19.1",
     "uritemplate": "git+https://lab.nexedi.com/nexedi/uritemplate-js.git",
-    "xhr2": "^0.1.4"
+    "xhr2": "git+https://github.com/clearroad/node-xhr2.git"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.0.0",
