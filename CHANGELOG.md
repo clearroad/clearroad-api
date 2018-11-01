@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.2.0"></a>
+# [2.2.0](https://github.com/clearroad/clearroad-api/compare/v2.1.0...v2.2.0) (2018-11-01)
+
+
+### Bug Fixes
+
+* **jio:** fix convert ArrayBuffer to Blob on ajax response ([f0a3216](https://github.com/clearroad/clearroad-api/commit/f0a3216))
+
+
+### Features
+
+* **clearroad:** return report as JSON ([36f3ac9](https://github.com/clearroad/clearroad-api/commit/36f3ac9))
+
+
+
 <a name="2.1.0"></a>
 # [2.1.0](https://github.com/clearroad/clearroad-api/compare/v2.0.0...v2.1.0) (2018-11-01)
 
