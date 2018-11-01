@@ -478,26 +478,43 @@ $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.j
 <tr>
 <th>Property</th>
 <th>Description</th>
+<th>Required</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>url</td>
 <td>Url of the storage</td>
+<td></td>
 </tr>
 <tr>
 <td>accessToken</td>
-<td>Optional. Access token to authenticate on the ClearRoad API (if necessary)</td>
+<td>Access token to authenticate on the ClearRoad API (if necessary)</td>
+<td>No</td>
 </tr>
 <tr>
 <td>options.localStorage.type</td>
 <td>View <a href="#local-storage-types">types</a> below</td>
+<td>Yes</td>
 </tr>
 <tr>
 <td>options.localStorage.accessToken</td>
 <td>Access token (if required)</td>
+<td>No</td>
+</tr>
+<tr>
+<td>options.database</td>
+<td>Name of the database when the objects will be stored</td>
+<td>No</td>
+</tr>
+<tr>
+<td>options.useQueryStorage</td>
+<td>Use if the localStorage does not support query</td>
+<td>No</td>
 </tr>
 </tbody></table>
 <h3 id='api-reference-constructor-local-storage-types'>Local Storage Types</h3>
+<p>Note: this list does not contain the additional Node.js storages developped by ClearRoad available <a href="https://github.com/clearroad/clearroad-api-storages">here</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
