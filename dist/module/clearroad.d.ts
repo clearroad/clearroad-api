@@ -5,10 +5,13 @@ import { IQueue } from './queue';
 import { IJioQueryOptions } from './storage';
 export declare enum PortalTypes {
     BillingPeriodMessage = "Billing Period Message",
+    RoadAccount = "Road Account",
     RoadAccountMessage = "Road Account Message",
+    RoadEvent = "Road Event",
     RoadEventMessage = "Road Event Message",
     RoadMessage = "Road Message",
-    RoadReportRequest = "Road Report Request"
+    RoadReportRequest = "Road Report Request",
+    RoadTransaction = "Road Transaction"
 }
 export declare type storageName = 'messages' | 'ingestion-reports' | 'directories' | 'reports';
 export declare type localStorageType = 'indexeddb' | 'dropbox' | 'gdrive';
@@ -22,6 +25,11 @@ export interface IOptions {
         database?: string;
     };
     maxDate?: Date | number | string;
+    /**
+     * Force using a query storage around the localStorage.
+     * Needed if the storage can not query data directly. See information on the storage
+     */
+    useQueryStorage?: boolean;
 }
 export interface IAttachmentOptions {
     format: 'text' | 'json' | 'blob' | 'data_url' | 'array_buffer';

@@ -12,14 +12,18 @@ new ClearRoad('apiUrl', 'accessToken');
 
 Initialise a new ClearRoad object to interact with the ERP5 storage.
 
-Property | Description
---------- | -----------
+Property | Description | Required
+--------- | ----------- | -----------
 url | Url of the storage
-accessToken | Optional. Access token to authenticate on the ClearRoad API (if necessary)
-options.localStorage.type | View [types](#local-storage-types) below
-options.localStorage.accessToken | Access token (if required)
+accessToken | Access token to authenticate on the ClearRoad API (if necessary) | No
+options.localStorage.type | View [types](#local-storage-types) below | Yes
+options.localStorage.accessToken | Access token (if required) | No
+options.database | Name of the database when the objects will be stored | No
+options.useQueryStorage | Use if the localStorage does not support query | No
 
 ### Local Storage Types
+
+Note: this list does not contain the additional Node.js storages developped by ClearRoad available [here](https://github.com/clearroad/clearroad-api-storages)
 
 Type | Description | Options | Support | Need access token
 --------- | --------- | ----------- | ----------- | -----------

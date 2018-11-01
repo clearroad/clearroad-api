@@ -147,6 +147,19 @@ describe('ClearRoad', () => {
       it('should return the config', () => {
         expect(cr.localSubStorage(reference)).toEqual({});
       });
+
+      describe('force using query storage', () => {
+        beforeEach(() => {
+          cr.options.useQueryStorage = true;
+        });
+
+        it('should return the config', () => {
+          expect(cr.localSubStorage(reference)).toEqual({
+            type: 'query',
+            sub_storage: {}
+          });
+        });
+      });
     });
   });
 
@@ -200,6 +213,21 @@ describe('ClearRoad', () => {
       it('should set the database', () => {
         expect(cr.signatureSubStorage(database)).toEqual({
           database
+        });
+      });
+
+      describe('force using query storage', () => {
+        beforeEach(() => {
+          cr.options.useQueryStorage = true;
+        });
+
+        it('should return the config', () => {
+          expect(cr.signatureSubStorage(database)).toEqual({
+            type: 'query',
+            sub_storage: {
+              database
+            }
+          });
         });
       });
     });

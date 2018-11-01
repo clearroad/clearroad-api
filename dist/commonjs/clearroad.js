@@ -10,10 +10,13 @@ var queryPortalType = 'portal_type';
 var PortalTypes;
 (function (PortalTypes) {
     PortalTypes["BillingPeriodMessage"] = "Billing Period Message";
+    PortalTypes["RoadAccount"] = "Road Account";
     PortalTypes["RoadAccountMessage"] = "Road Account Message";
+    PortalTypes["RoadEvent"] = "Road Event";
     PortalTypes["RoadEventMessage"] = "Road Event Message";
     PortalTypes["RoadMessage"] = "Road Message";
     PortalTypes["RoadReportRequest"] = "Road Report Request";
+    PortalTypes["RoadTransaction"] = "Road Transaction";
 })(PortalTypes = exports.PortalTypes || (exports.PortalTypes = {}));
 var queryPortalTypes = [
     "\"" + PortalTypes.BillingPeriodMessage + "\"",
@@ -25,9 +28,6 @@ var queryPortalTypes = [
 var InternalPortalTypes;
 (function (InternalPortalTypes) {
     InternalPortalTypes["File"] = "File";
-    InternalPortalTypes["RoadAccount"] = "Road Account";
-    InternalPortalTypes["RoadEvent"] = "Road Event";
-    InternalPortalTypes["RoadTransaction"] = "Road Transaction";
 })(InternalPortalTypes || (InternalPortalTypes = {}));
 var ValidationStates;
 (function (ValidationStates) {
@@ -152,6 +152,12 @@ var ClearRoad = /** @class */ (function () {
      * @internal
      */
     ClearRoad.prototype.localSubStorage = function (key) {
+        if (this.options.useQueryStorage) {
+            return {
+                type: 'query',
+                sub_storage: merge({}, this.options.localStorage)
+            };
+        }
         switch (this.localStorageType) {
             case 'dropbox':
             case 'gdrive':
@@ -159,7 +165,7 @@ var ClearRoad = /** @class */ (function () {
                     type: 'mapping',
                     sub_storage: {
                         type: 'query',
-                        sub_storage: this.options.localStorage
+                        sub_storage: merge({}, this.options.localStorage)
                     },
                     mapping_dict: {
                         portal_type: ['equalSubProperty', key]
@@ -188,6 +194,14 @@ var ClearRoad = /** @class */ (function () {
      * @internal
      */
     ClearRoad.prototype.signatureSubStorage = function (db) {
+        if (this.options.useQueryStorage) {
+            return {
+                type: 'query',
+                sub_storage: merge(this.options.localStorage, {
+                    database: db
+                })
+            };
+        }
         switch (this.localStorageType) {
             case 'dropbox':
             case 'gdrive':
@@ -304,9 +318,9 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.initDirectoryStorage = function () {
         var refKey = 'source_reference';
         var query = joinQueries([queryPortalType + ":(" + [
-                "\"" + InternalPortalTypes.RoadAccount + "\"",
-                "\"" + InternalPortalTypes.RoadEvent + "\"",
-                "\"" + InternalPortalTypes.RoadTransaction + "\""
+                "\"" + PortalTypes.RoadAccount + "\"",
+                "\"" + PortalTypes.RoadEvent + "\"",
+                "\"" + PortalTypes.RoadTransaction + "\""
             ].join(' OR ') + ')', this.queryMaxDate()]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-directory-signatures");
         var localStorage = this.localSubStorage(refKey);

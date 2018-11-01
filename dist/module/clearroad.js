@@ -8,10 +8,13 @@ const queryPortalType = 'portal_type';
 export var PortalTypes;
 (function (PortalTypes) {
     PortalTypes["BillingPeriodMessage"] = "Billing Period Message";
+    PortalTypes["RoadAccount"] = "Road Account";
     PortalTypes["RoadAccountMessage"] = "Road Account Message";
+    PortalTypes["RoadEvent"] = "Road Event";
     PortalTypes["RoadEventMessage"] = "Road Event Message";
     PortalTypes["RoadMessage"] = "Road Message";
     PortalTypes["RoadReportRequest"] = "Road Report Request";
+    PortalTypes["RoadTransaction"] = "Road Transaction";
 })(PortalTypes || (PortalTypes = {}));
 const queryPortalTypes = [
     `"${PortalTypes.BillingPeriodMessage}"`,
@@ -23,9 +26,6 @@ const queryPortalTypes = [
 var InternalPortalTypes;
 (function (InternalPortalTypes) {
     InternalPortalTypes["File"] = "File";
-    InternalPortalTypes["RoadAccount"] = "Road Account";
-    InternalPortalTypes["RoadEvent"] = "Road Event";
-    InternalPortalTypes["RoadTransaction"] = "Road Transaction";
 })(InternalPortalTypes || (InternalPortalTypes = {}));
 var ValidationStates;
 (function (ValidationStates) {
@@ -145,6 +145,12 @@ export class ClearRoad {
      * @internal
      */
     localSubStorage(key) {
+        if (this.options.useQueryStorage) {
+            return {
+                type: 'query',
+                sub_storage: merge({}, this.options.localStorage)
+            };
+        }
         switch (this.localStorageType) {
             case 'dropbox':
             case 'gdrive':
@@ -152,7 +158,7 @@ export class ClearRoad {
                     type: 'mapping',
                     sub_storage: {
                         type: 'query',
-                        sub_storage: this.options.localStorage
+                        sub_storage: merge({}, this.options.localStorage)
                     },
                     mapping_dict: {
                         portal_type: ['equalSubProperty', key]
@@ -181,6 +187,14 @@ export class ClearRoad {
      * @internal
      */
     signatureSubStorage(db) {
+        if (this.options.useQueryStorage) {
+            return {
+                type: 'query',
+                sub_storage: merge(this.options.localStorage, {
+                    database: db
+                })
+            };
+        }
         switch (this.localStorageType) {
             case 'dropbox':
             case 'gdrive':
@@ -297,9 +311,9 @@ export class ClearRoad {
     initDirectoryStorage() {
         const refKey = 'source_reference';
         const query = joinQueries([`${queryPortalType}:(` + [
-                `"${InternalPortalTypes.RoadAccount}"`,
-                `"${InternalPortalTypes.RoadEvent}"`,
-                `"${InternalPortalTypes.RoadTransaction}"`
+                `"${PortalTypes.RoadAccount}"`,
+                `"${PortalTypes.RoadEvent}"`,
+                `"${PortalTypes.RoadTransaction}"`
             ].join(' OR ') + ')', this.queryMaxDate()]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signatures`);
         const localStorage = this.localSubStorage(refKey);
