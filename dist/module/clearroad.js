@@ -487,6 +487,7 @@ export class ClearRoad {
     /**
      * Query for documents in the local storage. Make sure `.sync()` is called before.
      * @param options Query options. If none set, return all documents.
+     * @return Results
      */
     allDocs(options) {
         return this.messagesStorage.allDocs(options);
@@ -494,6 +495,7 @@ export class ClearRoad {
     /**
      * Get a report using the Report Request reference
      * @param sourceReference The reference of the Report Request
+     * @return The report as JSON
      */
     getReportFromRequest(sourceReference) {
         return this.allDocs({
@@ -504,13 +506,14 @@ export class ClearRoad {
             if (report) {
                 return this.getReport(report.value.reference);
             }
-            return {};
+            return null;
         });
     }
     /**
      * Get a report using the reference.
      * If you do not have the Report reference, use `getReportFromRequest` with the Report Request reference instead.
      * @param reference The reference of the Report
+     * @return The report as JSON
      */
     getReport(reference) {
         return getQueue()
@@ -524,7 +527,8 @@ export class ClearRoad {
         }, () => {
             return this.reportStorage.allAttachments(reference);
         })
-            .push(attachment => attachment[defaultAttachmentName]);
+            .push(attachment => jIO.util.readBlobAsText(attachment[defaultAttachmentName]))
+            .push(report => report.target.result ? JSON.parse(report.target.result) : {});
     }
 }
 //# sourceMappingURL=clearroad.js.map

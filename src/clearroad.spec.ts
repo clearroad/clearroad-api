@@ -404,6 +404,9 @@ describe('ClearRoad', () => {
 
     beforeEach(() => {
       cr = new ClearRoad(url);
+      spyOn(jioImport.jIO.util, 'readBlobAsText').and.returnValue({
+        target: {result: '{}'}
+      });
       allAttachmentsSpy = spyOn((cr as any).reportStorage, 'allAttachments').and.returnValue({});
     });
 
@@ -470,8 +473,9 @@ describe('ClearRoad', () => {
       });
 
       it('should get the report', async () => {
-        await cr.getReportFromRequest(id);
+        const res = await cr.getReportFromRequest(id);
         expect(getReportSpy).not.toHaveBeenCalled();
+        expect(res).toBeNull();
       });
     });
   });

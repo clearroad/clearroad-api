@@ -497,6 +497,7 @@ var ClearRoad = /** @class */ (function () {
     /**
      * Query for documents in the local storage. Make sure `.sync()` is called before.
      * @param options Query options. If none set, return all documents.
+     * @return Results
      */
     ClearRoad.prototype.allDocs = function (options) {
         return this.messagesStorage.allDocs(options);
@@ -504,6 +505,7 @@ var ClearRoad = /** @class */ (function () {
     /**
      * Get a report using the Report Request reference
      * @param sourceReference The reference of the Report Request
+     * @return The report as JSON
      */
     ClearRoad.prototype.getReportFromRequest = function (sourceReference) {
         var _this = this;
@@ -515,13 +517,14 @@ var ClearRoad = /** @class */ (function () {
             if (report) {
                 return _this.getReport(report.value.reference);
             }
-            return {};
+            return null;
         });
     };
     /**
      * Get a report using the reference.
      * If you do not have the Report reference, use `getReportFromRequest` with the Report Request reference instead.
      * @param reference The reference of the Report
+     * @return The report as JSON
      */
     ClearRoad.prototype.getReport = function (reference) {
         var _this = this;
@@ -537,7 +540,8 @@ var ClearRoad = /** @class */ (function () {
         }, function () {
             return _this.reportStorage.allAttachments(reference);
         })
-            .push(function (attachment) { return attachment[storage_1.defaultAttachmentName]; });
+            .push(function (attachment) { return jIO.util.readBlobAsText(attachment[storage_1.defaultAttachmentName]); })
+            .push(function (report) { return report.target.result ? JSON.parse(report.target.result) : {}; });
     };
     return ClearRoad;
 }());
