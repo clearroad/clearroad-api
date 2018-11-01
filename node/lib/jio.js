@@ -2809,7 +2809,7 @@ var jIO = window.jIO;
 
 function convertToBlob(evt, convert) {
   if (convert && evt.target.response instanceof ArrayBuffer) {
-    evt.target.response = new Blob(evt.target.response);
+    evt.target.response = new Blob([evt.target.response]);
   }
   return evt;
 }
