@@ -15,7 +15,7 @@ export declare enum PortalTypes {
 }
 export declare type storageName = 'messages' | 'ingestion-reports' | 'directories' | 'reports';
 export declare type localStorageType = 'indexeddb' | 'dropbox' | 'gdrive';
-export interface IOptions {
+export interface IClearRoadOptions {
     localStorage?: {
         type: localStorageType | string;
         accessToken?: string;
@@ -30,6 +30,10 @@ export interface IOptions {
      * Needed if the storage can not query data directly. See information on the storage
      */
     useQueryStorage?: boolean;
+    /**
+     * Turn on debugging mode to console
+     */
+    debug?: boolean;
 }
 export interface IAttachmentOptions {
     format: 'text' | 'json' | 'blob' | 'data_url' | 'array_buffer';
@@ -113,7 +117,7 @@ export declare class ClearRoad {
      * @param accessToken ClearRoad API access token (required when using Node)
      * @param options Override default options
      */
-    constructor(url: string, accessToken?: string | undefined, options?: IOptions);
+    constructor(url: string, accessToken?: string | undefined, options?: IClearRoadOptions);
     /**
      * Post a message to the ClearRoad API.
      * If not currently connected, messages will be put in the local storage and sent later when using `.sync()`

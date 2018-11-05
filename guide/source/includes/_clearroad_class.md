@@ -20,6 +20,7 @@ options.localStorage.type | View [types](#local-storage-types) below | Yes
 options.localStorage.accessToken | Access token (if required) | No
 options.database | Name of the database when the objects will be stored | No
 options.useQueryStorage | Use if the localStorage does not support query | No
+options.debug | Log to console replication steps between local and remote storage | No
 
 ### Local Storage Types
 

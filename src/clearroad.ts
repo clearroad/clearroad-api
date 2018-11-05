@@ -51,7 +51,7 @@ const queryValidationStates = Object.keys(ValidationStates)
 export type storageName = 'messages' | 'ingestion-reports' | 'directories' | 'reports';
 
 export type localStorageType = 'indexeddb' | 'dropbox' | 'gdrive';
-export interface IOptions {
+export interface IClearRoadOptions {
   localStorage?: {
     type: localStorageType|string;
     accessToken?: string;
@@ -66,6 +66,10 @@ export interface IOptions {
    * Needed if the storage can not query data directly. See information on the storage
    */
   useQueryStorage?: boolean;
+  /**
+   * Turn on debugging mode to console
+   */
+  debug?: boolean;
 }
 
 export interface IAttachmentOptions {
@@ -200,6 +204,8 @@ const merge = (obj1, obj2) => {
 
 const joinQueries = (queries: string[], joinType = 'AND') => queries.filter(query => !!query).join(` ${joinType} `);
 
+const maxLogLevel = 1000;
+
 export class ClearRoad {
   private databaseName: string;
   private localStorageType: string;
@@ -218,7 +224,7 @@ export class ClearRoad {
   constructor(
     private url: string,
     private accessToken?: string,
-    private options: IOptions = {}
+    private options: IClearRoadOptions = {}
   ) {
     if (!options.localStorage || !options.localStorage.type) {
       options.localStorage = {
@@ -357,6 +363,8 @@ export class ClearRoad {
     const localStorage = this.localSubStorage(refKey);
 
     this.messagesStorage = jIO.createJIO({
+      report_level: maxLogLevel,
+      debug: this.options.debug,
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -402,6 +410,8 @@ export class ClearRoad {
     const localStorage = this.localSubStorage(refKey);
 
     this.ingestionReportStorage = jIO.createJIO({
+      report_level: maxLogLevel,
+      debug: this.options.debug,
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -447,6 +457,8 @@ export class ClearRoad {
     const localStorage = this.localSubStorage(refKey);
 
     this.directoryStorage = jIO.createJIO({
+      report_level: maxLogLevel,
+      debug: this.options.debug,
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,
@@ -501,6 +513,8 @@ export class ClearRoad {
     });
 
     this.reportStorage = jIO.createJIO({
+      report_level: maxLogLevel,
+      debug: this.options.debug,
       type: 'replicate',
       parallel_operation_amount: 1,
       use_remote_post: false,

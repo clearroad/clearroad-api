@@ -100,6 +100,7 @@ var joinQueries = function (queries, joinType) {
     if (joinType === void 0) { joinType = 'AND'; }
     return queries.filter(function (query) { return !!query; }).join(" " + joinType + " ");
 };
+var maxLogLevel = 1000;
 var ClearRoad = /** @class */ (function () {
     /**
      * Instantiate a ClearRoad api instance.
@@ -239,6 +240,8 @@ var ClearRoad = /** @class */ (function () {
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-messages-signatures");
         var localStorage = this.localSubStorage(refKey);
         this.messagesStorage = jIO.createJIO({
+            report_level: maxLogLevel,
+            debug: this.options.debug,
             type: 'replicate',
             parallel_operation_amount: 1,
             use_remote_post: false,
@@ -282,6 +285,8 @@ var ClearRoad = /** @class */ (function () {
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-ingestion-signatures");
         var localStorage = this.localSubStorage(refKey);
         this.ingestionReportStorage = jIO.createJIO({
+            report_level: maxLogLevel,
+            debug: this.options.debug,
             type: 'replicate',
             parallel_operation_amount: 1,
             use_remote_post: false,
@@ -325,6 +330,8 @@ var ClearRoad = /** @class */ (function () {
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-directory-signatures");
         var localStorage = this.localSubStorage(refKey);
         this.directoryStorage = jIO.createJIO({
+            report_level: maxLogLevel,
+            debug: this.options.debug,
             type: 'replicate',
             parallel_operation_amount: 1,
             use_remote_post: false,
@@ -376,6 +383,8 @@ var ClearRoad = /** @class */ (function () {
             }
         });
         this.reportStorage = jIO.createJIO({
+            report_level: maxLogLevel,
+            debug: this.options.debug,
             type: 'replicate',
             parallel_operation_amount: 1,
             use_remote_post: false,

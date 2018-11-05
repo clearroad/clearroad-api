@@ -94,6 +94,7 @@ const merge = (obj1, obj2) => {
     return obj3;
 };
 const joinQueries = (queries, joinType = 'AND') => queries.filter(query => !!query).join(` ${joinType} `);
+const maxLogLevel = 1000;
 export class ClearRoad {
     /**
      * Instantiate a ClearRoad api instance.
@@ -232,6 +233,8 @@ export class ClearRoad {
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-messages-signatures`);
         const localStorage = this.localSubStorage(refKey);
         this.messagesStorage = jIO.createJIO({
+            report_level: maxLogLevel,
+            debug: this.options.debug,
             type: 'replicate',
             parallel_operation_amount: 1,
             use_remote_post: false,
@@ -275,6 +278,8 @@ export class ClearRoad {
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-ingestion-signatures`);
         const localStorage = this.localSubStorage(refKey);
         this.ingestionReportStorage = jIO.createJIO({
+            report_level: maxLogLevel,
+            debug: this.options.debug,
             type: 'replicate',
             parallel_operation_amount: 1,
             use_remote_post: false,
@@ -318,6 +323,8 @@ export class ClearRoad {
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signatures`);
         const localStorage = this.localSubStorage(refKey);
         this.directoryStorage = jIO.createJIO({
+            report_level: maxLogLevel,
+            debug: this.options.debug,
             type: 'replicate',
             parallel_operation_amount: 1,
             use_remote_post: false,
@@ -369,6 +376,8 @@ export class ClearRoad {
             }
         });
         this.reportStorage = jIO.createJIO({
+            report_level: maxLogLevel,
+            debug: this.options.debug,
             type: 'replicate',
             parallel_operation_amount: 1,
             use_remote_post: false,

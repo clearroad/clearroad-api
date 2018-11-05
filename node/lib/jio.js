@@ -1,6 +1,6 @@
 (function (window) {
-  var navigator = {},
-  RSVP = require('rsvp'),
+  var navigator = {};
+  var RSVP = require('rsvp'),
   moment = require('moment'),
   Rusha = require('rusha'),
   XMLHttpRequest = require('xhr2'),
@@ -9,13 +9,14 @@
   UriTemplate = require('uritemplate'),
   process = require('process');
 
+window.moment = moment;
 window.FormData = window.FormData || FormData;
 window.XMLHttpRequest = window.XMLHttpRequest || XMLHttpRequest;
 var html5weakmap = new WeakMap();
 
 function EventTarget() {
   html5weakmap.set(this, Object.create(null));
-};
+}
 
 EventTarget.prototype.addEventListener = function (type, listener) {
   if (typeof listener !== 'function') {
@@ -107,7 +108,8 @@ function Blob(blobParts, options) {
     enumerable: true,
     value: options ? '' + (options.type || '') : ''
   });
-};
+}
+
 Blob.prototype.size = 0;
 Blob.prototype.type = '';
 Blob.prototype.slice = function (start, end, contentType) {
@@ -120,7 +122,8 @@ window.Blob = window.Blob || Blob;
 
 function FileReader() {
   EventTarget.call(this);
-};
+}
+
 FileReader.prototype = Object.create(EventTarget.prototype);
 Object.defineProperty(FileReader, 'constructor', {
   value: FileReader
@@ -252,9 +255,9 @@ var arrayExtend = function () {
   if (query.operator === "NOT") {
     return query.query_list[0];
   }
-  return {"type": "complex", "key": "", "operator": "NOT", "query_list": [query]};
+  return {"type": "complex", "operator": "NOT", "query_list": [query]};
 
-}, mkComplexQuery = function (key, operator, query_list) {
+}, mkComplexQuery = function (operator, query_list) {
   var i, query_list2 = [];
   for (i = 0; i < query_list.length; i += 1) {
     if (query_list[i].operator === operator) {
@@ -263,10 +266,17 @@ var arrayExtend = function () {
       query_list2.push(query_list[i]);
     }
   }
-  return {type:"complex",key:key,operator:operator,query_list:query_list2};
+  return {type:"complex",operator:operator,query_list:query_list2};
 
-}, querySetKey = function (query, key) {
-  if (({simple: 1, complex: 1})[query.type] && !query.key) {
+}, simpleQuerySetKey = function (query, key) {
+  var i;
+  if (query.type === "complex") {
+    for (i = 0; i < query.query_list.length; ++i) {
+      simpleQuerySetKey (query.query_list[i],key);
+    }
+    return true;
+  }
+  if (query.type === "simple" && !query.key) {
     query.key = key;
     return true;
   }
@@ -368,13 +378,13 @@ case 5: case 8: case 11: case 14: case 16:
  this.$ = $$[$0];
 break;
 case 6:
- this.$ = mkComplexQuery('', 'AND', [$$[$0-1], $$[$0]]);
+ this.$ = mkComplexQuery('AND', [$$[$0-1], $$[$0]]);
 break;
 case 7:
- this.$ = mkComplexQuery('', 'OR', [$$[$0-2], $$[$0]]);
+ this.$ = mkComplexQuery('OR', [$$[$0-2], $$[$0]]);
 break;
 case 9:
- this.$ = mkComplexQuery('', 'AND', [$$[$0-2], $$[$0]]);
+ this.$ = mkComplexQuery('AND', [$$[$0-2], $$[$0]]);
 break;
 case 10:
  this.$ = mkNotQuery($$[$0]);
@@ -383,7 +393,7 @@ case 12:
  this.$ = $$[$0-1];
 break;
 case 13:
- querySetKey($$[$0], $$[$0-2]); this.$ = $$[$0];
+ simpleQuerySetKey($$[$0], $$[$0-2]); this.$ = $$[$0];
 break;
 case 15:
  $$[$0].operator = $$[$0-1] ; this.$ = $$[$0];
@@ -1476,8 +1486,6 @@ return new Parser;
      */
     this.operator = spec.operator;
 
-    this.key = spec.key || this.key;
-
     /**
      * The sub Query list which are used to query an item.
      *
@@ -1497,7 +1505,6 @@ return new Parser;
 
   ComplexQuery.prototype.operator = "AND";
   ComplexQuery.prototype.type = "complex";
-  ComplexQuery.prototype.key = "";
 
   /**
    * #crossLink "Query/match:method"
@@ -1514,8 +1521,21 @@ return new Parser;
    * #crossLink "Query/toString:method"
    */
   ComplexQuery.prototype.toString = function () {
-    /*global objectToSearchText */
-    return objectToSearchText(this.toJSON());
+    var str_list = [], this_operator = this.operator;
+    if (this.operator === "NOT") {
+      str_list.push("NOT (");
+      str_list.push(this.query_list[0].toString());
+      str_list.push(")");
+      return str_list.join(" ");
+    }
+    this.query_list.forEach(function (query) {
+      str_list.push("(");
+      str_list.push(query.toString());
+      str_list.push(")");
+      str_list.push(this_operator);
+    });
+    str_list.length -= 1;
+    return str_list.join(" ");
   };
 
   /**
@@ -1525,7 +1545,6 @@ return new Parser;
     var s = {
       "type": "complex",
       "operator": this.operator,
-      "key": this.key,
       "query_list": []
     };
     this.query_list.forEach(function (query) {
@@ -1615,26 +1634,12 @@ return new Parser;
   };
 
   function objectToSearchText(query) {
-    var str_list = [], operator = "", query_list = null;
+    var str_list = [];
     if (query.type === "complex") {
-      query_list = query.query_list || [];
-      if (query_list.length === 0) {
-        return "";
-      }
-      operator = query.operator;
-      if (operator === "NOT") {
-        str_list.push("NOT");
-        // fallback to AND operator if several queries are given
-        // i.e. `NOT ( a AND b )`
-        operator = "AND";
-      }
-      if (query.key) {
-        str_list.push(query.key + ":");
-      }
       str_list.push("(");
-      query_list.forEach(function (sub_query) {
+      (query.query_list || []).forEach(function (sub_query) {
         str_list.push(objectToSearchText(sub_query));
-        str_list.push(operator);
+        str_list.push(query.operator);
       });
       str_list.length -= 1;
       str_list.push(")");
@@ -1811,7 +1816,8 @@ return new Parser;
    * #crossLink "Query/toString:method"
    */
   SimpleQuery.prototype.toString = function () {
-    return objectToSearchText(this.toJSON());
+    return (this.key ? this.key + ":" : "") +
+      (this.operator ? " " + this.operator : "") + ' "' + this.value + '"';
   };
 
   /**
@@ -2805,6 +2811,9 @@ var jiodate = window.jiodate;
 
 }(window, RSVP, Blob, QueryFactory, Query, atob,
   FileReader, ArrayBuffer, Uint8Array, navigator));
+/*global window, ArrayBuffer, Blob */
+"use strict";
+
 var jIO = window.jIO;
 
 function convertToBlob(evt, convert) {
@@ -3730,23 +3739,48 @@ jIO.util.ajax = function ajax(param) {
 // }
 
 /*jslint nomen: true, unparam: true */
-/*global jIO, UriTemplate, FormData, RSVP, URI, Blob,
+/*global jIO, UriTemplate, FormData, RSVP, URI, Blob, btoa,
          SimpleQuery, ComplexQuery*/
 
 (function (jIO, UriTemplate, FormData, RSVP, URI, Blob, btoa,
            SimpleQuery, ComplexQuery) {
   "use strict";
 
+  function ajax(storage, options) {
+    if (options === undefined) {
+      options = {};
+    }
+    if (options.xhrFields === undefined) {
+      options.xhrFields = {};
+    }
+
+    if (storage._access_token !== undefined) {
+      if (options.headers === undefined) {
+        options.headers = {};
+      }
+      options.headers.Accept = "*/*";
+      options.headers['X-ACCESS-TOKEN'] = storage._access_token;
+      options.xhrFields.withCredentials = false;
+    } else if (storage._authorization) {
+      if (options.headers === undefined) {
+        options.headers = {};
+      }
+      options.headers.Accept = "*/*";
+      options.headers.Authorization = storage._authorization;
+      options.xhrFields.withCredentials = false;
+    } else {
+      options.xhrFields.withCredentials = true;
+    }
+
+    return jIO.util.ajax(options);
+  }
+
   function getSiteDocument(storage) {
     return new RSVP.Queue()
       .push(function () {
-        return jIO.util.ajax({
-          type: "GET",
-          url: storage._url,
-          xhrFields: {
-            withCredentials: storage._withCredentials
-          },
-          headers: storage._headers
+        return ajax(storage, {
+          "type": "GET",
+          "url": storage._url
         });
       })
       .push(function (event) {
@@ -3763,18 +3797,13 @@ jIO.util.ajax = function ajax(param) {
         // XXX need to get modified metadata
         return new RSVP.Queue()
           .push(function () {
-            return jIO.util.ajax({
-              type: "GET",
-              url: UriTemplate.parse(
-                site_hal._links.traverse.href
-              ).expand({
-                relative_url: id,
-                view: options._view
-              }),
-              xhrFields: {
-                withCredentials: storage._withCredentials
-              },
-              headers: storage._headers
+            return ajax(storage, {
+              "type": "GET",
+              "url": UriTemplate.parse(site_hal._links.traverse.href)
+                                .expand({
+                  relative_url: id,
+                  view: options._view
+                })
             });
           })
           .push(undefined, function (error) {
@@ -3869,21 +3898,11 @@ jIO.util.ajax = function ajax(param) {
     }
     this._url = spec.url;
     this._default_view_reference = spec.default_view_reference;
-    this._headers = null;
-    this._withCredentials = true;
-    if (spec.login && spec.password) {
-      this._headers = {
-        Accept: "*/*",
-        Authorization: "Basic " + btoa(spec.login + ":" + spec.password)
-      };
-      this._withCredentials = false;
+    if (spec.hasOwnProperty('access_token')) {
+      this._access_token = spec.access_token;
     }
-    else if (spec.access_token) {
-      this._headers = {
-        Accept: "*/*",
-        'X-ACCESS-TOKEN': spec.access_token
-      };
-      this._withCredentials = false;
+    if (spec.login && spec.password) {
+      this._authorization = "Basic " + btoa(spec.login + ":" + spec.password);
     }
   }
 
@@ -3917,14 +3936,10 @@ jIO.util.ajax = function ajax(param) {
         var form_data = new FormData();
         form_data.append("portal_type", data.portal_type);
         form_data.append("parent_relative_url", data.parent_relative_url);
-        return jIO.util.ajax({
+        return ajax(context, {
           type: "POST",
           url: site_hal._actions.add.href,
-          data: form_data,
-          xhrFields: {
-            withCredentials: context._withCredentials
-          },
-          headers: context._headers
+          data: form_data
         });
       })
       .push(function (evt) {
@@ -3999,6 +4014,7 @@ jIO.util.ajax = function ajax(param) {
   };
 
   ERP5Storage.prototype.getAttachment = function (id, action, options) {
+    var storage = this;
     if (options === undefined) {
       options = {};
     }
@@ -4035,21 +4051,15 @@ jIO.util.ajax = function ajax(param) {
         });
     }
     if (action.indexOf(this._url) === 0) {
-      var context = this;
-
       return new RSVP.Queue()
         .push(function () {
           var start,
             end,
             range,
             request_options = {
-              type: "GET",
-              dataType: "blob",
-              url: action,
-              xhrFields: {
-                withCredentials: context._withCredentials
-              },
-              headers: context._headers
+              "type": "GET",
+              "dataType": "blob",
+              "url": action
             };
           if (options.start !== undefined ||  options.end !== undefined) {
             start = options.start || 0;
@@ -4071,7 +4081,7 @@ jIO.util.ajax = function ajax(param) {
             }
             request_options.headers = {Range: range};
           }
-          return jIO.util.ajax(request_options);
+          return ajax(storage, request_options);
         })
         .push(function (evt) {
           if (evt.target.response === undefined) {
@@ -4088,8 +4098,7 @@ jIO.util.ajax = function ajax(param) {
   };
 
   ERP5Storage.prototype.putAttachment = function (id, name, blob) {
-    var context = this;
-
+    var storage = this;
     // Assert we use a callable on a document from the ERP5 site
     if (name.indexOf(this._url) !== 0) {
       throw new jIO.util.jIOError("Can not store outside ERP5: " +
@@ -4125,15 +4134,11 @@ jIO.util.ajax = function ajax(param) {
             }
           }
         }
-        return jIO.util.ajax({
-          type: "POST",
-          url: name,
-          data: data,
-          dataType: "blob",
-          xhrFields: {
-            withCredentials: context._withCredentials
-          },
-          headers: context._headers
+        return ajax(storage, {
+          "type": "POST",
+          "url": name,
+          "data": data,
+          "dataType": "blob"
         });
       });
   };
@@ -4192,8 +4197,7 @@ jIO.util.ajax = function ajax(param) {
   }
 
   ERP5Storage.prototype.buildQuery = function (options) {
-    var context = this;
-
+    var storage = this;
 //     if (typeof options.query !== "string") {
 //       options.query = (options.query ?
 //                        jIO.Query.objectToSearchText(options.query) :
@@ -4286,23 +4290,18 @@ jIO.util.ajax = function ajax(param) {
           selection_domain = JSON.stringify(selection_domain);
         }
 
-        return jIO.util.ajax({
-          type: "GET",
-          url: UriTemplate.parse(
-            site_hal._links.raw_search.href
-          ).expand({
-            query: query,
-            // XXX Force erp5 to return embedded document
-            select_list: options.select_list || ["title", "reference"],
-            limit: options.limit,
-            sort_on: sort_list,
-            local_roles: local_roles,
-            selection_domain: selection_domain
-          }),
-          xhrFields: {
-            withCredentials: context._withCredentials
-          },
-          headers: context._headers
+        return ajax(storage, {
+          "type": "GET",
+          "url": UriTemplate.parse(site_hal._links.raw_search.href)
+                            .expand({
+              query: query,
+              // XXX Force erp5 to return embedded document
+              select_list: options.select_list || ["title", "reference"],
+              limit: options.limit,
+              sort_on: sort_list,
+              local_roles: local_roles,
+              selection_domain: selection_domain
+            })
         });
       })
       .push(function (response) {
@@ -5270,7 +5269,8 @@ jIO.util.ajax = function ajax(param) {
       query,
       property,
       select_list = [],
-      sort_on = [];
+      sort_on = [],
+      queryOptions = {};
 
     function mapQuery(one_query) {
       var j, query_list = [], key, sub_query;
@@ -5346,7 +5346,7 @@ jIO.util.ajax = function ajax(param) {
     if (query !== undefined) {
       query = Query.objectToSearchText(query);
     }
-    var queryOptions = {};
+
     if (query) {
       queryOptions.query = query;
     }
@@ -5359,6 +5359,7 @@ jIO.util.ajax = function ajax(param) {
     if (option.limit) {
       queryOptions.limit = option.limit;
     }
+
     return this._sub_storage.allDocs(queryOptions)
       .push(function (result) {
         var sub_doc, map_info = storage._map_id || ["equalSubId"];
@@ -5383,7 +5384,8 @@ jIO.util.ajax = function ajax(param) {
 
   jIO.addStorage('mapping', MappingStorage);
 }(jIO, RSVP, UriTemplate, SimpleQuery, ComplexQuery, QueryFactory, Query,
-  FormData));/*
+  FormData));
+/*
  * Copyright 2013, Nexedi SA
  *
  * This program is free software: you can Use, Study, Modify and Redistribute
@@ -5859,7 +5861,218 @@ jIO.util.ajax = function ajax(param) {
     CONFLICT_THROW = 0,
     CONFLICT_KEEP_LOCAL = 1,
     CONFLICT_KEEP_REMOTE = 2,
-    CONFLICT_CONTINUE = 3;
+    CONFLICT_CONTINUE = 3,
+
+    // 0 - 99 error
+    LOG_UNEXPECTED_ERROR = 0,
+    LOG_UNRESOLVED_CONFLICT = 74,
+    LOG_UNEXPECTED_LOCAL_ATTACHMENT = 49,
+    LOG_UNEXPECTED_REMOTE_ATTACHMENT = 47,
+    LOG_UNRESOLVED_ATTACHMENT_CONFLICT = 75,
+    // 100 - 199 solving conflict
+    LOG_FORCE_PUT_REMOTE = 116,
+    LOG_FORCE_DELETE_REMOTE = 136,
+    LOG_FORCE_PUT_REMOTE_ATTACHMENT = 117,
+    LOG_FORCE_DELETE_REMOTE_ATTACHMENT = 137,
+    LOG_FORCE_PUT_LOCAL = 118,
+    LOG_FORCE_DELETE_LOCAL = 138,
+    LOG_FORCE_PUT_LOCAL_ATTACHMENT = 119,
+    LOG_FORCE_DELETE_LOCAL_ATTACHMENT = 139,
+    // 200 - 299 pushing change
+    LOG_PUT_REMOTE = 216,
+    LOG_POST_REMOTE = 226,
+    LOG_DELETE_REMOTE = 236,
+    LOG_PUT_REMOTE_ATTACHMENT = 217,
+    LOG_DELETE_REMOTE_ATTACHMENT = 237,
+    LOG_PUT_LOCAL = 218,
+    LOG_POST_LOCAL = 228,
+    LOG_DELETE_LOCAL = 238,
+    LOG_PUT_LOCAL_ATTACHMENT = 219,
+    LOG_DELETE_LOCAL_ATTACHMENT = 239,
+    LOG_FALSE_CONFLICT = 284,
+    LOG_FALSE_CONFLICT_ATTACHMENT = 285,
+    // 300 - 399 nothing to do
+    LOG_SKIP_LOCAL_CREATION = 348,
+    LOG_SKIP_LOCAL_MODIFICATION = 358,
+    LOG_SKIP_LOCAL_DELETION = 368,
+    LOG_SKIP_REMOTE_CREATION = 346,
+    LOG_SKIP_REMOTE_MODIFICATION = 356,
+    LOG_SKIP_REMOTE_DELETION = 366,
+    LOG_SKIP_LOCAL_ATTACHMENT_CREATION = 349,
+    LOG_SKIP_LOCAL_ATTACHMENT_MODIFICATION = 359,
+    LOG_SKIP_LOCAL_ATTACHMENT_DELETION = 369,
+    LOG_SKIP_REMOTE_ATTACHMENT_CREATION = 347,
+    LOG_SKIP_REMOTE_ATTACHMENT_MODIFICATION = 357,
+    LOG_SKIP_REMOTE_ATTACHMENT_DELETION = 367,
+    LOG_SKIP_CONFLICT = 374,
+    LOG_SKIP_CONFLICT_ATTACHMENT = 375,
+    LOG_NO_CHANGE = 384,
+    LOG_NO_CHANGE_ATTACHMENT = 385;
+
+  function ReplicateReport(log_level, log_console) {
+    this._list = [];
+    this.name = 'ReplicateReport';
+    this.message = this.name;
+    this.has_error = false;
+    this._log_level = log_level;
+    this._log_console = log_console;
+  }
+
+  ReplicateReport.prototype = {
+    constructor: ReplicateReport,
+
+    LOG_UNEXPECTED_ERROR: LOG_UNEXPECTED_ERROR,
+    LOG_UNRESOLVED_CONFLICT: LOG_UNRESOLVED_CONFLICT,
+    LOG_UNEXPECTED_LOCAL_ATTACHMENT: LOG_UNEXPECTED_LOCAL_ATTACHMENT,
+    LOG_UNEXPECTED_REMOTE_ATTACHMENT: LOG_UNEXPECTED_REMOTE_ATTACHMENT,
+    LOG_UNRESOLVED_ATTACHMENT_CONFLICT: LOG_UNRESOLVED_ATTACHMENT_CONFLICT,
+    LOG_FORCE_PUT_REMOTE: LOG_FORCE_PUT_REMOTE,
+    LOG_FORCE_DELETE_REMOTE: LOG_FORCE_DELETE_REMOTE,
+    LOG_FORCE_PUT_LOCAL: LOG_FORCE_PUT_LOCAL,
+    LOG_FORCE_DELETE_LOCAL: LOG_FORCE_DELETE_LOCAL,
+    LOG_FORCE_PUT_REMOTE_ATTACHMENT: LOG_FORCE_PUT_REMOTE_ATTACHMENT,
+    LOG_FORCE_DELETE_REMOTE_ATTACHMENT: LOG_FORCE_DELETE_REMOTE_ATTACHMENT,
+    LOG_FORCE_PUT_LOCAL_ATTACHMENT: LOG_FORCE_PUT_LOCAL_ATTACHMENT,
+    LOG_FORCE_DELETE_LOCAL_ATTACHMENT: LOG_FORCE_DELETE_LOCAL_ATTACHMENT,
+    LOG_PUT_REMOTE: LOG_PUT_REMOTE,
+    LOG_POST_REMOTE: LOG_POST_REMOTE,
+    LOG_DELETE_REMOTE: LOG_DELETE_REMOTE,
+    LOG_PUT_REMOTE_ATTACHMENT: LOG_PUT_REMOTE_ATTACHMENT,
+    LOG_DELETE_REMOTE_ATTACHMENT: LOG_DELETE_REMOTE_ATTACHMENT,
+    LOG_PUT_LOCAL: LOG_PUT_LOCAL,
+    LOG_DELETE_LOCAL: LOG_DELETE_LOCAL,
+    LOG_PUT_LOCAL_ATTACHMENT: LOG_PUT_LOCAL_ATTACHMENT,
+    LOG_DELETE_LOCAL_ATTACHMENT: LOG_DELETE_LOCAL_ATTACHMENT,
+    LOG_FALSE_CONFLICT: LOG_FALSE_CONFLICT,
+    LOG_FALSE_CONFLICT_ATTACHMENT: LOG_FALSE_CONFLICT_ATTACHMENT,
+    LOG_SKIP_LOCAL_CREATION: LOG_SKIP_LOCAL_CREATION,
+    LOG_SKIP_LOCAL_MODIFICATION: LOG_SKIP_LOCAL_MODIFICATION,
+    LOG_SKIP_LOCAL_DELETION: LOG_SKIP_LOCAL_DELETION,
+    LOG_SKIP_REMOTE_CREATION: LOG_SKIP_REMOTE_CREATION,
+    LOG_SKIP_REMOTE_MODIFICATION: LOG_SKIP_REMOTE_MODIFICATION,
+    LOG_SKIP_REMOTE_DELETION: LOG_SKIP_REMOTE_DELETION,
+    LOG_SKIP_LOCAL_ATTACHMENT_CREATION: LOG_SKIP_LOCAL_ATTACHMENT_CREATION,
+    LOG_SKIP_LOCAL_ATTACHMENT_MODIFICATION:
+      LOG_SKIP_LOCAL_ATTACHMENT_MODIFICATION,
+    LOG_SKIP_LOCAL_ATTACHMENT_DELETION: LOG_SKIP_LOCAL_ATTACHMENT_DELETION,
+    LOG_SKIP_REMOTE_ATTACHMENT_CREATION: LOG_SKIP_REMOTE_ATTACHMENT_CREATION,
+    LOG_SKIP_REMOTE_ATTACHMENT_MODIFICATION:
+      LOG_SKIP_REMOTE_ATTACHMENT_MODIFICATION,
+    LOG_SKIP_REMOTE_ATTACHMENT_DELETION: LOG_SKIP_REMOTE_ATTACHMENT_DELETION,
+    LOG_SKIP_CONFLICT: LOG_SKIP_CONFLICT,
+    LOG_SKIP_CONFLICT_ATTACHMENT: LOG_SKIP_CONFLICT_ATTACHMENT,
+    LOG_NO_CHANGE: LOG_NO_CHANGE,
+    LOG_NO_CHANGE_ATTACHMENT: LOG_NO_CHANGE_ATTACHMENT,
+
+    logConsole: function (code, a, b, c) {
+      if (!this._log_console) {
+        return;
+      }
+      var txt = code,
+        parsed_code = code,
+        log;
+
+      // Check severity level
+      if (parsed_code >= 300) {
+        txt += ' SKIP ';
+        log = console.info;
+      } else if (parsed_code >= 200) {
+        txt += ' SOLVE ';
+        log = console.log;
+      } else if (parsed_code >= 100) {
+        txt += ' FORCE ';
+        log = console.warn;
+      } else {
+        txt += ' ERROR ';
+        log = console.error;
+      }
+
+      // Check operation
+      parsed_code = code % 100;
+      if (parsed_code >= 80) {
+        txt += 'idem ';
+      } else if (parsed_code >= 70) {
+        txt += 'conflict ';
+      } else if (parsed_code >= 60) {
+        txt += 'deleted ';
+      } else if (parsed_code >= 50) {
+        txt += 'modified ';
+      } else if (parsed_code >= 40) {
+        txt += 'created ';
+      } else if (parsed_code >= 30) {
+        txt += 'delete ';
+      } else if (parsed_code >= 20) {
+        txt += 'post ';
+      } else if (parsed_code >= 10) {
+        txt += 'put ';
+      }
+
+      // Check document
+      parsed_code = code % 10;
+      if (parsed_code >= 8) {
+        txt += 'local ';
+      } else if (parsed_code >= 6) {
+        txt += 'remote ';
+      }
+      if (parsed_code !== 0) {
+        txt += (parsed_code % 2 === 0) ? 'document' : 'attachment';
+      }
+      txt += ' ' + a;
+      if (b !== undefined) {
+        txt += ' ' + b;
+        if (c !== undefined) {
+          txt += ' ' + c;
+        }
+      }
+      log(txt);
+    },
+
+    log: function (id, type, extra) {
+      if (type === undefined) {
+        if (extra === undefined) {
+          extra = 'Unknown type: ' + type;
+        }
+        type = LOG_UNEXPECTED_ERROR;
+      }
+      if (type < this._log_level) {
+        if (extra === undefined) {
+          this.logConsole(type, id);
+          this._list.push([type, id]);
+        } else {
+          this.logConsole(type, id, extra);
+          this._list.push([type, id, extra]);
+        }
+        if (type < 100) {
+          this.has_error = true;
+        }
+      }
+    },
+
+    logAttachment: function (id, name, type, extra) {
+      if (type === undefined) {
+        if (extra === undefined) {
+          extra = 'Unknown type: ' + type;
+        }
+        type = LOG_UNEXPECTED_ERROR;
+      }
+      if (type < this._log_level) {
+        if (extra === undefined) {
+          this.logConsole(type, id, name);
+          this._list.push([type, id, name]);
+        } else {
+          this.logConsole(type, id, name, extra);
+          this._list.push([type, id, name, extra]);
+        }
+        if (type < 100) {
+          this.has_error = true;
+        }
+      }
+    },
+
+    toString: function () {
+      return this._list.toString();
+    }
+  };
 
   function SkipError(message) {
     if ((message !== undefined) && (typeof message !== "string")) {
@@ -5888,6 +6101,8 @@ jIO.util.ajax = function ajax(param) {
 
   function ReplicateStorage(spec) {
     this._query_options = spec.query || {};
+    this._log_level = spec.report_level || 100;
+    this._log_console = spec.debug || false;
     if (spec.signature_hash_key !== undefined) {
       this._query_options.select_list = [spec.signature_hash_key];
     }
@@ -6105,30 +6320,42 @@ jIO.util.ajax = function ajax(param) {
       });
   }
 
-  function propagateAttachmentDeletion(context, skip_attachment_dict,
+  function propagateAttachmentDeletion(context,
                                        destination,
-                                       id, name) {
+                                       id, name,
+                                       conflict, from_local, report) {
+    if (conflict) {
+      report.logAttachment(id, name, from_local ?
+                                     LOG_FORCE_DELETE_REMOTE_ATTACHMENT :
+                                     LOG_FORCE_DELETE_LOCAL_ATTACHMENT);
+    } else {
+      report.logAttachment(id, name, from_local ? LOG_DELETE_REMOTE_ATTACHMENT :
+                                                  LOG_DELETE_LOCAL_ATTACHMENT);
+    }
     return destination.removeAttachment(id, name)
       .push(function () {
         return context._signature_sub_storage.removeAttachment(id, name);
-      })
-      .push(function () {
-        skip_attachment_dict[name] = null;
       });
   }
 
-  function propagateAttachmentModification(context, skip_attachment_dict,
+  function propagateAttachmentModification(context,
                                            destination,
-                                           blob, hash, id, name) {
+                                           blob, hash, id, name,
+                                           from_local, is_conflict, report) {
+    if (is_conflict) {
+      report.logAttachment(id, name, from_local ?
+                                     LOG_FORCE_PUT_REMOTE_ATTACHMENT :
+                                     LOG_FORCE_PUT_LOCAL_ATTACHMENT);
+    } else {
+      report.logAttachment(id, name, from_local ? LOG_PUT_REMOTE_ATTACHMENT :
+                                                  LOG_PUT_LOCAL_ATTACHMENT);
+    }
     return destination.putAttachment(id, name, blob)
       .push(function () {
         return context._signature_sub_storage.putAttachment(id, name,
                                                             JSON.stringify({
             hash: hash
           }));
-      })
-      .push(function () {
-        skip_attachment_dict[name] = null;
       });
   }
 
@@ -6137,7 +6364,9 @@ jIO.util.ajax = function ajax(param) {
                                        status_hash, local_hash, blob,
                                        source, destination, id, name,
                                        conflict_force, conflict_revert,
-                                       conflict_ignore) {
+                                       conflict_ignore, from_local, report) {
+    // No need to check twice
+    skip_attachment_dict[name] = null;
     var remote_blob;
     return destination.getAttachment(id, name)
       .push(function (result) {
@@ -6159,39 +6388,39 @@ jIO.util.ajax = function ajax(param) {
       .push(function (remote_hash) {
         if (local_hash === remote_hash) {
           // Same modifications on both side
+          report.logAttachment(id, name, LOG_FALSE_CONFLICT_ATTACHMENT);
           if (local_hash === null) {
             // Deleted on both side, drop signature
-            return context._signature_sub_storage.removeAttachment(id, name)
-              .push(function () {
-                skip_attachment_dict[name] = null;
-              });
+            return context._signature_sub_storage.removeAttachment(id, name);
           }
 
           return context._signature_sub_storage.putAttachment(id, name,
             JSON.stringify({
               hash: local_hash
-            }))
-            .push(function () {
-              skip_attachment_dict[name] = null;
-            });
+            }));
         }
 
         if ((remote_hash === status_hash) || (conflict_force === true)) {
           // Modified only locally. No conflict or force
           if (local_hash === null) {
             // Deleted locally
-            return propagateAttachmentDeletion(context, skip_attachment_dict,
+            return propagateAttachmentDeletion(context,
                                                destination,
-                                               id, name);
+                                               id, name,
+                                               (remote_hash !== status_hash),
+                                               from_local, report);
           }
           return propagateAttachmentModification(context,
-                                       skip_attachment_dict,
                                        destination, blob,
-                                       local_hash, id, name);
+                                       local_hash, id, name,
+                                       from_local,
+                                       (remote_hash !== status_hash),
+                                       report);
         }
 
         // Conflict cases
         if (conflict_ignore === true) {
+          report.logAttachment(id, name, LOG_SKIP_CONFLICT_ATTACHMENT);
           return;
         }
 
@@ -6199,17 +6428,21 @@ jIO.util.ajax = function ajax(param) {
           // Automatically resolve conflict or force revert
           if (remote_hash === null) {
             // Deleted remotely
-            return propagateAttachmentDeletion(context, skip_attachment_dict,
-                                               source, id, name);
+            return propagateAttachmentDeletion(context,
+                                               source, id, name,
+                                               (local_hash !== status_hash),
+                                               !from_local, report);
           }
           return propagateAttachmentModification(
             context,
-            skip_attachment_dict,
             source,
             remote_blob,
             remote_hash,
             id,
-            name
+            name,
+            !from_local,
+            (local_hash !== status_hash),
+            report
           );
         }
 
@@ -6217,14 +6450,15 @@ jIO.util.ajax = function ajax(param) {
         if (remote_hash === null) {
           // Copy remote modification remotely
           return propagateAttachmentModification(context,
-                                       skip_attachment_dict,
                                        destination, blob,
-                                       local_hash, id, name);
+                                       local_hash, id, name, from_local,
+                                       false,
+                                       report);
         }
-        throw new jIO.util.jIOError("Conflict on '" + id +
-                                    "' with attachment '" +
-                                    name + "'",
-                                    409);
+        report.logAttachment(id, name, LOG_UNRESOLVED_ATTACHMENT_CONFLICT);
+      })
+      .push(undefined, function (error) {
+        report.logAttachment(id, name, LOG_UNEXPECTED_ERROR, error);
       });
   }
 
@@ -6235,7 +6469,9 @@ jIO.util.ajax = function ajax(param) {
                                               conflict_force,
                                               conflict_revert,
                                               conflict_ignore,
-                                              is_creation, is_modification) {
+                                              is_creation, is_modification,
+                                              from_local,
+                                              report) {
     var blob,
       status_hash;
     queue
@@ -6270,14 +6506,20 @@ jIO.util.ajax = function ajax(param) {
         var array_buffer = evt.target.result,
           local_hash = generateHashFromArrayBuffer(array_buffer);
 
-        if (local_hash !== status_hash) {
-          return checkAndPropagateAttachment(context,
-                                             skip_attachment_dict,
-                                             status_hash, local_hash, blob,
-                                             source, destination, id, name,
-                                             conflict_force, conflict_revert,
-                                             conflict_ignore);
+        if (local_hash === status_hash) {
+          if (!from_local) {
+            report.logAttachment(id, name, LOG_NO_CHANGE_ATTACHMENT);
+          }
+          return;
         }
+        return checkAndPropagateAttachment(context,
+                                           skip_attachment_dict,
+                                           status_hash, local_hash, blob,
+                                           source, destination, id, name,
+                                           conflict_force, conflict_revert,
+                                           conflict_ignore,
+                                           from_local,
+                                           report);
       });
   }
 
@@ -6285,7 +6527,7 @@ jIO.util.ajax = function ajax(param) {
                               skip_attachment_dict,
                               destination, id, name, source,
                               conflict_force, conflict_revert,
-                              conflict_ignore) {
+                              conflict_ignore, from_local, report) {
     var status_hash;
     queue
       .push(function () {
@@ -6299,16 +6541,17 @@ jIO.util.ajax = function ajax(param) {
                                  status_hash, null, null,
                                  source, destination, id, name,
                                  conflict_force, conflict_revert,
-                                 conflict_ignore);
+                                 conflict_ignore, from_local, report);
       });
   }
 
   function pushDocumentAttachment(context,
                                   skip_attachment_dict, id, source,
                                   destination, signature_allAttachments,
-                                  options) {
+                                  report, options) {
     var local_dict = {},
-      signature_dict = {};
+      signature_dict = {},
+      from_local = options.from_local;
     return source.allAttachments(id)
       .push(undefined, function (error) {
         if ((error instanceof jIO.util.jIOError) &&
@@ -6353,7 +6596,19 @@ jIO.util.ajax = function ajax(param) {
                                   options.conflict_revert,
                                   options.conflict_ignore,
                                   is_creation,
-                                  is_modification]);
+                                  is_modification,
+                                  from_local,
+                                  report]);
+            } else {
+              if (signature_dict.hasOwnProperty(key)) {
+                report.logAttachment(id, key, from_local ?
+                                     LOG_SKIP_LOCAL_ATTACHMENT_MODIFICATION :
+                                     LOG_SKIP_REMOTE_ATTACHMENT_MODIFICATION);
+              } else {
+                report.logAttachment(id, key, from_local ?
+                                     LOG_SKIP_LOCAL_ATTACHMENT_CREATION :
+                                     LOG_SKIP_REMOTE_ATTACHMENT_CREATION);
+              }
             }
           }
         }
@@ -6366,10 +6621,10 @@ jIO.util.ajax = function ajax(param) {
       })
       .push(function () {
         var key, argument_list = [];
-        if (options.check_deletion === true) {
-          for (key in signature_dict) {
-            if (signature_dict.hasOwnProperty(key)) {
-              if (!local_dict.hasOwnProperty(key)) {
+        for (key in signature_dict) {
+          if (signature_dict.hasOwnProperty(key)) {
+            if (!local_dict.hasOwnProperty(key)) {
+              if (options.check_deletion === true) {
                 argument_list.push([undefined,
                                              context,
                                              skip_attachment_dict,
@@ -6377,29 +6632,51 @@ jIO.util.ajax = function ajax(param) {
                                              source,
                                              options.conflict_force,
                                              options.conflict_revert,
-                                             options.conflict_ignore]);
+                                             options.conflict_ignore,
+                                             from_local,
+                                             report]);
+              } else {
+                report.logAttachment(id, key, from_local ?
+                                     LOG_SKIP_LOCAL_ATTACHMENT_DELETION :
+                                     LOG_SKIP_REMOTE_ATTACHMENT_DELETION);
               }
             }
           }
-          return dispatchQueue(
-            context,
-            checkAttachmentLocalDeletion,
-            argument_list,
-            context._parallel_operation_attachment_amount
-          );
         }
+        return dispatchQueue(
+          context,
+          checkAttachmentLocalDeletion,
+          argument_list,
+          context._parallel_operation_attachment_amount
+        );
       });
   }
 
-  function propagateFastAttachmentDeletion(queue, id, name, storage) {
+  function propagateFastAttachmentDeletion(queue, id, name, storage, signature,
+                                           from_local, report) {
+    report.logAttachment(id, name, from_local ? LOG_DELETE_REMOTE_ATTACHMENT :
+                                                LOG_DELETE_LOCAL_ATTACHMENT);
     return queue
       .push(function () {
         return storage.removeAttachment(id, name);
+      })
+      .push(function () {
+        return signature.removeAttachment(id, name);
+      });
+  }
+
+  function propagateFastSignatureDeletion(queue, id, name, signature,
+                                          report) {
+    report.logAttachment(id, name, LOG_FALSE_CONFLICT_ATTACHMENT);
+    return queue
+      .push(function () {
+        return signature.removeAttachment(id, name);
       });
   }
 
   function propagateFastAttachmentModification(queue, id, key, source,
-                                               destination, signature, hash) {
+                                               destination, signature, hash,
+                                               from_local, report) {
     return queue
       .push(function () {
         return signature.getAttachment(id, key, {format: 'json'})
@@ -6412,6 +6689,9 @@ jIO.util.ajax = function ajax(param) {
           })
           .push(function (result) {
             if (result.hash !== hash) {
+              report.logAttachment(id, key, from_local ?
+                                            LOG_PUT_REMOTE_ATTACHMENT :
+                                            LOG_PUT_LOCAL_ATTACHMENT);
               return source.getAttachment(id, key)
                 .push(function (blob) {
                   return destination.putAttachment(id, key, blob);
@@ -6430,7 +6710,8 @@ jIO.util.ajax = function ajax(param) {
   function repairFastDocumentAttachment(context, id,
                                         signature_hash,
                                         signature_attachment_hash,
-                                        signature_from_local) {
+                                        signature_from_local,
+                                        report) {
     if (signature_hash === signature_attachment_hash) {
       // No replication to do
       return;
@@ -6451,6 +6732,7 @@ jIO.util.ajax = function ajax(param) {
           destination,
           push_argument_list = [],
           delete_argument_list = [],
+          delete_signature_argument_list = [],
           signature_attachment_dict = result_list[0],
           local_attachment_dict = result_list[1],
           remote_attachment_list = result_list[2],
@@ -6461,13 +6743,15 @@ jIO.util.ajax = function ajax(param) {
           check_remote_modification =
             context._check_remote_attachment_modification,
           check_remote_creation = context._check_remote_attachment_creation,
-          check_remote_deletion = context._check_remote_attachment_deletion;
+          check_remote_deletion = context._check_remote_attachment_deletion,
+          from_local;
 
         if (signature_from_local) {
           source_attachment_dict = local_attachment_dict;
           destination_attachment_dict = remote_attachment_list;
           source = context._local_sub_storage;
           destination = context._remote_sub_storage;
+          from_local = true;
         } else {
           source_attachment_dict = remote_attachment_list;
           destination_attachment_dict = local_attachment_dict;
@@ -6478,6 +6762,7 @@ jIO.util.ajax = function ajax(param) {
           check_local_deletion = check_remote_deletion;
           check_remote_creation = check_local_creation;
           check_remote_deletion = check_local_deletion;
+          from_local = false;
         }
 
         // Push all source attachments
@@ -6495,8 +6780,20 @@ jIO.util.ajax = function ajax(param) {
                 source,
                 destination,
                 context._signature_sub_storage,
-                signature_hash
+                signature_hash,
+                from_local,
+                report
               ]);
+            } else {
+              if (signature_attachment_dict.hasOwnProperty(key)) {
+                report.logAttachment(id, key, from_local ?
+                                     LOG_SKIP_LOCAL_ATTACHMENT_MODIFICATION :
+                                     LOG_SKIP_REMOTE_ATTACHMENT_MODIFICATION);
+              } else {
+                report.logAttachment(id, key, from_local ?
+                                     LOG_SKIP_LOCAL_ATTACHMENT_CREATION :
+                                     LOG_SKIP_REMOTE_ATTACHMENT_CREATION);
+              }
             }
           }
         }
@@ -6505,16 +6802,19 @@ jIO.util.ajax = function ajax(param) {
         for (key in signature_attachment_dict) {
           if (signature_attachment_dict.hasOwnProperty(key)) {
             if (check_local_deletion &&
-                !source_attachment_dict.hasOwnProperty(key)) {
-              delete_argument_list.push([
+                !source_attachment_dict.hasOwnProperty(key) &&
+                !destination_attachment_dict.hasOwnProperty(key)) {
+              delete_signature_argument_list.push([
                 undefined,
                 id,
                 key,
-                context._signature_sub_storage
+                context._signature_sub_storage,
+                report
               ]);
             }
           }
         }
+
         for (key in destination_attachment_dict) {
           if (destination_attachment_dict.hasOwnProperty(key)) {
             if (!source_attachment_dict.hasOwnProperty(key)) {
@@ -6526,8 +6826,21 @@ jIO.util.ajax = function ajax(param) {
                   undefined,
                   id,
                   key,
-                  destination
+                  destination,
+                  context._signature_sub_storage,
+                  from_local,
+                  report
                 ]);
+              } else {
+                if (signature_attachment_dict.hasOwnProperty(key)) {
+                  report.logAttachment(id, key, from_local ?
+                       LOG_SKIP_LOCAL_ATTACHMENT_DELETION :
+                       LOG_SKIP_REMOTE_ATTACHMENT_DELETION);
+                } else {
+                  report.logAttachment(id, key, from_local ?
+                       LOG_SKIP_LOCAL_ATTACHMENT_CREATION :
+                       LOG_SKIP_REMOTE_ATTACHMENT_CREATION);
+                }
               }
             }
           }
@@ -6545,6 +6858,12 @@ jIO.util.ajax = function ajax(param) {
             propagateFastAttachmentDeletion,
             delete_argument_list,
             context._parallel_operation_attachment_amount
+          ),
+          dispatchQueue(
+            context,
+            propagateFastSignatureDeletion,
+            delete_signature_argument_list,
+            context._parallel_operation_attachment_amount
           )
         ]);
       })
@@ -6558,7 +6877,7 @@ jIO.util.ajax = function ajax(param) {
       });
   }
 
-  function repairDocumentAttachment(context, id, signature_hash_key,
+  function repairDocumentAttachment(context, id, report, signature_hash_key,
                                     signature_hash,
                                     signature_attachment_hash,
                                     signature_from_local) {
@@ -6566,7 +6885,7 @@ jIO.util.ajax = function ajax(param) {
       return repairFastDocumentAttachment(context, id,
                                     signature_hash,
                                     signature_attachment_hash,
-                                    signature_from_local);
+                                    signature_from_local, report);
     }
 
     var skip_attachment_dict = {};
@@ -6600,6 +6919,7 @@ jIO.util.ajax = function ajax(param) {
             context._local_sub_storage,
             context._remote_sub_storage,
             signature_allAttachments,
+            report,
             {
               conflict_force: (context._conflict_handling ===
                                CONFLICT_KEEP_LOCAL),
@@ -6610,7 +6930,8 @@ jIO.util.ajax = function ajax(param) {
               check_modification:
                 context._check_local_attachment_modification,
               check_creation: context._check_local_attachment_creation,
-              check_deletion: context._check_local_attachment_deletion
+              check_deletion: context._check_local_attachment_deletion,
+              from_local: true
             }
           )
             .push(function () {
@@ -6630,6 +6951,7 @@ jIO.util.ajax = function ajax(param) {
             context._remote_sub_storage,
             context._local_sub_storage,
             signature_allAttachments,
+            report,
             {
               use_revert_post: context._use_remote_post,
               conflict_force: (context._conflict_handling ===
@@ -6641,7 +6963,8 @@ jIO.util.ajax = function ajax(param) {
               check_modification:
                 context._check_remote_attachment_modification,
               check_creation: context._check_remote_attachment_creation,
-              check_deletion: context._check_remote_attachment_deletion
+              check_deletion: context._check_remote_attachment_deletion,
+              from_local: false
             }
           );
         }
@@ -6651,15 +6974,17 @@ jIO.util.ajax = function ajax(param) {
   function propagateModification(context, source, destination, doc, hash, id,
                                  skip_document_dict,
                                  skip_deleted_document_dict,
+                                 report,
                                  options) {
     var result = new RSVP.Queue(),
       post_id,
-      to_skip = true,
-      from_local;
+      from_local,
+      conflict;
     if (options === undefined) {
       options = {};
     }
     from_local = options.from_local;
+    conflict = options.conflict || false;
 
     if (doc === null) {
       result
@@ -6679,10 +7004,10 @@ jIO.util.ajax = function ajax(param) {
     if (options.use_post) {
       result
         .push(function () {
+          report.log(id, from_local ? LOG_POST_REMOTE : LOG_POST_LOCAL);
           return destination.post(doc);
         })
         .push(function (new_id) {
-          to_skip = false;
           post_id = new_id;
           return source.put(post_id, doc);
         })
@@ -6720,7 +7045,6 @@ jIO.util.ajax = function ajax(param) {
           return context._signature_sub_storage.remove(id);
         })
         .push(function () {
-          to_skip = true;
           return context._signature_sub_storage.put(post_id, {
             hash: hash,
             from_local: from_local
@@ -6732,6 +7056,12 @@ jIO.util.ajax = function ajax(param) {
     } else {
       result
         .push(function () {
+          if (conflict) {
+            report.log(id, from_local ? LOG_FORCE_PUT_REMOTE :
+                                        LOG_FORCE_PUT_LOCAL);
+          } else {
+            report.log(id, from_local ? LOG_PUT_REMOTE : LOG_PUT_LOCAL);
+          }
           // Drop signature if the destination document was empty
           // but a signature exists
           if (options.create_new_document === true) {
@@ -6750,11 +7080,6 @@ jIO.util.ajax = function ajax(param) {
         });
     }
     return result
-      .push(function () {
-        if (to_skip) {
-          skip_document_dict[id] = null;
-        }
-      })
       .push(undefined, function (error) {
         if (error instanceof SkipError) {
           return;
@@ -6763,30 +7088,46 @@ jIO.util.ajax = function ajax(param) {
       });
   }
 
-  function propagateDeletion(context, destination, id, skip_document_dict,
-                             skip_deleted_document_dict) {
+  function propagateDeletion(context, destination, id,
+                             skip_deleted_document_dict, report, options) {
     // Do not delete a document if it has an attachment
     // ie, replication should prevent losing user data
     // Synchronize attachments before, to ensure
     // all of them will be deleted too
     var result;
     if (context._signature_hash_key !== undefined) {
+      if (options.conflict) {
+        report.log(id, options.from_local ? LOG_FORCE_DELETE_REMOTE :
+                                            LOG_FORCE_DELETE_LOCAL);
+      } else {
+        report.log(id, options.from_local ? LOG_DELETE_REMOTE :
+                                            LOG_DELETE_LOCAL);
+      }
       result = destination.remove(id)
         .push(function () {
           return context._signature_sub_storage.remove(id);
         });
     } else {
-      result = repairDocumentAttachment(context, id)
+      result = repairDocumentAttachment(context, id, report)
         .push(function () {
           return destination.allAttachments(id);
         })
         .push(function (attachment_dict) {
           if (JSON.stringify(attachment_dict) === "{}") {
+            if (options.conflict) {
+              report.log(id, options.from_local ? LOG_FORCE_DELETE_REMOTE :
+                                                  LOG_FORCE_DELETE_LOCAL);
+            } else {
+              report.log(id, options.from_local ? LOG_DELETE_REMOTE :
+                                                  LOG_DELETE_LOCAL);
+            }
             return destination.remove(id)
               .push(function () {
                 return context._signature_sub_storage.remove(id);
               });
           }
+          report.log(id, options.from_local ? LOG_UNEXPECTED_REMOTE_ATTACHMENT :
+                                              LOG_UNEXPECTED_LOCAL_ATTACHMENT);
         }, function (error) {
           if ((error instanceof jIO.util.jIOError) &&
               (error.status_code === 404)) {
@@ -6797,7 +7138,6 @@ jIO.util.ajax = function ajax(param) {
     }
     return result
       .push(function () {
-        skip_document_dict[id] = null;
         // No need to sync attachment twice on this document
         skip_deleted_document_dict[id] = null;
       });
@@ -6810,7 +7150,10 @@ jIO.util.ajax = function ajax(param) {
                              source, destination, id,
                              conflict_force, conflict_revert,
                              conflict_ignore,
+                             report,
                              options) {
+    // No need to check twice
+    skip_document_dict[id] = null;
     var from_local = options.from_local;
     return new RSVP.Queue()
       .push(function () {
@@ -6841,21 +7184,16 @@ jIO.util.ajax = function ajax(param) {
           remote_hash = remote_list[1];
         if (local_hash === remote_hash) {
           // Same modifications on both side
+          report.log(id, LOG_FALSE_CONFLICT);
           if (local_hash === null) {
             // Deleted on both side, drop signature
-            return context._signature_sub_storage.remove(id)
-              .push(function () {
-                skip_document_dict[id] = null;
-              });
+            return context._signature_sub_storage.remove(id);
           }
 
           return context._signature_sub_storage.put(id, {
             hash: local_hash,
             from_local: from_local
-          })
-            .push(function () {
-              skip_document_dict[id] = null;
-            });
+          });
         }
 
         if ((remote_hash === status_hash) || (conflict_force === true)) {
@@ -6863,14 +7201,19 @@ jIO.util.ajax = function ajax(param) {
           if (local_hash === null) {
             // Deleted locally
             return propagateDeletion(context, destination, id,
-                                     skip_document_dict,
-                                     skip_deleted_document_dict);
+                                     skip_deleted_document_dict,
+                                     report,
+                                     {from_local: from_local,
+                                      conflict: (remote_hash !== status_hash)
+                                      });
           }
           return propagateModification(context, source, destination, doc,
                                        local_hash, id, skip_document_dict,
                                        skip_deleted_document_dict,
+                                       report,
                                        {use_post: ((options.use_post) &&
                                                    (remote_hash === null)),
+                                        conflict: (remote_hash !== status_hash),
                                         from_local: from_local,
                                         create_new_document:
                                           ((remote_hash === null) &&
@@ -6880,6 +7223,7 @@ jIO.util.ajax = function ajax(param) {
 
         // Conflict cases
         if (conflict_ignore === true) {
+          report.log(id, LOG_SKIP_CONFLICT);
           return;
         }
 
@@ -6887,8 +7231,11 @@ jIO.util.ajax = function ajax(param) {
           // Automatically resolve conflict or force revert
           if (remote_hash === null) {
             // Deleted remotely
-            return propagateDeletion(context, source, id, skip_document_dict,
-                                     skip_deleted_document_dict);
+            return propagateDeletion(context, source, id,
+                                     skip_deleted_document_dict, report,
+                                     {from_local: !from_local,
+                                      conflict: (local_hash !== null)
+                                     });
           }
           return propagateModification(
             context,
@@ -6899,9 +7246,11 @@ jIO.util.ajax = function ajax(param) {
             id,
             skip_document_dict,
             skip_deleted_document_dict,
+            report,
             {use_post: ((options.use_revert_post) &&
                         (local_hash === null)),
               from_local: !from_local,
+              conflict: true,
               create_new_document: ((local_hash === null) &&
                                     (status_hash !== null))}
           );
@@ -6913,17 +7262,17 @@ jIO.util.ajax = function ajax(param) {
           return propagateModification(context, source, destination, doc,
                                        local_hash, id, skip_document_dict,
                                        skip_deleted_document_dict,
+                                       report,
                                        {use_post: options.use_post,
+                                        conflict: true,
                                         from_local: from_local,
                                         create_new_document:
                                           (status_hash !== null)});
         }
-        doc = doc || local_hash;
-        remote_doc = remote_doc || remote_hash;
-        throw new jIO.util.jIOError("Conflict on '" + id + "': " +
-                                    stringify(doc) + " !== " +
-                                    stringify(remote_doc),
-                                    409);
+        report.log(id, LOG_UNRESOLVED_CONFLICT);
+      })
+      .push(undefined, function (error) {
+        report.log(id, LOG_UNEXPECTED_ERROR, error);
       });
   }
 
@@ -6932,7 +7281,7 @@ jIO.util.ajax = function ajax(param) {
                               cache, destination_key,
                               destination, id, source,
                               conflict_force, conflict_revert,
-                              conflict_ignore, options) {
+                              conflict_ignore, report, options) {
     var status_hash;
     queue
       .push(function () {
@@ -6946,7 +7295,7 @@ jIO.util.ajax = function ajax(param) {
                                  status_hash, null, null,
                                  source, destination, id,
                                  conflict_force, conflict_revert,
-                                 conflict_ignore,
+                                 conflict_ignore, report,
                                  options);
       });
   }
@@ -6957,7 +7306,7 @@ jIO.util.ajax = function ajax(param) {
                                     source, destination, id,
                                     conflict_force, conflict_revert,
                                     conflict_ignore,
-                                    local_hash, status_hash,
+                                    local_hash, status_hash, report,
                                     options) {
     queue
       .push(function () {
@@ -6981,7 +7330,11 @@ jIO.util.ajax = function ajax(param) {
                                    source, destination, id,
                                    conflict_force, conflict_revert,
                                    conflict_ignore,
+                                   report,
                                    options);
+        }
+        if (!options.from_local) {
+          report.log(id, LOG_NO_CHANGE);
         }
       });
   }
@@ -6989,7 +7342,8 @@ jIO.util.ajax = function ajax(param) {
   function pushStorage(context, skip_document_dict,
                        skip_deleted_document_dict,
                        cache, source_key, destination_key,
-                       source, destination, signature_allDocs, options) {
+                       source, destination, signature_allDocs,
+                       report, options) {
     var argument_list = [],
       argument_list_deletion = [];
     if (!options.hasOwnProperty("use_post")) {
@@ -7070,7 +7424,19 @@ jIO.util.ajax = function ajax(param) {
                                   options.conflict_revert,
                                   options.conflict_ignore,
                                   local_hash, status_hash,
+                                  report,
                                   options]);
+            } else if (local_hash === status_hash) {
+              report.log(key, LOG_NO_CHANGE);
+            } else {
+              if (signature_dict.hasOwnProperty(key)) {
+                report.log(key, options.from_local ?
+                           LOG_SKIP_LOCAL_MODIFICATION :
+                           LOG_SKIP_REMOTE_MODIFICATION);
+              } else {
+                report.log(key, options.from_local ? LOG_SKIP_LOCAL_CREATION :
+                                                     LOG_SKIP_REMOTE_CREATION);
+              }
             }
           }
         }
@@ -7097,8 +7463,11 @@ jIO.util.ajax = function ajax(param) {
                                              options.conflict_force,
                                              options.conflict_revert,
                                              options.conflict_ignore,
+                                             report,
                                              options]);
               } else {
+                report.log(key, options.from_local ? LOG_SKIP_LOCAL_DELETION :
+                                                     LOG_SKIP_REMOTE_DELETION);
                 skip_deleted_document_dict[key] = null;
               }
             }
@@ -7118,11 +7487,11 @@ jIO.util.ajax = function ajax(param) {
       });
   }
 
-  function repairDocument(queue, context, id, signature_hash_key,
+  function repairDocument(queue, context, id, report, signature_hash_key,
                           signature_hash, signature_attachment_hash,
                           signature_from_local) {
     queue.push(function () {
-      return repairDocumentAttachment(context, id, signature_hash_key,
+      return repairDocumentAttachment(context, id, report, signature_hash_key,
                                       signature_hash,
                                       signature_attachment_hash,
                                       signature_from_local);
@@ -7134,7 +7503,8 @@ jIO.util.ajax = function ajax(param) {
       argument_list = arguments,
       skip_document_dict = {},
       skip_deleted_document_dict = {},
-      cache = {};
+      cache = {},
+      report = new ReplicateReport(this._log_level, this._log_console);
 
     return new RSVP.Queue()
       .push(function () {
@@ -7201,7 +7571,7 @@ jIO.util.ajax = function ajax(param) {
                              cache, 'local', 'remote',
                              context._local_sub_storage,
                              context._remote_sub_storage,
-                             signature_allDocs,
+                             signature_allDocs, report,
                              {
               use_post: context._use_remote_post,
               conflict_force: (context._conflict_handling ===
@@ -7232,7 +7602,8 @@ jIO.util.ajax = function ajax(param) {
                              cache, 'remote', 'local',
                              context._remote_sub_storage,
                              context._local_sub_storage,
-                             signature_allDocs, {
+                             signature_allDocs,
+                             report, {
               use_revert_post: context._use_remote_post,
               conflict_force: (context._conflict_handling ===
                                CONFLICT_KEEP_REMOTE),
@@ -7273,9 +7644,10 @@ jIO.util.ajax = function ajax(param) {
                 // is deleted but not pushed to the other storage
                 if (!skip_deleted_document_dict.hasOwnProperty(row.id)) {
                   local_argument_list.push(
-                    [undefined, context, row.id, context._signature_hash_key,
+                    [undefined, context, row.id, report,
+                      context._signature_hash_key,
                       row.value.hash, row.value.attachment_hash,
-                      row.value.from_local]
+                      row.value.from_local, report]
                   );
                 }
               }
@@ -7287,12 +7659,358 @@ jIO.util.ajax = function ajax(param) {
               );
             });
         }
+      })
+      .push(function () {
+        if (report.has_error) {
+          throw report;
+        }
+        return report;
       });
   };
 
   jIO.addStorage('replicate', ReplicateStorage);
 
 }(jIO, RSVP, Rusha, jIO.util.stringify));
+/*
+ * Copyright 2015, Nexedi SA
+ *
+ * This program is free software: you can Use, Study, Modify and Redistribute
+ * it under the terms of the GNU General Public License version 3, or (at your
+ * option) any later version, as published by the Free Software Foundation.
+ *
+ * You can also Link and Combine this program with other software covered by
+ * the terms of any of the Free Software licenses or any of the Open Source
+ * Initiative approved licenses and Convey the resulting work. Corresponding
+ * source of such a combination shall include the source code for all other
+ * software used.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See COPYING file for full licensing terms.
+ * See https://www.nexedi.com/licensing for rationale and options.
+ */
+
+/*jslint nomen: true*/
+/*global Rusha*/
+
+/**
+ * JIO Sha Storage. Type = 'sha'.
+ */
+
+(function (Rusha) {
+  "use strict";
+
+  var rusha = new Rusha();
+
+  function ShaStorage(spec) {
+    this._sub_storage = jIO.createJIO(spec.sub_storage);
+  }
+
+  ShaStorage.prototype.post = function (param) {
+    return this._sub_storage.put(
+      rusha.digestFromString(JSON.stringify(param)),
+      param
+    );
+  };
+
+  ShaStorage.prototype.get = function () {
+    return this._sub_storage.get.apply(this._sub_storage, arguments);
+  };
+  ShaStorage.prototype.remove = function () {
+    return this._sub_storage.remove.apply(this._sub_storage, arguments);
+  };
+  ShaStorage.prototype.hasCapacity = function () {
+    return this._sub_storage.hasCapacity.apply(this._sub_storage, arguments);
+  };
+  ShaStorage.prototype.buildQuery = function () {
+    return this._sub_storage.buildQuery.apply(this._sub_storage, arguments);
+  };
+  ShaStorage.prototype.getAttachment = function () {
+    return this._sub_storage.getAttachment.apply(this._sub_storage, arguments);
+  };
+  ShaStorage.prototype.putAttachment = function () {
+    return this._sub_storage.putAttachment.apply(this._sub_storage, arguments);
+  };
+  ShaStorage.prototype.removeAttachment = function () {
+    return this._sub_storage.removeAttachment.apply(this._sub_storage,
+                                                    arguments);
+  };
+  ShaStorage.prototype.allAttachments = function () {
+    return this._sub_storage.allAttachments.apply(this._sub_storage, arguments);
+  };
+  ShaStorage.prototype.repair = function () {
+    return this._sub_storage.repair.apply(this._sub_storage, arguments);
+  };
+
+  jIO.addStorage('sha', ShaStorage);
+
+}(Rusha));
+/*
+ * Copyright 2014, Nexedi SA
+ *
+ * This program is free software: you can Use, Study, Modify and Redistribute
+ * it under the terms of the GNU General Public License version 3, or (at your
+ * option) any later version, as published by the Free Software Foundation.
+ *
+ * You can also Link and Combine this program with other software covered by
+ * the terms of any of the Free Software licenses or any of the Open Source
+ * Initiative approved licenses and Convey the resulting work. Corresponding
+ * source of such a combination shall include the source code for all other
+ * software used.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See COPYING file for full licensing terms.
+ * See https://www.nexedi.com/licensing for rationale and options.
+ */
+/*jslint nomen: true */
+/*global RSVP*/
+
+/**
+ * JIO Union Storage. Type = 'union'.
+ * This provide a unified access other multiple storage.
+ * New document are created in the first sub storage.
+ * Document are searched in each sub storage until it is found.
+ *
+ *
+ * Storage Description:
+ *
+ *     {
+ *       "type": "union",
+ *       "storage_list": [
+ *         sub_storage_description_1,
+ *         sub_storage_description_2,
+ *
+ *         sub_storage_description_X,
+ *       ]
+ *     }
+ *
+ * @class UnionStorage
+ */
+
+(function (jIO, RSVP) {
+  "use strict";
+
+  /**
+   * The JIO UnionStorage extension
+   *
+   * @class UnionStorage
+   * @constructor
+   */
+  function UnionStorage(spec) {
+    if (!Array.isArray(spec.storage_list)) {
+      throw new jIO.util.jIOError("storage_list is not an Array", 400);
+    }
+    var i;
+    this._storage_list = [];
+    for (i = 0; i < spec.storage_list.length; i += 1) {
+      this._storage_list.push(jIO.createJIO(spec.storage_list[i]));
+    }
+  }
+
+  UnionStorage.prototype._getWithStorageIndex = function () {
+    var i,
+      index = 0,
+      context = this,
+      arg = arguments,
+      result = this._storage_list[0].get.apply(this._storage_list[0], arg);
+
+    function handle404(j) {
+      result
+        .push(undefined, function (error) {
+          if ((error instanceof jIO.util.jIOError) &&
+              (error.status_code === 404)) {
+            return context._storage_list[j].get.apply(context._storage_list[j],
+                                                      arg)
+              .push(function (doc) {
+                index = j;
+                return doc;
+              });
+          }
+          throw error;
+        });
+    }
+
+    for (i = 1; i < this._storage_list.length; i += 1) {
+      handle404(i);
+    }
+    return result
+      .push(function (doc) {
+        return [index, doc];
+      });
+  };
+
+  /*
+   * Get a document
+   * Try on each substorage on after the other
+   */
+  UnionStorage.prototype.get = function () {
+    return this._getWithStorageIndex.apply(this, arguments)
+      .push(function (result) {
+        return result[1];
+      });
+  };
+
+  /*
+   * Get attachments list
+   * Try on each substorage on after the other
+   */
+  UnionStorage.prototype.allAttachments = function () {
+    var argument_list = arguments,
+      context = this;
+    return this._getWithStorageIndex.apply(this, arguments)
+      .push(function (result) {
+        var sub_storage = context._storage_list[result[0]];
+        return sub_storage.allAttachments.apply(sub_storage, argument_list);
+      });
+  };
+
+  /*
+   * Post a document
+   * Simply store on the first substorage
+   */
+  UnionStorage.prototype.post = function () {
+    return this._storage_list[0].post.apply(this._storage_list[0], arguments);
+  };
+
+  /*
+   * Put a document
+   * Search the document location, and modify it in its storage.
+   */
+  UnionStorage.prototype.put = function () {
+    var arg = arguments,
+      context = this;
+    return this._getWithStorageIndex(arg[0])
+      .push(undefined, function (error) {
+        if ((error instanceof jIO.util.jIOError) &&
+            (error.status_code === 404)) {
+          // Document does not exist, create in first substorage
+          return [0];
+        }
+        throw error;
+      })
+      .push(function (result) {
+        // Storage found, modify in it directly
+        var sub_storage = context._storage_list[result[0]];
+        return sub_storage.put.apply(sub_storage, arg);
+      });
+  };
+
+  /*
+   * Remove a document
+   * Search the document location, and remove it from its storage.
+   */
+  UnionStorage.prototype.remove = function () {
+    var arg = arguments,
+      context = this;
+    return this._getWithStorageIndex(arg[0])
+      .push(function (result) {
+        // Storage found, remove from it directly
+        var sub_storage = context._storage_list[result[0]];
+        return sub_storage.remove.apply(sub_storage, arg);
+      });
+  };
+
+  UnionStorage.prototype.buildQuery = function () {
+    var promise_list = [],
+      i,
+      id_dict = {},
+      len = this._storage_list.length,
+      sub_storage;
+    for (i = 0; i < len; i += 1) {
+      sub_storage = this._storage_list[i];
+      promise_list.push(sub_storage.buildQuery.apply(sub_storage, arguments));
+    }
+    return new RSVP.Queue()
+      .push(function () {
+        return RSVP.all(promise_list);
+      })
+      .push(function (result_list) {
+        var result = [],
+          sub_result,
+          sub_result_len,
+          j;
+        len = result_list.length;
+        for (i = 0; i < len; i += 1) {
+          sub_result = result_list[i];
+          sub_result_len = sub_result.length;
+          for (j = 0; j < sub_result_len; j += 1) {
+            if (!id_dict.hasOwnProperty(sub_result[j].id)) {
+              id_dict[sub_result[j].id] = null;
+              result.push(sub_result[j]);
+            }
+          }
+        }
+        return result;
+      });
+  };
+
+  UnionStorage.prototype.hasCapacity = function (name) {
+    var i,
+      len,
+      result,
+      sub_storage;
+    if ((name === "list") ||
+            (name === "query") ||
+            (name === "select")) {
+      result = true;
+      len = this._storage_list.length;
+      for (i = 0; i < len; i += 1) {
+        sub_storage = this._storage_list[i];
+        result = result && sub_storage.hasCapacity(name);
+      }
+      return result;
+    }
+    return false;
+  };
+
+  UnionStorage.prototype.repair = function () {
+    var i,
+      promise_list = [];
+    for (i = 0; i < this._storage_list.length; i += 1) {
+      promise_list.push(this._storage_list[i].repair.apply(
+        this._storage_list[i],
+        arguments
+      ));
+    }
+    return RSVP.all(promise_list);
+  };
+
+  UnionStorage.prototype.getAttachment = function () {
+    var argument_list = arguments,
+      context = this;
+    return this._getWithStorageIndex.apply(this, arguments)
+      .push(function (result) {
+        var sub_storage = context._storage_list[result[0]];
+        return sub_storage.getAttachment.apply(sub_storage, argument_list);
+      });
+  };
+
+  UnionStorage.prototype.putAttachment = function () {
+    var argument_list = arguments,
+      context = this;
+    return this._getWithStorageIndex.apply(this, arguments)
+      .push(function (result) {
+        var sub_storage = context._storage_list[result[0]];
+        return sub_storage.putAttachment.apply(sub_storage, argument_list);
+      });
+  };
+
+  UnionStorage.prototype.removeAttachment = function () {
+    var argument_list = arguments,
+      context = this;
+    return this._getWithStorageIndex.apply(this, arguments)
+      .push(function (result) {
+        var sub_storage = context._storage_list[result[0]];
+        return sub_storage.removeAttachment.apply(sub_storage, argument_list);
+      });
+  };
+
+  jIO.addStorage('union', UnionStorage);
+
+}(jIO, RSVP));
 /*
  * Copyright 2015, Nexedi SA
  *
@@ -7378,7 +8096,5 @@ jIO.util.ajax = function ajax(param) {
   jIO.addStorage('uuid', UUIDStorage);
 
 }(jIO));
-
   module.exports = window;
-
 }({}));
