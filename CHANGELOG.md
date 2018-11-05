@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.3.0"></a>
+# [2.3.0](https://github.com/clearroad/clearroad-api/compare/v2.2.0...v2.3.0) (2018-11-05)
+
+
+### Features
+
+* **clearroad:** add debug option ([798951a](https://github.com/clearroad/clearroad-api/commit/798951a))
+
+
+
 <a name="2.2.0"></a>
 # [2.2.0](https://github.com/clearroad/clearroad-api/compare/v2.1.0...v2.2.0) (2018-11-01)
 
