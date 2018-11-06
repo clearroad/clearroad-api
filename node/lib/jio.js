@@ -2030,9 +2030,9 @@ return new Parser;
 
 }(RSVP, window, parseStringToObject));
   var QueryFactory = window.QueryFactory,
-    Query = window.Query,
-    SimpleQuery = window.SimpleQuery,
-    ComplexQuery = window.ComplexQuery;
+  Query = window.Query,
+  SimpleQuery = window.SimpleQuery,
+  ComplexQuery = window.ComplexQuery;
 /*
  * Copyright 2014, Nexedi SA
  *
@@ -2356,10 +2356,9 @@ var jiodate = window.jiodate;
 
   function readBlobAsText(blob, encoding) {
     var fr = new FileReader();
-    return new RSVP.Promise(function (resolve, reject, notify) {
+    return new RSVP.Promise(function (resolve, reject) {
       fr.addEventListener("load", resolve);
       fr.addEventListener("error", reject);
-      fr.addEventListener("progress", notify);
       fr.readAsText(blob, encoding);
     }, function () {
       fr.abort();
@@ -2369,10 +2368,9 @@ var jiodate = window.jiodate;
 
   function readBlobAsArrayBuffer(blob) {
     var fr = new FileReader();
-    return new RSVP.Promise(function (resolve, reject, notify) {
+    return new RSVP.Promise(function (resolve, reject) {
       fr.addEventListener("load", resolve);
       fr.addEventListener("error", reject);
-      fr.addEventListener("progress", notify);
       fr.readAsArrayBuffer(blob);
     }, function () {
       fr.abort();
@@ -2382,10 +2380,9 @@ var jiodate = window.jiodate;
 
   function readBlobAsDataURL(blob) {
     var fr = new FileReader();
-    return new RSVP.Promise(function (resolve, reject, notify) {
+    return new RSVP.Promise(function (resolve, reject) {
       fr.addEventListener("load", resolve);
       fr.addEventListener("error", reject);
-      fr.addEventListener("progress", notify);
       fr.readAsDataURL(blob);
     }, function () {
       fr.abort();
@@ -3739,10 +3736,10 @@ jIO.util.ajax = function ajax(param) {
 // }
 
 /*jslint nomen: true, unparam: true */
-/*global jIO, UriTemplate, FormData, RSVP, URI, Blob, btoa,
+/*global jIO, UriTemplate, FormData, RSVP, URI, Blob,
          SimpleQuery, ComplexQuery*/
 
-(function (jIO, UriTemplate, FormData, RSVP, URI, Blob, btoa,
+(function (jIO, UriTemplate, FormData, RSVP, URI, Blob,
            SimpleQuery, ComplexQuery) {
   "use strict";
 
@@ -3753,20 +3750,12 @@ jIO.util.ajax = function ajax(param) {
     if (options.xhrFields === undefined) {
       options.xhrFields = {};
     }
-
     if (storage._access_token !== undefined) {
       if (options.headers === undefined) {
         options.headers = {};
       }
       options.headers.Accept = "*/*";
       options.headers['X-ACCESS-TOKEN'] = storage._access_token;
-      options.xhrFields.withCredentials = false;
-    } else if (storage._authorization) {
-      if (options.headers === undefined) {
-        options.headers = {};
-      }
-      options.headers.Accept = "*/*";
-      options.headers.Authorization = storage._authorization;
       options.xhrFields.withCredentials = false;
     } else {
       options.xhrFields.withCredentials = true;
@@ -3900,9 +3889,6 @@ jIO.util.ajax = function ajax(param) {
     this._default_view_reference = spec.default_view_reference;
     if (spec.hasOwnProperty('access_token')) {
       this._access_token = spec.access_token;
-    }
-    if (spec.login && spec.password) {
-      this._authorization = "Basic " + btoa(spec.login + ":" + spec.password);
     }
   }
 
@@ -4329,7 +4315,7 @@ jIO.util.ajax = function ajax(param) {
 
   jIO.addStorage("erp5", ERP5Storage);
 
-}(jIO, UriTemplate, FormData, RSVP, URI, Blob, btoa,
+}(jIO, UriTemplate, FormData, RSVP, URI, Blob,
   SimpleQuery, ComplexQuery));
 /*
  * Copyright 2017, Nexedi SA
