@@ -6,10 +6,17 @@ exports.jIO = jIO;
 var index_1 = require("./definitions/index");
 var queue_1 = require("./queue");
 var storage_1 = require("./storage");
-var queryPortalType = 'portal_type';
+/**
+ * Query key for `PortalTypes`
+ */
+exports.queryPortalType = 'portal_type';
+/**
+ * Each message is represented by a "portal_type" (or message category)
+ */
 var PortalTypes;
 (function (PortalTypes) {
     PortalTypes["BillingPeriodMessage"] = "Billing Period Message";
+    PortalTypes["File"] = "File";
     PortalTypes["RoadAccount"] = "Road Account";
     PortalTypes["RoadAccountMessage"] = "Road Account Message";
     PortalTypes["RoadEvent"] = "Road Event";
@@ -22,13 +29,9 @@ var queryPortalTypes = [
     "\"" + PortalTypes.BillingPeriodMessage + "\"",
     "\"" + PortalTypes.RoadAccountMessage + "\"",
     "\"" + PortalTypes.RoadEventMessage + "\"",
-    "\"" + PortalTypes.RoadMessage + "\" ",
+    "\"" + PortalTypes.RoadMessage + "\"",
     "\"" + PortalTypes.RoadReportRequest + "\""
 ].join(' OR ');
-var InternalPortalTypes;
-(function (InternalPortalTypes) {
-    InternalPortalTypes["File"] = "File";
-})(InternalPortalTypes || (InternalPortalTypes = {}));
 var ValidationStates;
 (function (ValidationStates) {
     ValidationStates["Processed"] = "processed";
@@ -38,6 +41,22 @@ var ValidationStates;
 })(ValidationStates || (ValidationStates = {}));
 var queryValidationStates = Object.keys(ValidationStates)
     .map(function (key) { return ValidationStates[key]; }).map(function (val) { return "\"" + val + "\""; }).join(' OR ');
+/**
+ * Query key for `GroupingReferences`
+ */
+exports.queryGroupingReference = 'grouping_reference';
+var GroupingReferences;
+(function (GroupingReferences) {
+    /**
+     * Message created locally
+     * @internal
+     */
+    GroupingReferences["Data"] = "data";
+    /**
+     * Message created on the ClearRoad Platform
+     */
+    GroupingReferences["Report"] = "report";
+})(GroupingReferences = exports.GroupingReferences || (exports.GroupingReferences = {}));
 var jsonIdRec = function (keyValueSpace, key, value, deep) {
     if (deep === void 0) { deep = 0; }
     var res;
@@ -153,6 +172,7 @@ var ClearRoad = /** @class */ (function () {
      * @internal
      */
     ClearRoad.prototype.localSubStorage = function (key) {
+        var _a;
         if (this.options.useQueryStorage) {
             return {
                 type: 'query',
@@ -168,9 +188,9 @@ var ClearRoad = /** @class */ (function () {
                         type: 'query',
                         sub_storage: merge({}, this.options.localStorage)
                     },
-                    mapping_dict: {
-                        portal_type: ['equalSubProperty', key]
-                    }
+                    mapping_dict: (_a = {},
+                        _a[exports.queryPortalType] = ['equalSubProperty', key],
+                        _a)
                 };
             case 'memory':
                 return {
@@ -233,8 +253,8 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.initMessagesStorage = function () {
         var refKey = 'source_reference';
         var query = joinQueries([
-            queryPortalType + ":(" + queryPortalTypes + ")",
-            "grouping_reference:\"" + storage_1.defaultAttachmentName + "\"",
+            exports.queryPortalType + ": (" + queryPortalTypes + ")",
+            exports.queryGroupingReference + ": \"" + GroupingReferences.Data + "\"",
             this.queryMaxDate()
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-messages-signatures");
@@ -278,8 +298,8 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.initIngestionReportStorage = function () {
         var refKey = 'destination_reference';
         var query = joinQueries([
-            queryPortalType + ":(" + queryPortalTypes + ")",
-            "validation_state:(" + queryValidationStates + ")",
+            exports.queryPortalType + ": (" + queryPortalTypes + ")",
+            "validation_state: (" + queryValidationStates + ")",
             this.queryMaxDate()
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-ingestion-signatures");
@@ -322,11 +342,11 @@ var ClearRoad = /** @class */ (function () {
      */
     ClearRoad.prototype.initDirectoryStorage = function () {
         var refKey = 'source_reference';
-        var query = joinQueries([queryPortalType + ":(" + [
+        var query = joinQueries([exports.queryPortalType + ": (" + [
                 "\"" + PortalTypes.RoadAccount + "\"",
                 "\"" + PortalTypes.RoadEvent + "\"",
                 "\"" + PortalTypes.RoadTransaction + "\""
-            ].join(' OR ') + ')', this.queryMaxDate()]);
+            ].join(' OR ') + ")", this.queryMaxDate()]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-directory-signatures");
         var localStorage = this.localSubStorage(refKey);
         this.directoryStorage = jIO.createJIO({
@@ -366,21 +386,22 @@ var ClearRoad = /** @class */ (function () {
      * @internal
      */
     ClearRoad.prototype.initReportStorage = function () {
+        var _a, _b, _c, _d;
         var refKey = 'reference';
         var query = joinQueries([
-            queryPortalType + ":(\"" + InternalPortalTypes.File + "\")",
+            exports.queryPortalType + ": (\"" + PortalTypes.File + "\")",
             this.queryMaxDate()
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-files-signatures");
         var localStorage = this.localSubStorage(refKey);
         var mappingStorageWithEnclosure = merge(localStorage, {
             attachment_list: [storage_1.defaultAttachmentName],
-            attachment: {
-                data: {
+            attachment: (_a = {},
+                _a[storage_1.defaultAttachmentName] = {
                     get: { uri_template: 'enclosure' },
                     put: { uri_template: 'enclosure' }
-                }
-            }
+                },
+                _a)
         });
         this.reportStorage = jIO.createJIO({
             report_level: maxLogLevel,
@@ -391,9 +412,9 @@ var ClearRoad = /** @class */ (function () {
             conflict_handling: 1,
             signature_hash_key: 'source_reference',
             signature_sub_storage: this.useLocalStorage ? signatureStorage : merge(mappingStorageWithEnclosure, {
-                mapping_dict: {
-                    portal_type: ['equalSubProperty', 'source_reference']
-                }
+                mapping_dict: (_b = {},
+                    _b[exports.queryPortalType] = ['equalSubProperty', 'source_reference'],
+                    _b)
             }),
             query: {
                 query: query,
@@ -413,24 +434,24 @@ var ClearRoad = /** @class */ (function () {
             check_local_attachment_modification: false,
             check_local_attachment_deletion: false,
             local_sub_storage: this.useLocalStorage ? localStorage : merge(mappingStorageWithEnclosure, {
-                mapping_dict: {
-                    portal_type: ['equalSubProperty', refKey]
-                }
+                mapping_dict: (_c = {},
+                    _c[exports.queryPortalType] = ['equalSubProperty', refKey],
+                    _c)
             }),
             remote_sub_storage: {
                 type: 'mapping',
                 id: ['equalSubProperty', refKey],
                 attachment_list: [storage_1.defaultAttachmentName],
-                attachment: {
-                    data: {
+                attachment: (_d = {},
+                    _d[storage_1.defaultAttachmentName] = {
                         get: {
                             uri_template: this.url + "/{+id}/Base_downloadWithCors"
                         },
                         put: {
                             erp5_put_template: this.url + "/{+id}/Base_edit"
                         }
-                    }
-                },
+                    },
+                    _d),
                 sub_storage: {
                     type: 'erp5',
                     url: this.url,
@@ -447,9 +468,9 @@ var ClearRoad = /** @class */ (function () {
      */
     ClearRoad.prototype.post = function (data) {
         var _this = this;
-        index_1.validateDefinition(data.portal_type, data);
+        index_1.validateDefinition(data[exports.queryPortalType], data);
         var options = merge({}, data);
-        switch (data.portal_type) {
+        switch (data[exports.queryPortalType]) {
             case PortalTypes.RoadAccountMessage:
                 options.parent_relative_url = 'road_account_message_module';
                 break;
@@ -470,10 +491,9 @@ var ClearRoad = /** @class */ (function () {
         if ('request' in data) {
             options.request = JSON.stringify(data.request);
         }
-        options.grouping_reference = storage_1.defaultAttachmentName;
-        var dataAsString = jsonId(options);
+        options[exports.queryGroupingReference] = GroupingReferences.Data;
         var rusha = new Rusha();
-        var reference = rusha.digestFromString(dataAsString);
+        var reference = rusha.digestFromString(jsonId(options));
         options.source_reference = reference;
         options.destination_reference = reference;
         return queue_1.getQueue().push(function () {
@@ -506,7 +526,7 @@ var ClearRoad = /** @class */ (function () {
     /**
      * Query for documents in the local storage. Make sure `.sync()` is called before.
      * @param options Query options. If none set, return all documents.
-     * @return Results
+     * @return Search results
      */
     ClearRoad.prototype.allDocs = function (options) {
         return this.messagesStorage.allDocs(options);
@@ -519,10 +539,10 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.getReportFromRequest = function (sourceReference) {
         var _this = this;
         return this.allDocs({
-            query: queryPortalType + ":\"" + InternalPortalTypes.File + "\"",
-            select_list: ['source_reference', 'reference']
+            query: exports.queryPortalType + ": \"" + PortalTypes.File + "\" AND source_reference: \"" + sourceReference + "\"",
+            select_list: ['reference']
         }).push(function (result) {
-            var report = result.data.rows.find(function (row) { return row.value.source_reference === sourceReference; });
+            var report = result.data.rows[0];
             if (report) {
                 return _this.getReport(report.value.reference);
             }

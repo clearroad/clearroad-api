@@ -2,9 +2,17 @@ declare const jIO: any;
 export { jIO };
 import { portalType } from './message-types';
 import { IQueue } from './queue';
-import { IJioQueryOptions } from './storage';
+import { IJioQueryOptions, IJioQueryResults } from './storage';
+/**
+ * Query key for `PortalTypes`
+ */
+export declare const queryPortalType = "portal_type";
+/**
+ * Each message is represented by a "portal_type" (or message category)
+ */
 export declare enum PortalTypes {
     BillingPeriodMessage = "Billing Period Message",
+    File = "File",
     RoadAccount = "Road Account",
     RoadAccountMessage = "Road Account Message",
     RoadEvent = "Road Event",
@@ -13,7 +21,21 @@ export declare enum PortalTypes {
     RoadReportRequest = "Road Report Request",
     RoadTransaction = "Road Transaction"
 }
+/**
+ * Query key for `GroupingReferences`
+ */
+export declare const queryGroupingReference = "grouping_reference";
+export declare enum GroupingReferences {
+    /**
+     * Message created on the ClearRoad Platform
+     */
+    Report = "report"
+}
+/**
+ * ClearRoad will create 4 storages during synchronization, reprensented each by a name.
+ */
 export declare type storageName = 'messages' | 'ingestion-reports' | 'directories' | 'reports';
+export declare type syncProgressCallback = (type: storageName) => void;
 export declare type localStorageType = 'indexeddb' | 'dropbox' | 'gdrive';
 export interface IClearRoadOptions {
     localStorage?: {
@@ -38,12 +60,11 @@ export interface IClearRoadOptions {
 export interface IAttachmentOptions {
     format: 'text' | 'json' | 'blob' | 'data_url' | 'array_buffer';
 }
-export declare type syncProgressCallback = (type: storageName) => void;
 export interface IPostData {
-    portal_type: portalType;
+    [queryPortalType]: portalType;
 }
 export interface IPostRoadAccountMessage extends IPostData {
-    portal_type: PortalTypes.RoadAccountMessage;
+    [queryPortalType]: PortalTypes.RoadAccountMessage;
     account_manager: string;
     data_collector: string;
     condition: string;
@@ -58,20 +79,20 @@ export interface IPostRoadAccountMessage extends IPostData {
     product_line: string;
 }
 export interface IPostBillingPeriodMessage extends IPostData {
-    portal_type: PortalTypes.BillingPeriodMessage;
+    [queryPortalType]: PortalTypes.BillingPeriodMessage;
     reference: string;
     start_date: string;
     stop_date: string;
 }
 export interface IPostRoadReportRequest extends IPostData {
-    portal_type: PortalTypes.RoadReportRequest;
+    [queryPortalType]: PortalTypes.RoadReportRequest;
     report_type: string;
     billing_period_reference: string;
     request_date: string;
     request?: string;
 }
 export interface IPostRoadEventMessage extends IPostData {
-    portal_type: PortalTypes.RoadEventMessage;
+    [queryPortalType]: PortalTypes.RoadEventMessage;
     request: {
         vehicle_reference: string;
         obu_reference: string;
@@ -82,7 +103,7 @@ export interface IPostRoadEventMessage extends IPostData {
     };
 }
 export interface IPostRoadMessage extends IPostData {
-    portal_type: PortalTypes.RoadMessage;
+    [queryPortalType]: PortalTypes.RoadMessage;
     request: {
         description: string;
         vehicle_reference: string;
@@ -134,9 +155,9 @@ export declare class ClearRoad {
     /**
      * Query for documents in the local storage. Make sure `.sync()` is called before.
      * @param options Query options. If none set, return all documents.
-     * @return Results
+     * @return Search results
      */
-    allDocs(options?: IJioQueryOptions): IQueue<import("src/storage").IJioQueryResults>;
+    allDocs(options?: IJioQueryOptions): IQueue<IJioQueryResults>;
     /**
      * Get a report using the Report Request reference
      * @param sourceReference The reference of the Report Request

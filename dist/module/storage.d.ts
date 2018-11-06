@@ -4,6 +4,7 @@ import { IQueue } from './queue';
  * use this one.
  */
 export declare const defaultAttachmentName = "data";
+export declare type JioQuerySortProperty = [string, 'ascending' | 'descending'];
 export interface IJioQueryOptions {
     /**
      * Search with a query.
@@ -20,7 +21,7 @@ export interface IJioQueryOptions {
      * List of fields to sort on, each specifying the order with ascending/descending.
      * @example [['date', 'ascending'], ['id', 'descending]]
      */
-    sort_on?: Array<[string, 'ascending' | 'descending']>;
+    sort_on?: JioQuerySortProperty[];
     /**
      * When provided, the response has a value containing the values of these keys for each document.
      * @example ['id', 'date']

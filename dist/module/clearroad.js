@@ -4,10 +4,17 @@ export { jIO };
 import { validateDefinition } from './definitions/index';
 import { getQueue } from './queue';
 import { defaultAttachmentName } from './storage';
-const queryPortalType = 'portal_type';
+/**
+ * Query key for `PortalTypes`
+ */
+export const queryPortalType = 'portal_type';
+/**
+ * Each message is represented by a "portal_type" (or message category)
+ */
 export var PortalTypes;
 (function (PortalTypes) {
     PortalTypes["BillingPeriodMessage"] = "Billing Period Message";
+    PortalTypes["File"] = "File";
     PortalTypes["RoadAccount"] = "Road Account";
     PortalTypes["RoadAccountMessage"] = "Road Account Message";
     PortalTypes["RoadEvent"] = "Road Event";
@@ -20,13 +27,9 @@ const queryPortalTypes = [
     `"${PortalTypes.BillingPeriodMessage}"`,
     `"${PortalTypes.RoadAccountMessage}"`,
     `"${PortalTypes.RoadEventMessage}"`,
-    `"${PortalTypes.RoadMessage}" `,
+    `"${PortalTypes.RoadMessage}"`,
     `"${PortalTypes.RoadReportRequest}"`
 ].join(' OR ');
-var InternalPortalTypes;
-(function (InternalPortalTypes) {
-    InternalPortalTypes["File"] = "File";
-})(InternalPortalTypes || (InternalPortalTypes = {}));
 var ValidationStates;
 (function (ValidationStates) {
     ValidationStates["Processed"] = "processed";
@@ -36,6 +39,22 @@ var ValidationStates;
 })(ValidationStates || (ValidationStates = {}));
 const queryValidationStates = Object.keys(ValidationStates)
     .map(key => ValidationStates[key]).map(val => `"${val}"`).join(' OR ');
+/**
+ * Query key for `GroupingReferences`
+ */
+export const queryGroupingReference = 'grouping_reference';
+export var GroupingReferences;
+(function (GroupingReferences) {
+    /**
+     * Message created locally
+     * @internal
+     */
+    GroupingReferences["Data"] = "data";
+    /**
+     * Message created on the ClearRoad Platform
+     */
+    GroupingReferences["Report"] = "report";
+})(GroupingReferences || (GroupingReferences = {}));
 const jsonIdRec = (keyValueSpace, key, value, deep = 0) => {
     let res;
     if (value && typeof value.toJSON === 'function') {
@@ -162,7 +181,7 @@ export class ClearRoad {
                         sub_storage: merge({}, this.options.localStorage)
                     },
                     mapping_dict: {
-                        portal_type: ['equalSubProperty', key]
+                        [queryPortalType]: ['equalSubProperty', key]
                     }
                 };
             case 'memory':
@@ -226,8 +245,8 @@ export class ClearRoad {
     initMessagesStorage() {
         const refKey = 'source_reference';
         const query = joinQueries([
-            `${queryPortalType}:(${queryPortalTypes})`,
-            `grouping_reference:"${defaultAttachmentName}"`,
+            `${queryPortalType}: (${queryPortalTypes})`,
+            `${queryGroupingReference}: "${GroupingReferences.Data}"`,
             this.queryMaxDate()
         ]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-messages-signatures`);
@@ -271,8 +290,8 @@ export class ClearRoad {
     initIngestionReportStorage() {
         const refKey = 'destination_reference';
         const query = joinQueries([
-            `${queryPortalType}:(${queryPortalTypes})`,
-            `validation_state:(${queryValidationStates})`,
+            `${queryPortalType}: (${queryPortalTypes})`,
+            `validation_state: (${queryValidationStates})`,
             this.queryMaxDate()
         ]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-ingestion-signatures`);
@@ -315,11 +334,11 @@ export class ClearRoad {
      */
     initDirectoryStorage() {
         const refKey = 'source_reference';
-        const query = joinQueries([`${queryPortalType}:(` + [
+        const query = joinQueries([`${queryPortalType}: (${[
                 `"${PortalTypes.RoadAccount}"`,
                 `"${PortalTypes.RoadEvent}"`,
                 `"${PortalTypes.RoadTransaction}"`
-            ].join(' OR ') + ')', this.queryMaxDate()]);
+            ].join(' OR ')})`, this.queryMaxDate()]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signatures`);
         const localStorage = this.localSubStorage(refKey);
         this.directoryStorage = jIO.createJIO({
@@ -361,7 +380,7 @@ export class ClearRoad {
     initReportStorage() {
         const refKey = 'reference';
         const query = joinQueries([
-            `${queryPortalType}:("${InternalPortalTypes.File}")`,
+            `${queryPortalType}: ("${PortalTypes.File}")`,
             this.queryMaxDate()
         ]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-files-signatures`);
@@ -369,7 +388,7 @@ export class ClearRoad {
         const mappingStorageWithEnclosure = merge(localStorage, {
             attachment_list: [defaultAttachmentName],
             attachment: {
-                data: {
+                [defaultAttachmentName]: {
                     get: { uri_template: 'enclosure' },
                     put: { uri_template: 'enclosure' }
                 }
@@ -385,7 +404,7 @@ export class ClearRoad {
             signature_hash_key: 'source_reference',
             signature_sub_storage: this.useLocalStorage ? signatureStorage : merge(mappingStorageWithEnclosure, {
                 mapping_dict: {
-                    portal_type: ['equalSubProperty', 'source_reference']
+                    [queryPortalType]: ['equalSubProperty', 'source_reference']
                 }
             }),
             query: {
@@ -407,7 +426,7 @@ export class ClearRoad {
             check_local_attachment_deletion: false,
             local_sub_storage: this.useLocalStorage ? localStorage : merge(mappingStorageWithEnclosure, {
                 mapping_dict: {
-                    portal_type: ['equalSubProperty', refKey]
+                    [queryPortalType]: ['equalSubProperty', refKey]
                 }
             }),
             remote_sub_storage: {
@@ -415,7 +434,7 @@ export class ClearRoad {
                 id: ['equalSubProperty', refKey],
                 attachment_list: [defaultAttachmentName],
                 attachment: {
-                    data: {
+                    [defaultAttachmentName]: {
                         get: {
                             uri_template: `${this.url}/{+id}/Base_downloadWithCors`
                         },
@@ -439,9 +458,9 @@ export class ClearRoad {
      * @param data The message
      */
     post(data) {
-        validateDefinition(data.portal_type, data);
+        validateDefinition(data[queryPortalType], data);
         const options = merge({}, data);
-        switch (data.portal_type) {
+        switch (data[queryPortalType]) {
             case PortalTypes.RoadAccountMessage:
                 options.parent_relative_url = 'road_account_message_module';
                 break;
@@ -462,10 +481,9 @@ export class ClearRoad {
         if ('request' in data) {
             options.request = JSON.stringify(data.request);
         }
-        options.grouping_reference = defaultAttachmentName;
-        const dataAsString = jsonId(options);
+        options[queryGroupingReference] = GroupingReferences.Data;
         const rusha = new Rusha();
-        const reference = rusha.digestFromString(dataAsString);
+        const reference = rusha.digestFromString(jsonId(options));
         options.source_reference = reference;
         options.destination_reference = reference;
         return getQueue().push(() => {
@@ -496,7 +514,7 @@ export class ClearRoad {
     /**
      * Query for documents in the local storage. Make sure `.sync()` is called before.
      * @param options Query options. If none set, return all documents.
-     * @return Results
+     * @return Search results
      */
     allDocs(options) {
         return this.messagesStorage.allDocs(options);
@@ -508,10 +526,10 @@ export class ClearRoad {
      */
     getReportFromRequest(sourceReference) {
         return this.allDocs({
-            query: `${queryPortalType}:"${InternalPortalTypes.File}"`,
-            select_list: ['source_reference', 'reference']
+            query: `${queryPortalType}: "${PortalTypes.File}" AND source_reference: "${sourceReference}"`,
+            select_list: ['reference']
         }).push(result => {
-            const report = result.data.rows.find(row => row.value.source_reference === sourceReference);
+            const report = result.data.rows[0];
             if (report) {
                 return this.getReport(report.value.reference);
             }
