@@ -2,8 +2,6 @@ coverage/
 dist/iife/
 guide/
 legacy/
-lib/
-node/
 src/
 test/
 *.spec.ts

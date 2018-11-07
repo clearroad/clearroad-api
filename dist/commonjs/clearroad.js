@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Rusha = require('rusha');
-var jIO = require('../node/lib/jio.js').jIO;
-exports.jIO = jIO;
+var jIO = require('jio').jIO;
 var index_1 = require("./definitions/index");
 var queue_1 = require("./queue");
 var storage_1 = require("./storage");

@@ -1,9 +1,5 @@
 const Rusha = require('rusha');
-const jIO = require('../node/lib/jio.js').jIO;
-
-export {
-  jIO
-};
+const jIO = require('jio').jIO;
 
 import { portalType } from './message-types';
 import { validateDefinition } from './definitions/index';

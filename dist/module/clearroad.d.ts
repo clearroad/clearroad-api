@@ -1,5 +1,3 @@
-declare const jIO: any;
-export { jIO };
 import { portalType } from './message-types';
 import { IQueue } from './queue';
 import { IJioQueryOptions, IJioQueryResults } from './storage';

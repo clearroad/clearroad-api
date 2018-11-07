@@ -6,8 +6,7 @@
   "module": "dist/module/index.js",
   "typings": "dist/module/index.d.ts",
   "scripts": {
-    "build": "rimraf dist && npm run build:libs && rollup -c && npm run build:modules",
-    "build:libs": "mkdir -p dist/node/lib && cp -R node/lib/*.js dist/node/lib/",
+    "build": "rimraf dist && rollup -c && npm run build:modules",
     "build:modules": "tsc -p tsconfig.commonjs.json && tsc -p tsconfig.build.json",
     "build:definitions": "node build-definitions.js; npm run lint:fix",
     "lint": "tslint \"src/**/*.ts\"",
@@ -33,13 +32,10 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "ajv": "^6.5.4",
+    "jio": "git+https://lab.nexedi.com/mebibou/jio.git#node",
     "jsonschema": "^1.2.4",
-    "moment": "^2.21.0",
     "rsvp": "git+https://lab.nexedi.com/nexedi/rsvp.js.git",
-    "rusha": "0.8.2",
-    "urijs": "^1.19.1",
-    "uritemplate": "git+https://lab.nexedi.com/nexedi/uritemplate-js.git",
-    "xhr2": "git+https://github.com/clearroad/node-xhr2.git"
+    "rusha": "0.8.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.0.0",

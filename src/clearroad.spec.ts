@@ -1,5 +1,5 @@
 /* tslint:disable: no-console */
-import * as jioImport from '../node/lib/jio.js';
+import * as jioImport from 'jio';
 import {
   ClearRoad, PortalTypes,
   IPostBillingPeriodMessage, IPostRoadMessage, IPostRoadReportRequest, IPostRoadAccountMessage, IPostRoadEventMessage

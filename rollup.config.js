@@ -21,7 +21,8 @@ const iife = {
     name: 'bundle',
     banner: `(function(${libs}) {
 `,
-    footer: `window.ClearRoad = bundle.ClearRoad;
+    footer: `
+  window.ClearRoad = bundle.ClearRoad;
 })(${libs});
     `
   }],
@@ -39,7 +40,7 @@ const iife = {
       values: {
         "var Queue = require('rsvp').Queue;": 'var Queue = RSVP.Queue;',
         "var Rusha = require('rusha');": '',
-        "var jIO = require('../node/lib/jio.js').jIO;": '',
+        "var jIO = require('jio').jIO;": '',
         "var Ajv = require('ajv');": ''
       }
     }),
