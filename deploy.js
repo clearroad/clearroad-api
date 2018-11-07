@@ -48,7 +48,7 @@ const run = async () => {
     let directory = './dist/iife';
     let files = jsFile(fs.readdirSync(path.resolve(directory)));
     await Promise.all(files.map(file => {
-      updloadFile(path.resolve(directory, file), `api/${path.basename(file)}`);
+      return updloadFile(path.resolve(directory, file), `api/${path.basename(file)}`);
     }));
 
     console.log('Uploading libraries...');
@@ -63,7 +63,7 @@ const run = async () => {
       path: 'node_modules/jio/dist/jio.js'
     }];
     await Promise.all(files.map(file => {
-      updloadFile(path.resolve(file.path), `lib/${file.name}`);
+      return updloadFile(path.resolve(file.path), `lib/${file.name}`);
     }));
 
     process.exit(0);

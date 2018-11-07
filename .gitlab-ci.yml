@@ -28,8 +28,10 @@ test:
 
 deploy:
   stage: deploy
+  environment:
+    name: $CI_COMMIT_REF_NAME
   script:
-    - TARGET=$CI_BUILD_REF npm run deploy
+    - TARGET=$CI_COMMIT_REF_NAME npm run deploy
   only:
     - master
     - develop
