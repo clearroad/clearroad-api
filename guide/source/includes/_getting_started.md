@@ -6,6 +6,7 @@ We are using `npm` to install the `ClearRoad` api library.
 Open a terminal window in your project and install the dependency using the command:
 
 <div class="full-column"></div>
+
 ```shell
 npm i @clearroad/api -S
 ```
@@ -13,6 +14,7 @@ npm i @clearroad/api -S
 If you want to include the files directly in your page, you can include via our CDN:
 
 <div class="full-column"></div>
+
 ```html
 <script src="https://clearroadlab.azureedge.net/lib/ajv.js"></script>
 <script src="https://clearroadlab.azureedge.net/lib/rsvp.js"></script>

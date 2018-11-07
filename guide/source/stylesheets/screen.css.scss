@@ -589,42 +589,51 @@ html, body {
     }
   }
 
-  .center-column,
+  .center-column ,
   .full-column {
-    + pre,
-    + aside {
-      position: static;
-      float: none;
-      clear: none;
-      left: 0;
-    }
+    +,
+    > {
+      pre,
+      aside,
+      blockquote,
+      blockquote + pre,
+      blockquote + aside {
+        position: static;
+        float: none;
+        clear: none;
+        left: 0;
+      }
 
-    + aside {
-      margin-right: 0;
-    }
-
-    + pre {
-      margin: 0 $main-padding $main-padding;
+      pre,
+      aside {
+        margin: 0 0 $main-padding;
+      }
     }
   }
 
   .center-column {
-    + aside {
-      width: 50%;
-    }
-
-    + pre {
-      width: calc(50% - #{$main-padding});
+    +,
+    > {
+      pre,
+      aside,
+      blockquote,
+      blockquote + pre,
+      blockquote + aside {
+        width: 50%;
+      }
     }
   }
 
   .full-column {
-    + aside {
-      width: 100%;
-    }
-
-    + pre {
-      width: calc(100% - #{$main-padding});
+    +,
+    > {
+      pre,
+      aside,
+      blockquote,
+      blockquote + pre,
+      blockquote + aside {
+        width: 100%;
+      }
     }
   }
 }

@@ -103,3 +103,52 @@ result.data.rows.forEach(row => {
 ```
 
 After [pushing data](#pushing-data-to-clearroad-api) to the API, you can retrieve it using the [cr.allDocs](#alldocs) function.
+
+<div class="full-column"></div>
+
+### Examples
+
+<div class="full-column"></div>
+
+> Check the status of all messages:
+
+```javascript
+cr.allDocs({
+  query: 'grouping_reference: "report"',
+  select_list: ['source_reference', 'destination_reference', 'state', 'comment']
+});
+```
+
+<div class="full-column"></div>
+
+> Check the status of a particular message:
+
+```javascript
+// posting a message returns the reference of the message
+const reference = await cr.post({
+  ...
+});
+// use reference in search as "source_reference"
+cr.allDocs({
+  query: 'grouping_reference: "report" AND source_reference: "' + reference + '"',
+  select_list: ['source_reference', 'destination_reference', 'state', 'comment']
+});
+```
+
+<div class="full-column"></div>
+
+> Retrieve the `Road Account` associated with a `Road Account Message`:
+
+```javascript
+const reference = 'my-account-reference';
+cr.post({
+  portal_type: 'Road Account Message',
+  account_reference: reference,
+  ...
+});
+// use reference in search as "reference"
+cr.allDocs({
+  query: 'portal_type: "Road Account" AND reference: "' + reference + '"',
+  select_list: ['source_reference', 'registrations']
+});
+```
