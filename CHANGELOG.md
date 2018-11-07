@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.4.0"></a>
+# [2.4.0](https://github.com/clearroad/clearroad-api/compare/v2.3.0...v2.4.0) (2018-11-07)
+
+
+### Bug Fixes
+
+* **clearroad:** fix error in definitions ([1d24f34](https://github.com/clearroad/clearroad-api/commit/1d24f34))
+* **jio:** remove unused login/password auth on ERP5Storage ([74ab3ca](https://github.com/clearroad/clearroad-api/commit/74ab3ca))
+
+
+### Features
+
+* **jio:** use node version from repo ([9804188](https://github.com/clearroad/clearroad-api/commit/9804188))
+
+
+
 <a name="2.3.0"></a>
 # [2.3.0](https://github.com/clearroad/clearroad-api/compare/v2.2.0...v2.3.0) (2018-11-05)
 
