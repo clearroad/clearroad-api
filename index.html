@@ -466,7 +466,51 @@ $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.j
 <span class="p">});</span>
 </code></pre>
 <p>After <a href="#pushing-data-to-clearroad-api">pushing data</a> to the API, you can retrieve it using the <a href="#alldocs">cr.allDocs</a> function.</p>
-<h1 id='api-reference'>API reference</h1>
+
+<div class="full-column"></div>
+<h3 id='concepts-retrieving-data-from-clearroad-api-examples'>Examples</h3>
+<div class="full-column"></div>
+
+<blockquote>
+<p>Check the status of all messages:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">({</span>
+  <span class="na">query</span><span class="p">:</span> <span class="s1">'grouping_reference: "report"'</span><span class="p">,</span>
+  <span class="na">select_list</span><span class="p">:</span> <span class="p">[</span><span class="s1">'source_reference'</span><span class="p">,</span> <span class="s1">'destination_reference'</span><span class="p">,</span> <span class="s1">'state'</span><span class="p">,</span> <span class="s1">'comment'</span><span class="p">]</span>
+<span class="p">});</span>
+</code></pre>
+<div class="full-column"></div>
+
+<blockquote>
+<p>Check the status of a particular message:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="c1">// posting a message returns the reference of the message</span>
+<span class="kr">const</span> <span class="nx">reference</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
+  <span class="p">...</span>
+<span class="p">});</span>
+<span class="c1">// use reference in search as "source_reference"</span>
+<span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">({</span>
+  <span class="na">query</span><span class="p">:</span> <span class="s1">'grouping_reference: "report" AND source_reference: "'</span> <span class="o">+</span> <span class="nx">reference</span> <span class="o">+</span> <span class="s1">'"'</span><span class="p">,</span>
+  <span class="na">select_list</span><span class="p">:</span> <span class="p">[</span><span class="s1">'source_reference'</span><span class="p">,</span> <span class="s1">'destination_reference'</span><span class="p">,</span> <span class="s1">'state'</span><span class="p">,</span> <span class="s1">'comment'</span><span class="p">]</span>
+<span class="p">});</span>
+</code></pre>
+<div class="full-column"></div>
+
+<blockquote>
+<p>Retrieve the <code>Road Account</code> associated with a <code>Road Account Message</code>:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">reference</span> <span class="o">=</span> <span class="s1">'my-account-reference'</span><span class="p">;</span>
+<span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
+  <span class="na">portal_type</span><span class="p">:</span> <span class="s1">'Road Account Message'</span><span class="p">,</span>
+  <span class="na">account_reference</span><span class="p">:</span> <span class="nx">reference</span><span class="p">,</span>
+  <span class="p">...</span>
+<span class="p">});</span>
+<span class="c1">// use reference in search as "reference"</span>
+<span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">({</span>
+  <span class="na">query</span><span class="p">:</span> <span class="s1">'portal_type: "Road Account" AND reference: "'</span> <span class="o">+</span> <span class="nx">reference</span> <span class="o">+</span> <span class="s1">'"'</span><span class="p">,</span>
+  <span class="na">select_list</span><span class="p">:</span> <span class="p">[</span><span class="s1">'source_reference'</span><span class="p">,</span> <span class="s1">'registrations'</span><span class="p">]</span>
+<span class="p">});</span>
+</code></pre><h1 id='api-reference'>API reference</h1>
 <p>The <code>ClearRoad</code> class contains a subset of functions from the underlying <a href="https://jio.nexedi.com/">jIO.js</a> library, which uses <a href="https://lab.nexedi.com/nexedi/rsvp.js">RSVP.js</a> to chain functions like <code>Promises</code>. Please refer to their documentation for more information.</p>
 <h2 id='api-reference-constructor'>constructor</h2><pre class="highlight javascript tab-javascript"><code><span class="k">new</span> <span class="nx">ClearRoad</span><span class="p">(</span><span class="s1">'apiUrl'</span><span class="p">,</span> <span class="s1">'accessToken'</span><span class="p">);</span>
 </code></pre>
