@@ -31,15 +31,23 @@ var queryPortalTypes = [
     "\"" + PortalTypes.RoadMessage + "\"",
     "\"" + PortalTypes.RoadReportRequest + "\""
 ].join(' OR ');
+/**
+ * When a message is processed by the ClearRoad platform, it will create a new message with a validation state.
+ * When the message has not been sent to the platform yet, the state is "unsynced".
+ */
 var ValidationStates;
 (function (ValidationStates) {
     ValidationStates["Processed"] = "processed";
     ValidationStates["Rejected"] = "rejected";
+    ValidationStates["Submitted"] = "submitted";
+    ValidationStates["Unsynced"] = "unsynced";
+})(ValidationStates = exports.ValidationStates || (exports.ValidationStates = {}));
+var queryValidationStates = [
+    "\"" + ValidationStates.Processed + "\"",
+    "\"" + ValidationStates.Rejected + "\""
     // TODO: submitted does not work yet
-    // Submitted = 'submitted'
-})(ValidationStates || (ValidationStates = {}));
-var queryValidationStates = Object.keys(ValidationStates)
-    .map(function (key) { return ValidationStates[key]; }).map(function (val) { return "\"" + val + "\""; }).join(' OR ');
+    // `"${ValidationStates.Submitted}"`
+].join(' OR ');
 /**
  * Query key for `GroupingReferences`
  */
@@ -56,6 +64,8 @@ var GroupingReferences;
      */
     GroupingReferences["Report"] = "report";
 })(GroupingReferences = exports.GroupingReferences || (exports.GroupingReferences = {}));
+exports.querySourceReference = 'source_reference';
+exports.queryDestinationReference = 'destination_reference';
 var jsonIdRec = function (keyValueSpace, key, value, deep) {
     if (deep === void 0) { deep = 0; }
     var res;
@@ -250,7 +260,7 @@ var ClearRoad = /** @class */ (function () {
      * @internal
      */
     ClearRoad.prototype.initMessagesStorage = function () {
-        var refKey = 'source_reference';
+        var refKey = exports.querySourceReference;
         var query = joinQueries([
             exports.queryPortalType + ": (" + queryPortalTypes + ")",
             exports.queryGroupingReference + ": \"" + GroupingReferences.Data + "\"",
@@ -295,7 +305,7 @@ var ClearRoad = /** @class */ (function () {
      * @internal
      */
     ClearRoad.prototype.initIngestionReportStorage = function () {
-        var refKey = 'destination_reference';
+        var refKey = exports.queryDestinationReference;
         var query = joinQueries([
             exports.queryPortalType + ": (" + queryPortalTypes + ")",
             "validation_state: (" + queryValidationStates + ")",
@@ -340,7 +350,7 @@ var ClearRoad = /** @class */ (function () {
      * @internal
      */
     ClearRoad.prototype.initDirectoryStorage = function () {
-        var refKey = 'source_reference';
+        var refKey = exports.querySourceReference;
         var query = joinQueries([exports.queryPortalType + ": (" + [
                 "\"" + PortalTypes.RoadAccount + "\"",
                 "\"" + PortalTypes.RoadEvent + "\"",
@@ -409,10 +419,10 @@ var ClearRoad = /** @class */ (function () {
             parallel_operation_amount: 1,
             use_remote_post: false,
             conflict_handling: 1,
-            signature_hash_key: 'source_reference',
+            signature_hash_key: exports.querySourceReference,
             signature_sub_storage: this.useLocalStorage ? signatureStorage : merge(mappingStorageWithEnclosure, {
                 mapping_dict: (_b = {},
-                    _b[exports.queryPortalType] = ['equalSubProperty', 'source_reference'],
+                    _b[exports.queryPortalType] = ['equalSubProperty', exports.querySourceReference],
                     _b)
             }),
             query: {
@@ -493,10 +503,25 @@ var ClearRoad = /** @class */ (function () {
         options[exports.queryGroupingReference] = GroupingReferences.Data;
         var rusha = new Rusha();
         var reference = rusha.digestFromString(jsonId(options));
-        options.source_reference = reference;
-        options.destination_reference = reference;
+        options[exports.querySourceReference] = reference;
+        options[exports.queryDestinationReference] = reference;
         return queue_1.getQueue().push(function () {
-            return _this.messagesStorage.put(options.source_reference, options);
+            return _this.messagesStorage.put(options[exports.querySourceReference], options);
+        });
+    };
+    /**
+     * Get the state of a message.
+     * @param id The id of the message
+     */
+    ClearRoad.prototype.state = function (id) {
+        return this.allDocs({
+            query: exports.querySourceReference + ": \"" + id + "\" AND " + exports.queryGroupingReference + ": \"" + GroupingReferences.Report + "\"",
+            select_list: ['state']
+        }).push(function (docs) {
+            if (docs.data.rows.length) {
+                return docs.data.rows[0].value.state;
+            }
+            return ValidationStates.Unsynced;
         });
     };
     /**
@@ -538,7 +563,7 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.getReportFromRequest = function (sourceReference) {
         var _this = this;
         return this.allDocs({
-            query: exports.queryPortalType + ": \"" + PortalTypes.File + "\" AND source_reference: \"" + sourceReference + "\"",
+            query: exports.queryPortalType + ": \"" + PortalTypes.File + "\" AND " + exports.querySourceReference + ": \"" + sourceReference + "\"",
             select_list: ['reference']
         }).push(function (result) {
             var report = result.data.rows[0];

@@ -15,8 +15,6 @@ module.exports = (config) => {
       'karma-chrome-launcher'
     ],
     files: [
-      'lib/rsvp.js',
-      'lib/jio.js',
       'src/**/*.ts'
     ],
     preprocessors: {

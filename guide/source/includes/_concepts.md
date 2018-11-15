@@ -110,7 +110,7 @@ After [pushing data](#pushing-data-to-clearroad-api) to the API, you can retriev
 
 <div class="full-column"></div>
 
-> Check the status of all messages:
+> Check the state of all messages:
 
 ```javascript
 cr.allDocs({
@@ -121,7 +121,7 @@ cr.allDocs({
 
 <div class="full-column"></div>
 
-> Check the status of a particular message:
+> Check the state of a particular message:
 
 ```javascript
 // posting a message returns the reference of the message
@@ -129,10 +129,7 @@ const reference = await cr.post({
   ...
 });
 // use reference in search as "source_reference"
-cr.allDocs({
-  query: 'grouping_reference: "report" AND source_reference: "' + reference + '"',
-  select_list: ['source_reference', 'destination_reference', 'state', 'comment']
-});
+const state = await cr.state(reference);
 ```
 
 <div class="full-column"></div>

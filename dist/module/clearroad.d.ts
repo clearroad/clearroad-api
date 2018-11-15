@@ -20,6 +20,16 @@ export declare enum PortalTypes {
     RoadTransaction = "Road Transaction"
 }
 /**
+ * When a message is processed by the ClearRoad platform, it will create a new message with a validation state.
+ * When the message has not been sent to the platform yet, the state is "unsynced".
+ */
+export declare enum ValidationStates {
+    Processed = "processed",
+    Rejected = "rejected",
+    Submitted = "submitted",
+    Unsynced = "unsynced"
+}
+/**
  * Query key for `GroupingReferences`
  */
 export declare const queryGroupingReference = "grouping_reference";
@@ -29,6 +39,8 @@ export declare enum GroupingReferences {
      */
     Report = "report"
 }
+export declare const querySourceReference = "source_reference";
+export declare const queryDestinationReference = "destination_reference";
 /**
  * ClearRoad will create 4 storages during synchronization, reprensented each by a name.
  */
@@ -143,6 +155,11 @@ export declare class ClearRoad {
      * @param data The message
      */
     post(data: postData): IQueue<string>;
+    /**
+     * Get the state of a message.
+     * @param id The id of the message
+     */
+    state(id: string): IQueue<ValidationStates>;
     /**
      * Synchronize local data and API data:
      *  - send local data to API if not present yet

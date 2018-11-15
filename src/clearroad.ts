@@ -37,15 +37,23 @@ const queryPortalTypes = [
   `"${PortalTypes.RoadReportRequest}"`
 ].join(' OR ');
 
-enum ValidationStates {
+/**
+ * When a message is processed by the ClearRoad platform, it will create a new message with a validation state.
+ * When the message has not been sent to the platform yet, the state is "unsynced".
+ */
+export enum ValidationStates {
   Processed = 'processed',
-  Rejected = 'rejected'
-  // TODO: submitted does not work yet
-  // Submitted = 'submitted'
+  Rejected = 'rejected',
+  Submitted = 'submitted',
+  Unsynced = 'unsynced'
 }
 
-const queryValidationStates = Object.keys(ValidationStates)
-  .map(key => ValidationStates[key]).map(val => `"${val}"`).join(' OR ');
+const queryValidationStates = [
+  `"${ValidationStates.Processed}"`,
+  `"${ValidationStates.Rejected}"`
+  // TODO: submitted does not work yet
+  // `"${ValidationStates.Submitted}"`
+].join(' OR ');
 
 /**
  * Query key for `GroupingReferences`
@@ -63,6 +71,9 @@ export enum GroupingReferences {
    */
   Report = 'report'
 }
+
+export const querySourceReference = 'source_reference';
+export const queryDestinationReference = 'destination_reference';
 
 /**
  * ClearRoad will create 4 storages during synchronization, reprensented each by a name.
@@ -375,7 +386,7 @@ export class ClearRoad {
    * @internal
    */
   private initMessagesStorage() {
-    const refKey = 'source_reference';
+    const refKey = querySourceReference;
     const query = joinQueries([
       `${queryPortalType}: (${queryPortalTypes})`,
       `${queryGroupingReference}: "${GroupingReferences.Data}"`,
@@ -422,7 +433,7 @@ export class ClearRoad {
    * @internal
    */
   private initIngestionReportStorage() {
-    const refKey = 'destination_reference';
+    const refKey = queryDestinationReference;
     const query = joinQueries([
       `${queryPortalType}: (${queryPortalTypes})`,
       `validation_state: (${queryValidationStates})`,
@@ -469,7 +480,7 @@ export class ClearRoad {
    * @internal
    */
   private initDirectoryStorage() {
-    const refKey = 'source_reference';
+    const refKey = querySourceReference;
     const query = joinQueries([`${queryPortalType}: (${[
       `"${PortalTypes.RoadAccount}"`,
       `"${PortalTypes.RoadEvent}"`,
@@ -541,10 +552,10 @@ export class ClearRoad {
       parallel_operation_amount: 1,
       use_remote_post: false,
       conflict_handling: 1,
-      signature_hash_key: 'source_reference',
+      signature_hash_key: querySourceReference,
       signature_sub_storage: this.useLocalStorage ? signatureStorage : merge(mappingStorageWithEnclosure, {
         mapping_dict: {
-          [queryPortalType]: ['equalSubProperty', 'source_reference']
+          [queryPortalType]: ['equalSubProperty', querySourceReference]
         }
       }),
       query: {
@@ -629,11 +640,27 @@ export class ClearRoad {
     options[queryGroupingReference] = GroupingReferences.Data;
     const rusha = new Rusha();
     const reference = rusha.digestFromString(jsonId(options));
-    options.source_reference = reference;
-    options.destination_reference = reference;
+    options[querySourceReference] = reference;
+    options[queryDestinationReference] = reference;
 
     return getQueue().push(() => {
-      return this.messagesStorage.put(options.source_reference, options);
+      return this.messagesStorage.put(options[querySourceReference], options);
+    });
+  }
+
+  /**
+   * Get the state of a message.
+   * @param id The id of the message
+   */
+  state(id: string) {
+    return this.allDocs({
+      query: `${querySourceReference}: "${id}" AND ${queryGroupingReference}: "${GroupingReferences.Report}"`,
+      select_list: ['state']
+    }).push(docs => {
+      if (docs.data.rows.length) {
+        return docs.data.rows[0].value.state as ValidationStates;
+      }
+      return ValidationStates.Unsynced;
     });
   }
 
@@ -675,7 +702,7 @@ export class ClearRoad {
    */
   getReportFromRequest(sourceReference: string) {
     return this.allDocs({
-      query: `${queryPortalType}: "${PortalTypes.File}" AND source_reference: "${sourceReference}"`,
+      query: `${queryPortalType}: "${PortalTypes.File}" AND ${querySourceReference}: "${sourceReference}"`,
       select_list: ['reference']
     }).push(result => {
       const report = result.data.rows[0];

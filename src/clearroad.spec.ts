@@ -354,6 +354,40 @@ describe('ClearRoad', () => {
     });
   });
 
+  describe('.state', () => {
+    let cr: ClearRoad;
+    const id = 'id';
+    const state = 'rejected';
+
+    beforeEach(() => {
+      cr = new ClearRoad(url);
+    });
+
+    describe('no document found', () => {
+      beforeEach(() => {
+        spyOn(cr, 'allDocs').and.returnValue({
+          push: callback => callback({data: {rows: []}})
+        });
+      });
+
+      it('should return not synced state', async () => {
+        expect(await cr.state(id)).toEqual('unsynced');
+      });
+    });
+
+    describe('document found', () => {
+      beforeEach(() => {
+        spyOn(cr, 'allDocs').and.returnValue({
+          push: callback => callback({data: {rows: [{value: {state}}]}})
+        });
+      });
+
+      it('should return the state', async () => {
+        expect(await cr.state(id)).toEqual(state);
+      });
+    });
+  });
+
   describe('.sync', () => {
     let cr: ClearRoad;
     let repairSpy: jasmine.Spy;
