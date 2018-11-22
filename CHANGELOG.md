@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.5.0"></a>
+# [2.5.0](https://github.com/clearroad/clearroad-api/compare/v2.4.1...v2.5.0) (2018-11-22)
+
+
+### Features
+
+* **clearroad:** add state function ([c03bc9a](https://github.com/clearroad/clearroad-api/commit/c03bc9a))
+* **definitions:** add event types ([edbe63a](https://github.com/clearroad/clearroad-api/commit/edbe63a))
+* **definitions:** add mrd types ([ed90ceb](https://github.com/clearroad/clearroad-api/commit/ed90ceb))
+* **definitions:** add rules and subrules ([6e02702](https://github.com/clearroad/clearroad-api/commit/6e02702))
+
+
+
 <a name="2.4.1"></a>
 ## [2.4.1](https://github.com/clearroad/clearroad-api/compare/v2.4.0...v2.4.1) (2018-11-12)
 
