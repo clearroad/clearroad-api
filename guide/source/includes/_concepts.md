@@ -34,7 +34,7 @@ await cr.sync();
 console.log('sync done');
 ```
 
-Pushing data to ClearRoad is done by [posting it](#post) in a local storage and [synchronizing](#sync) that storage with the ClearRoad API.
+Pushing data to ClearRoad is done by [posting it](#api-reference-post) in a local storage and [synchronizing](#api-reference-sync) that storage with the ClearRoad API.
 
 ## Data format and validation
 
@@ -46,7 +46,7 @@ $ npm install -g ajv-cli
 $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.json -d data.json
 ```
 
-All of the data can be pushed to the ClearRoad Platform using the [post](#post) method. To validate the data format, we are using the [ajv library](https://github.com/epoberezkin/ajv).
+All of the data can be pushed to the ClearRoad Platform using the [post](#api-reference-post) method. To validate the data format, we are using the [ajv library](https://github.com/epoberezkin/ajv).
 
 The list of valid data format can be found under the `node_modules/@clearroad/api/definitions` directory.
 
@@ -102,7 +102,7 @@ result.data.rows.forEach(row => {
 });
 ```
 
-After [pushing data](#pushing-data-to-clearroad-api) to the API, you can retrieve it using the [cr.allDocs](#alldocs) function.
+After [pushing data](#concepts-pushing-data-to-clearroad-api) to the API, you can retrieve it using the [cr.allDocs](#api-reference-alldocs) function.
 
 <div class="full-column"></div>
 

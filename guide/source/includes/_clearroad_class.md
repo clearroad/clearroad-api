@@ -16,7 +16,7 @@ Property | Description | Required
 --------- | ----------- | -----------
 url | Url of the storage
 accessToken | Access token to authenticate on the ClearRoad API (if necessary) | No
-options.localStorage.type | View [types](#local-storage-types) below | Yes
+options.localStorage.type | View [types](#api-reference-local-storage-types) below | Yes
 options.localStorage.accessToken | Access token (if required) | No
 options.database | Name of the database when the objects will be stored | No
 options.useQueryStorage | Use if the localStorage does not support query | No
@@ -67,7 +67,7 @@ const id = await cr.post({
 
 `post(data)`
 
-Posts data in your local storage and return the `reference` of the new document. Then use the [sync method](#sync) to synchronize the data with the ClearRoad API.
+Posts data in your local storage and return the `reference` of the new document. Then use the [sync method](#api-reference-sync) to synchronize the data with the ClearRoad API.
 
 Property | Description
 --------- | -----------
@@ -159,6 +159,49 @@ sort_on (optional) | List of fields to sort on, each specifying the order with `
 select_list | When provided, the response has a `value` containing the values of these keys for each document
 include_docs | When `true`, the response has a `doc` containing the full metadata for each document
 
+## state
+
+```javascript--browser
+cr.post({...})
+  .then(function(reference) {
+    // posting a message returns the reference of the message
+    // use reference to get the state of the message
+    return cr.state(reference);
+  })
+  .then(function(state) {
+    // state = 'processed'
+  });
+```
+
+```javascript--browser-es6
+// posting a message returns the reference of the message
+const reference = await cr.post({
+  ...
+});
+// use reference to get the state of the message
+const state = await cr.state(reference);
+// state = 'processed'
+```
+
+```javascript--node
+// posting a message returns the reference of the message
+const reference = await cr.post({
+  ...
+});
+// use reference to get the state of the message
+const state = await cr.state(reference);
+// state = 'processed'
+```
+
+`state(reference)`
+
+Check for the processing state of the message.
+Allow some time after [synchronizing](#api-reference-sync) before checking for the state.
+
+Property | Description
+--------- | -----------
+reference | Reference of the message
+
 ## getReport
 
 ```javascript--browser
@@ -177,7 +220,7 @@ const report = await cr.getReport('reference');
 
 `getReport(reference)`
 
-Retrieve [the report](https://api.clearroadlab.io/docs/#requesting-a-report) with the given report `reference`. If you only have the `reference` of the report request, please use [getReportFromRequest](#getReportFromRequest) instead.
+Retrieve [the report](https://api.clearroadlab.io/docs/#requesting-a-report) with the given report `reference`. If you only have the `reference` of the report request, please use [getReportFromRequest](#api-reference-getreportfromrequest) instead.
 
 Property | Description
 --------- | -----------

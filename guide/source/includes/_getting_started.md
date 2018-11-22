@@ -75,7 +75,7 @@ const cr = new ClearRoad(process.env.CLEARROAD_URL, process.env.CLEARROAD_ACCESS
 
 The ClearRoad API is based on a synchronization process, which will effectively synchronize data from the ClearRoad Platform to a "local" storage. This local storage can be on a local server, on the browser, or on a remote server.
 
-By default, the API will use `indexeddb` as local storage. To use another storage please refer to [the API reference](#constructor).
+By default, the API will use `indexeddb` as local storage. To use another storage please refer to [the API reference](#api-reference-constructor).
 
 ## Step 4. Retrieve messages
 
