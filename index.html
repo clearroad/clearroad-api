@@ -472,7 +472,7 @@ $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.j
 <div class="full-column"></div>
 
 <blockquote>
-<p>Check the status of all messages:</p>
+<p>Check the state of all messages:</p>
 </blockquote>
 <pre class="highlight javascript tab-javascript"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">({</span>
   <span class="na">query</span><span class="p">:</span> <span class="s1">'grouping_reference: "report"'</span><span class="p">,</span>
@@ -482,17 +482,14 @@ $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.j
 <div class="full-column"></div>
 
 <blockquote>
-<p>Check the status of a particular message:</p>
+<p>Check the state of a particular message:</p>
 </blockquote>
 <pre class="highlight javascript tab-javascript"><code><span class="c1">// posting a message returns the reference of the message</span>
 <span class="kr">const</span> <span class="nx">reference</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
   <span class="p">...</span>
 <span class="p">});</span>
 <span class="c1">// use reference in search as "source_reference"</span>
-<span class="nx">cr</span><span class="p">.</span><span class="nx">allDocs</span><span class="p">({</span>
-  <span class="na">query</span><span class="p">:</span> <span class="s1">'grouping_reference: "report" AND source_reference: "'</span> <span class="o">+</span> <span class="nx">reference</span> <span class="o">+</span> <span class="s1">'"'</span><span class="p">,</span>
-  <span class="na">select_list</span><span class="p">:</span> <span class="p">[</span><span class="s1">'source_reference'</span><span class="p">,</span> <span class="s1">'destination_reference'</span><span class="p">,</span> <span class="s1">'state'</span><span class="p">,</span> <span class="s1">'comment'</span><span class="p">]</span>
-<span class="p">});</span>
+<span class="kr">const</span> <span class="nx">state</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">state</span><span class="p">(</span><span class="nx">reference</span><span class="p">);</span>
 </code></pre>
 <div class="full-column"></div>
 
