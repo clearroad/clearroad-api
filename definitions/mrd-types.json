@@ -1,0 +1,7 @@
+{
+  "ADJ": "Adjusted mileage transaction",
+  "CRE": "Credit transaction",
+  "FEE": "Fees transaction",
+  "INV": "Invoicing transaction",
+  "MRP": "Reported mileage transaction"
+}
