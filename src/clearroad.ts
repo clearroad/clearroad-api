@@ -1,5 +1,6 @@
 const Rusha = require('rusha');
 const jIO = require('jio').jIO;
+const { all } = require('rsvp');
 
 import { portalType } from './message-types';
 import { validateDefinition } from './definitions/index';
@@ -39,13 +40,13 @@ const queryPortalTypes = [
 
 /**
  * When a message is processed by the ClearRoad platform, it will create a new message with a validation state.
- * When the message has not been sent to the platform yet, the state is "unsynced".
+ * When the message has not been sent to the platform yet, the state is "not_processed".
  */
 export enum ValidationStates {
   Processed = 'processed',
   Rejected = 'rejected',
   Submitted = 'submitted',
-  Unsynced = 'unsynced'
+  Unprocessed = 'not_processed'
 }
 
 const queryValidationStates = [
@@ -660,7 +661,7 @@ export class ClearRoad {
       if (docs.data.rows.length) {
         return docs.data.rows[0].value.state as ValidationStates;
       }
-      return ValidationStates.Unsynced;
+      return ValidationStates.Unprocessed;
     });
   }
 
@@ -684,6 +685,64 @@ export class ClearRoad {
       .push(() => {
         return this.reportStorage.repair().push(() => progress('reports'));
       });
+  }
+
+  /**
+   * Query the messages with a specific state.
+   * @param state The state to query for
+   * @param options Set { sort_on, limit } on the results
+   */
+  queryByState(state: ValidationStates, options: Partial<IJioQueryOptions> = {}) {
+    const { sort_on, limit } = options;
+    // query for data message without corresponding report message
+    if (state === ValidationStates.Unprocessed) {
+      return this.allDocs({
+        query: `${queryGroupingReference}: "${GroupingReferences.Data}"`,
+        select_list: [queryPortalType],
+        sort_on,
+        limit
+      })
+        .push(results => {
+          return all(results.data.rows.map(result => {
+            return this.allDocs({
+              query: `${queryGroupingReference}: "${GroupingReferences.Report}" AND ${querySourceReference}: "${result.id}"`
+            }).push(docs => {
+              return docs.data.rows.length === 0 ? result : null;
+            });
+          }));
+        })
+        .push(results => {
+          const rows = results.filter(result => result !== null);
+          return {
+            data: {
+              rows,
+              total_rows: rows.length
+            }
+          } as IJioQueryResults;
+        });
+    }
+
+    return this.allDocs({
+      query: `state: "${state}" AND ${queryGroupingReference}: "${GroupingReferences.Report}"`,
+      select_list: [queryPortalType, querySourceReference],
+      sort_on,
+      limit
+    }).push(results => {
+      const rows = results.data.rows.map(row => {
+        return {
+          id: row.value[querySourceReference],
+          value: {
+            [queryPortalType]: row.value[queryPortalType]
+          }
+        };
+      });
+      return {
+        data: {
+          rows,
+          total_rows: rows.length
+        }
+      } as IJioQueryResults;
+    });
   }
 
   /**

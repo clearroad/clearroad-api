@@ -159,6 +159,34 @@ sort_on (optional) | List of fields to sort on, each specifying the order with `
 select_list | When provided, the response has a `value` containing the values of these keys for each document
 include_docs | When `true`, the response has a `doc` containing the full metadata for each document
 
+## queryByState
+
+```javascript--browser
+cr.queryByState('rejected').then(function(results) {
+  // rejected messages
+});
+```
+
+```javascript--browser-es6
+const results = await cr.queryByState('rejected');
+// rejected messages
+console.log(results);
+```
+
+```javascript--node
+const results = await cr.queryByState('rejected');
+// rejected messages
+console.log(results);
+```
+
+`queryByState(state)`
+
+Retrieve the messages in a certain "processing" state. By default, when a message is not yet synchronized or processed, the state is `not_processed`.
+
+Property | Description
+--------- | -----------
+state | State of the message. Possible values are: `processed`, `rejected`, `not_processed`.
+
 ## state
 
 ```javascript--browser

@@ -21,13 +21,13 @@ export declare enum PortalTypes {
 }
 /**
  * When a message is processed by the ClearRoad platform, it will create a new message with a validation state.
- * When the message has not been sent to the platform yet, the state is "unsynced".
+ * When the message has not been sent to the platform yet, the state is "not_processed".
  */
 export declare enum ValidationStates {
     Processed = "processed",
     Rejected = "rejected",
     Submitted = "submitted",
-    Unsynced = "unsynced"
+    Unprocessed = "not_processed"
 }
 /**
  * Query key for `GroupingReferences`
@@ -167,6 +167,12 @@ export declare class ClearRoad {
      * @param progress Function to get notified of progress. There are 4 storages to sync.
      */
     sync(progress?: syncProgressCallback): IQueue<void>;
+    /**
+     * Query the messages with a specific state.
+     * @param state The state to query for
+     * @param options Set { sort_on, limit } on the results
+     */
+    queryByState(state: ValidationStates, options?: Partial<IJioQueryOptions>): IQueue<IJioQueryResults>;
     /**
      * Query for documents in the local storage. Make sure `.sync()` is called before.
      * @param options Query options. If none set, return all documents.

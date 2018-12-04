@@ -42,7 +42,6 @@ Pushing data to ClearRoad is done by [posting it](#api-reference-post) in a loca
 
 ```
 $ npm install -g ajv-cli
-// data samples can be found under the `node_modules/@clearroad/node/samples` folder
 $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.json -d data.json
 ```
 

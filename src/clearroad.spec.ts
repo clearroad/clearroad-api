@@ -2,9 +2,10 @@
 import * as jioImport from 'jio';
 import {
   ClearRoad, PortalTypes,
-  IPostBillingPeriodMessage, IPostRoadMessage, IPostRoadReportRequest, IPostRoadAccountMessage, IPostRoadEventMessage
+  IPostBillingPeriodMessage, IPostRoadMessage, IPostRoadReportRequest, IPostRoadAccountMessage, IPostRoadEventMessage, ValidationStates
 } from './clearroad';
 import * as definitions from './definitions';
+import { getQueue } from './queue';
 
 const url = '//fake-url';
 
@@ -357,7 +358,7 @@ describe('ClearRoad', () => {
   describe('.state', () => {
     let cr: ClearRoad;
     const id = 'id';
-    const state = 'rejected';
+    const state = ValidationStates.Rejected;
 
     beforeEach(() => {
       cr = new ClearRoad(url);
@@ -371,7 +372,7 @@ describe('ClearRoad', () => {
       });
 
       it('should return not synced state', async () => {
-        expect(await cr.state(id)).toEqual('unsynced');
+        expect(await cr.state(id)).toEqual(ValidationStates.Unprocessed);
       });
     });
 
@@ -409,6 +410,63 @@ describe('ClearRoad', () => {
         const progressSpy = jasmine.createSpy();
         await cr.sync(progressSpy);
         expect(progressSpy.calls.count()).toEqual(4);
+      });
+    });
+  });
+
+  describe('.queryByState', () => {
+    let cr: ClearRoad;
+    const document = {
+      id: 'id1',
+      value: {
+        portal_type: 'type'
+      }
+    };
+
+    beforeEach(() => {
+      cr = new ClearRoad(url);
+    });
+
+    describe(ValidationStates.Unprocessed, () => {
+      beforeEach(() => {
+        spyOn(cr, 'allDocs').and.callFake(params => {
+          // first query
+          if (params.query === 'grouping_reference: "data"') {
+            return getQueue().push(() => ({data: {rows: [document, {
+              id: 'id2',
+              value: {
+                portal_type: 'type'
+              }
+            }]}}));
+          }
+          else if (params.query === 'grouping_reference: "report" AND source_reference: "id1"') {
+            return getQueue().push(() => ({data: {rows: []}}));
+          }
+
+          return getQueue().push(() => ({data: {rows: [{id: 'id3'}]}}));
+        });
+      });
+
+      it('should return the messages', async () => {
+        const results = await cr.queryByState(ValidationStates.Unprocessed);
+        expect(results.data.rows).toEqual([document]);
+      });
+    });
+
+    describe(ValidationStates.Processed, () => {
+      beforeEach(() => {
+        spyOn(cr, 'allDocs').and.returnValue(getQueue().push(() => ({data: {rows: [{
+          id: 'id2',
+          value: {
+            portal_type: document.value.portal_type,
+            source_reference: document.id
+          }
+        }]}})));
+      });
+
+      it('should return the messages', async () => {
+        const results = await cr.queryByState(ValidationStates.Processed);
+        expect(results.data.rows).toEqual([document]);
       });
     });
   });

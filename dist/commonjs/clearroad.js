@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var Rusha = require('rusha');
 var jIO = require('jio').jIO;
+var all = require('rsvp').all;
 var index_1 = require("./definitions/index");
 var queue_1 = require("./queue");
 var storage_1 = require("./storage");
@@ -33,14 +34,14 @@ var queryPortalTypes = [
 ].join(' OR ');
 /**
  * When a message is processed by the ClearRoad platform, it will create a new message with a validation state.
- * When the message has not been sent to the platform yet, the state is "unsynced".
+ * When the message has not been sent to the platform yet, the state is "not_processed".
  */
 var ValidationStates;
 (function (ValidationStates) {
     ValidationStates["Processed"] = "processed";
     ValidationStates["Rejected"] = "rejected";
     ValidationStates["Submitted"] = "submitted";
-    ValidationStates["Unsynced"] = "unsynced";
+    ValidationStates["Unprocessed"] = "not_processed";
 })(ValidationStates = exports.ValidationStates || (exports.ValidationStates = {}));
 var queryValidationStates = [
     "\"" + ValidationStates.Processed + "\"",
@@ -521,7 +522,7 @@ var ClearRoad = /** @class */ (function () {
             if (docs.data.rows.length) {
                 return docs.data.rows[0].value.state;
             }
-            return ValidationStates.Unsynced;
+            return ValidationStates.Unprocessed;
         });
     };
     /**
@@ -545,6 +546,65 @@ var ClearRoad = /** @class */ (function () {
         })
             .push(function () {
             return _this.reportStorage.repair().push(function () { return progress('reports'); });
+        });
+    };
+    /**
+     * Query the messages with a specific state.
+     * @param state The state to query for
+     * @param options Set { sort_on, limit } on the results
+     */
+    ClearRoad.prototype.queryByState = function (state, options) {
+        var _this = this;
+        if (options === void 0) { options = {}; }
+        var sort_on = options.sort_on, limit = options.limit;
+        // query for data message without corresponding report message
+        if (state === ValidationStates.Unprocessed) {
+            return this.allDocs({
+                query: exports.queryGroupingReference + ": \"" + GroupingReferences.Data + "\"",
+                select_list: [exports.queryPortalType],
+                sort_on: sort_on,
+                limit: limit
+            })
+                .push(function (results) {
+                return all(results.data.rows.map(function (result) {
+                    return _this.allDocs({
+                        query: exports.queryGroupingReference + ": \"" + GroupingReferences.Report + "\" AND " + exports.querySourceReference + ": \"" + result.id + "\""
+                    }).push(function (docs) {
+                        return docs.data.rows.length === 0 ? result : null;
+                    });
+                }));
+            })
+                .push(function (results) {
+                var rows = results.filter(function (result) { return result !== null; });
+                return {
+                    data: {
+                        rows: rows,
+                        total_rows: rows.length
+                    }
+                };
+            });
+        }
+        return this.allDocs({
+            query: "state: \"" + state + "\" AND " + exports.queryGroupingReference + ": \"" + GroupingReferences.Report + "\"",
+            select_list: [exports.queryPortalType, exports.querySourceReference],
+            sort_on: sort_on,
+            limit: limit
+        }).push(function (results) {
+            var rows = results.data.rows.map(function (row) {
+                var _a;
+                return {
+                    id: row.value[exports.querySourceReference],
+                    value: (_a = {},
+                        _a[exports.queryPortalType] = row.value[exports.queryPortalType],
+                        _a)
+                };
+            });
+            return {
+                data: {
+                    rows: rows,
+                    total_rows: rows.length
+                }
+            };
         });
     };
     /**

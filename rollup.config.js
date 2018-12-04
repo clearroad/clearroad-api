@@ -39,6 +39,7 @@ const iife = {
       delimiters: ['', ''],
       values: {
         "var Queue = require('rsvp').Queue;": 'var Queue = RSVP.Queue;',
+        "var all = require('rsvp').all;": 'var all = RSVP.all;',
         "var Rusha = require('rusha');": '',
         "var jIO = require('jio').jIO;": '',
         "var Ajv = require('ajv');": ''
