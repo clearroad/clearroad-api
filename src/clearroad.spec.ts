@@ -49,32 +49,32 @@ describe('ClearRoad', () => {
     });
   });
 
-  describe('.queryMaxDate', () => {
+  describe('.queryMinDate', () => {
     let cr;
-    let maxDate: Date;
+    let minDate: Date;
 
     beforeEach(() => {
       cr = new ClearRoad(url);
-      maxDate = new Date();
+      minDate = new Date();
     });
 
-    describe('with a maxDate', () => {
+    describe('with a minDate', () => {
       beforeEach(() => {
-        cr.options = {maxDate};
+        cr.options = {minDate};
       });
 
       it('should return a subquery', () => {
-        expect(cr.queryMaxDate()).toEqual(`modification_date: >= "${maxDate.toJSON()}"`);
+        expect(cr.queryMinDate()).toEqual(`modification_date: >= "${minDate.toJSON()}"`);
       });
     });
 
-    describe('without a maxDate', () => {
+    describe('without a minDate', () => {
       beforeEach(() => {
         cr.options = {};
       });
 
       it('should return an empty string', () => {
-        expect(cr.queryMaxDate()).toEqual('');
+        expect(cr.queryMinDate()).toEqual('');
       });
     });
   });

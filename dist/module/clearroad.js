@@ -163,10 +163,10 @@ export class ClearRoad {
     /**
      * @internal
      */
-    queryMaxDate() {
+    queryMinDate() {
         // only retrieve the data since xxx
-        if (this.options.maxDate) {
-            const from = new Date(this.options.maxDate);
+        if (this.options.minDate) {
+            const from = new Date(this.options.minDate);
             return `modification_date: >= "${from.toJSON()}"`;
         }
         return '';
@@ -257,7 +257,7 @@ export class ClearRoad {
         const query = joinQueries([
             `${queryPortalType}: (${queryPortalTypes})`,
             `${queryGroupingReference}: "${GroupingReferences.Data}"`,
-            this.queryMaxDate()
+            this.queryMinDate()
         ]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-messages-signatures`);
         const localStorage = this.localSubStorage(refKey);
@@ -302,7 +302,7 @@ export class ClearRoad {
         const query = joinQueries([
             `${queryPortalType}: (${queryPortalTypes})`,
             `validation_state: (${queryValidationStates})`,
-            this.queryMaxDate()
+            this.queryMinDate()
         ]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-ingestion-signatures`);
         const localStorage = this.localSubStorage(refKey);
@@ -348,7 +348,7 @@ export class ClearRoad {
                 `"${PortalTypes.RoadAccount}"`,
                 `"${PortalTypes.RoadEvent}"`,
                 `"${PortalTypes.RoadTransaction}"`
-            ].join(' OR ')})`, this.queryMaxDate()]);
+            ].join(' OR ')})`, this.queryMinDate()]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signatures`);
         const localStorage = this.localSubStorage(refKey);
         this.directoryStorage = jIO.createJIO({
@@ -391,7 +391,7 @@ export class ClearRoad {
         const refKey = 'reference';
         const query = joinQueries([
             `${queryPortalType}: ("${PortalTypes.File}")`,
-            this.queryMaxDate()
+            this.queryMinDate()
         ]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-files-signatures`);
         const localStorage = this.localSubStorage(refKey);

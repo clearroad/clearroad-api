@@ -170,10 +170,10 @@ var ClearRoad = /** @class */ (function () {
     /**
      * @internal
      */
-    ClearRoad.prototype.queryMaxDate = function () {
+    ClearRoad.prototype.queryMinDate = function () {
         // only retrieve the data since xxx
-        if (this.options.maxDate) {
-            var from = new Date(this.options.maxDate);
+        if (this.options.minDate) {
+            var from = new Date(this.options.minDate);
             return "modification_date: >= \"" + from.toJSON() + "\"";
         }
         return '';
@@ -265,7 +265,7 @@ var ClearRoad = /** @class */ (function () {
         var query = joinQueries([
             exports.queryPortalType + ": (" + queryPortalTypes + ")",
             exports.queryGroupingReference + ": \"" + GroupingReferences.Data + "\"",
-            this.queryMaxDate()
+            this.queryMinDate()
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-messages-signatures");
         var localStorage = this.localSubStorage(refKey);
@@ -310,7 +310,7 @@ var ClearRoad = /** @class */ (function () {
         var query = joinQueries([
             exports.queryPortalType + ": (" + queryPortalTypes + ")",
             "validation_state: (" + queryValidationStates + ")",
-            this.queryMaxDate()
+            this.queryMinDate()
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-ingestion-signatures");
         var localStorage = this.localSubStorage(refKey);
@@ -356,7 +356,7 @@ var ClearRoad = /** @class */ (function () {
                 "\"" + PortalTypes.RoadAccount + "\"",
                 "\"" + PortalTypes.RoadEvent + "\"",
                 "\"" + PortalTypes.RoadTransaction + "\""
-            ].join(' OR ') + ")", this.queryMaxDate()]);
+            ].join(' OR ') + ")", this.queryMinDate()]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-directory-signatures");
         var localStorage = this.localSubStorage(refKey);
         this.directoryStorage = jIO.createJIO({
@@ -400,7 +400,7 @@ var ClearRoad = /** @class */ (function () {
         var refKey = 'reference';
         var query = joinQueries([
             exports.queryPortalType + ": (\"" + PortalTypes.File + "\")",
-            this.queryMaxDate()
+            this.queryMinDate()
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-files-signatures");
         var localStorage = this.localSubStorage(refKey);

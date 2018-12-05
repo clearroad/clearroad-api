@@ -120,24 +120,11 @@ cr.allDocs({
 
 <div class="full-column"></div>
 
-> Check the state of a particular message:
-
-```javascript
-// posting a message returns the reference of the message
-const reference = await cr.post({
-  ...
-});
-// use reference in search as "source_reference"
-const state = await cr.state(reference);
-```
-
-<div class="full-column"></div>
-
 > Retrieve the `Road Account` associated with a `Road Account Message`:
 
 ```javascript
 const reference = 'my-account-reference';
-cr.post({
+await cr.post({
   portal_type: 'Road Account Message',
   account_reference: reference,
   ...

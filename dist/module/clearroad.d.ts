@@ -50,20 +50,34 @@ export declare type localStorageType = 'indexeddb' | 'dropbox' | 'gdrive';
 export interface IClearRoadOptions {
     localStorage?: {
         type: localStorageType | string;
+        /**
+         * Access token of the storage.
+         */
         accessToken?: string;
         /**
-         * Primary database name. Default to 'clearroad'
+         * Primary database name. Default to 'clearroad'.
          */
         database?: string;
     };
-    maxDate?: Date | number | string;
+    /**
+     * Messages updated before this date will not be synchronized.
+     * If not set, all messages will be synchronized.
+     * Improves speed of synchronisation for big sets.
+     * @example
+     * ```
+     * const today = new Date();
+     * const from = today.setMonth(today.getMonth() - 1); // one month synchronization only
+     * new ClearRoad(url, token, {minDate: from})
+     * ```
+     */
+    minDate?: Date | number | string;
     /**
      * Force using a query storage around the localStorage.
-     * Needed if the storage can not query data directly. See information on the storage
+     * Needed if the storage can not query data directly. See information on the storage.
      */
     useQueryStorage?: boolean;
     /**
-     * Turn on debugging mode to console
+     * Log to console replication steps between local and remote storage.
      */
     debug?: boolean;
 }

@@ -87,20 +87,34 @@ export type localStorageType = 'indexeddb' | 'dropbox' | 'gdrive';
 export interface IClearRoadOptions {
   localStorage?: {
     type: localStorageType|string;
+    /**
+     * Access token of the storage.
+     */
     accessToken?: string;
     /**
-     * Primary database name. Default to 'clearroad'
+     * Primary database name. Default to 'clearroad'.
      */
     database?: string;
   };
-  maxDate?: Date|number|string;
+  /**
+   * Messages updated before this date will not be synchronized.
+   * If not set, all messages will be synchronized.
+   * Improves speed of synchronisation for big sets.
+   * @example
+   * ```
+   * const today = new Date();
+   * const from = today.setMonth(today.getMonth() - 1); // one month synchronization only
+   * new ClearRoad(url, token, {minDate: from})
+   * ```
+   */
+  minDate?: Date|number|string;
   /**
    * Force using a query storage around the localStorage.
-   * Needed if the storage can not query data directly. See information on the storage
+   * Needed if the storage can not query data directly. See information on the storage.
    */
   useQueryStorage?: boolean;
   /**
-   * Turn on debugging mode to console
+   * Log to console replication steps between local and remote storage.
    */
   debug?: boolean;
 }
@@ -292,10 +306,10 @@ export class ClearRoad {
   /**
    * @internal
    */
-  private queryMaxDate() {
+  private queryMinDate() {
     // only retrieve the data since xxx
-    if (this.options.maxDate) {
-      const from = new Date(this.options.maxDate);
+    if (this.options.minDate) {
+      const from = new Date(this.options.minDate);
       return `modification_date: >= "${from.toJSON()}"`;
     }
     return '';
@@ -391,7 +405,7 @@ export class ClearRoad {
     const query = joinQueries([
       `${queryPortalType}: (${queryPortalTypes})`,
       `${queryGroupingReference}: "${GroupingReferences.Data}"`,
-      this.queryMaxDate()
+      this.queryMinDate()
     ]);
     const signatureStorage = this.signatureSubStorage(`${this.databaseName}-messages-signatures`);
     const localStorage = this.localSubStorage(refKey);
@@ -438,7 +452,7 @@ export class ClearRoad {
     const query = joinQueries([
       `${queryPortalType}: (${queryPortalTypes})`,
       `validation_state: (${queryValidationStates})`,
-      this.queryMaxDate()
+      this.queryMinDate()
     ]);
     const signatureStorage = this.signatureSubStorage(`${this.databaseName}-ingestion-signatures`);
     const localStorage = this.localSubStorage(refKey);
@@ -486,7 +500,7 @@ export class ClearRoad {
       `"${PortalTypes.RoadAccount}"`,
       `"${PortalTypes.RoadEvent}"`,
       `"${PortalTypes.RoadTransaction}"`
-    ].join(' OR ')})`, this.queryMaxDate()]);
+    ].join(' OR ')})`, this.queryMinDate()]);
     const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signatures`);
     const localStorage = this.localSubStorage(refKey);
 
@@ -531,7 +545,7 @@ export class ClearRoad {
     const refKey = 'reference';
     const query = joinQueries([
       `${queryPortalType}: ("${PortalTypes.File}")`,
-      this.queryMaxDate()
+      this.queryMinDate()
     ]);
     const signatureStorage = this.signatureSubStorage(`${this.databaseName}-files-signatures`);
     const localStorage = this.localSubStorage(refKey);
