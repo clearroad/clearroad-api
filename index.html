@@ -298,6 +298,9 @@
                     <a href="#api-reference-alldocs" class="toc-h2 toc-link" data-title="allDocs">allDocs</a>
                   </li>
                   <li>
+                    <a href="#api-reference-querybystate" class="toc-h2 toc-link" data-title="queryByState">queryByState</a>
+                  </li>
+                  <li>
                     <a href="#api-reference-state" class="toc-h2 toc-link" data-title="state">state</a>
                   </li>
                   <li>
@@ -305,6 +308,12 @@
                   </li>
                   <li>
                     <a href="#api-reference-getreportfromrequest" class="toc-h2 toc-link" data-title="getReportFromRequest">getReportFromRequest</a>
+                  </li>
+                  <li>
+                    <a href="#api-reference-portaltypes" class="toc-h2 toc-link" data-title="PortalTypes">PortalTypes</a>
+                  </li>
+                  <li>
+                    <a href="#api-reference-validationstates" class="toc-h2 toc-link" data-title="ValidationStates">ValidationStates</a>
                   </li>
               </ul>
           </li>
@@ -419,7 +428,6 @@ If you do not have an access token, you can request one on the <a href="https://
 <p>You can install <a href="https://github.com/jessedc/ajv-cli">ajv</a> to test your JSON messages:</p>
 </blockquote>
 <pre class="highlight plaintext"><code>$ npm install -g ajv-cli
-// data samples can be found under the `node_modules/@clearroad/node/samples` folder
 $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.json -d data.json
 </code></pre>
 <p>All of the data can be pushed to the ClearRoad Platform using the <a href="#api-reference-post">post</a> method. To validate the data format, we are using the <a href="https://github.com/epoberezkin/ajv">ajv library</a>.</p>
@@ -485,22 +493,10 @@ $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.j
 <div class="full-column"></div>
 
 <blockquote>
-<p>Check the state of a particular message:</p>
-</blockquote>
-<pre class="highlight javascript tab-javascript"><code><span class="c1">// posting a message returns the reference of the message</span>
-<span class="kr">const</span> <span class="nx">reference</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
-  <span class="p">...</span>
-<span class="p">});</span>
-<span class="c1">// use reference in search as "source_reference"</span>
-<span class="kr">const</span> <span class="nx">state</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">state</span><span class="p">(</span><span class="nx">reference</span><span class="p">);</span>
-</code></pre>
-<div class="full-column"></div>
-
-<blockquote>
 <p>Retrieve the <code>Road Account</code> associated with a <code>Road Account Message</code>:</p>
 </blockquote>
 <pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">reference</span> <span class="o">=</span> <span class="s1">'my-account-reference'</span><span class="p">;</span>
-<span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
+<span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span>
   <span class="na">portal_type</span><span class="p">:</span> <span class="s1">'Road Account Message'</span><span class="p">,</span>
   <span class="na">account_reference</span><span class="p">:</span> <span class="nx">reference</span><span class="p">,</span>
   <span class="p">...</span>
@@ -521,42 +517,56 @@ $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.j
 <table><thead>
 <tr>
 <th>Property</th>
+<th>Type</th>
 <th>Description</th>
 <th>Required</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>url</td>
+<td><code>string</code></td>
 <td>Url of the storage</td>
 <td></td>
 </tr>
 <tr>
 <td>accessToken</td>
+<td><code>string</code></td>
 <td>Access token to authenticate on the ClearRoad API (if necessary)</td>
 <td>No</td>
 </tr>
 <tr>
 <td>options.localStorage.type</td>
+<td><code>string</code></td>
 <td>View <a href="#api-reference-local-storage-types">types</a> below</td>
 <td>Yes</td>
 </tr>
 <tr>
 <td>options.localStorage.accessToken</td>
-<td>Access token (if required)</td>
+<td><code>string</code></td>
+<td>Access token of the storage (if required)</td>
 <td>No</td>
 </tr>
 <tr>
 <td>options.database</td>
+<td><code>string</code></td>
 <td>Name of the database when the objects will be stored</td>
 <td>No</td>
 </tr>
 <tr>
 <td>options.useQueryStorage</td>
+<td><code>boolean</code></td>
 <td>Use if the localStorage does not support query</td>
 <td>No</td>
 </tr>
 <tr>
+<td>options.minDate</td>
+<td><code>string&#124;number&#124;Date</code></td>
+<td>Messages updated before this date will not be synchronized. If not set, all messages will be synchronized. Improves speed of synchronisation for big sets</td>
+<td>No</td>
+</tr>
+<tr>
 <td>options.debug</td>
+<td><code>boolean</code></td>
 <td>Log to console replication steps between local and remote storage</td>
 <td>No</td>
 </tr>
@@ -566,7 +576,7 @@ $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.j
 
 <table><thead>
 <tr>
-<th>Type</th>
+<th>Value</th>
 <th>Description</th>
 <th>Options</th>
 <th>Support</th>
@@ -576,21 +586,21 @@ $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.j
 <tr>
 <td>indexeddb</td>
 <td>Native Browser IndexedDB storage</td>
-<td>type: string</td>
+<td><code>{type: &#39;indexeddb&#39;}</code></td>
 <td>Browser only</td>
 <td>No</td>
 </tr>
 <tr>
 <td>dropbox</td>
 <td>Storage data in a dropbox account</td>
-<td>type: string, accessToken: string</td>
+<td><code>{type: &#39;dropbox&#39;, accessToken: string}</code></td>
 <td>Browser and Node</td>
 <td>Yes</td>
 </tr>
 <tr>
 <td>gdrive</td>
 <td>Storage data in a google drive account</td>
-<td>type: string, accessToken: string</td>
+<td><code>{type: &#39;gdrive&#39;, accessToken: string}</code></td>
 <td>Browser and Node</td>
 <td>Yes</td>
 </tr>
@@ -618,24 +628,26 @@ $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.j
   <span class="p">})</span>
 <span class="p">});</span>
 </code></pre>
-<p><code>post(data)</code></p>
+<p><code>post(data): Promise&lt;string&gt;</code></p>
 
 <p>Posts data in your local storage and return the <code>reference</code> of the new document. Then use the <a href="#api-reference-sync">sync method</a> to synchronize the data with the ClearRoad API.</p>
 
 <table><thead>
 <tr>
 <th>Property</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>data</td>
+<td><code>Object</code></td>
 <td>Data to post. Each <code>value</code> paired with a <code>key</code> must be a <code>string</code>.</td>
 </tr>
 </tbody></table>
 <h2 id='api-reference-sync'>sync</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">sync</span><span class="p">();</span>
 </code></pre>
-<p><code>sync()</code></p>
+<p><code>sync(): Promise&lt;void&gt;</code></p>
 
 <p>Synchronizes the local storage with the ClearRoad Platform (will make sure both storage contain the same data).</p>
 <h2 id='api-reference-alldocs'>allDocs</h2>
@@ -693,35 +705,68 @@ $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.j
   <span class="p">},</span> <span class="p">...]</span>
 <span class="p">}</span>
 </code></pre>
-<p><code>allDocs({query, limit, sort_on, select_list, include_docs})</code></p>
+<p><code>allDocs({query, limit, sort_on, select_list, include_docs}): Promise&lt;IJioQueryResults&gt;</code></p>
 
 <p>Retrieve a list of documents.</p>
 
 <table><thead>
 <tr>
 <th>Property</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>query</td>
+<td><code>string</code></td>
 <td>Refer to the <a href="https://jio.nexedi.com/">jIO documentation</a> in the <strong>jIO Query Engine</strong> section for details</td>
 </tr>
 <tr>
 <td>limit (optional)</td>
+<td><code>[number, number]</code></td>
 <td>Limit the results. Leave empty for no limit, or <code>[min, max]</code> for paging</td>
 </tr>
 <tr>
 <td>sort_on (optional)</td>
+<td><code>[[string, &#39;ascending&#39;&#124;&#39;descending&#39;]]</code></td>
 <td>List of fields to sort on, each specifying the order with <code>ascending</code>/<code>descending</code></td>
 </tr>
 <tr>
 <td>select_list</td>
+<td><code>string[]</code></td>
 <td>When provided, the response has a <code>value</code> containing the values of these keys for each document</td>
 </tr>
 <tr>
 <td>include_docs</td>
+<td><code>boolean</code></td>
 <td>When <code>true</code>, the response has a <code>doc</code> containing the full metadata for each document</td>
+</tr>
+</tbody></table>
+<h2 id='api-reference-querybystate'>queryByState</h2><pre class="highlight javascript tab-javascript--browser"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">queryByState</span><span class="p">(</span><span class="s1">'rejected'</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// rejected messages</span>
+<span class="p">});</span>
+</code></pre><pre class="highlight javascript tab-javascript--browser-es6"><code><span class="kr">const</span> <span class="nx">results</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">queryByState</span><span class="p">(</span><span class="s1">'rejected'</span><span class="p">);</span>
+<span class="c1">// rejected messages</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">results</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript tab-javascript--node"><code><span class="kr">const</span> <span class="nx">results</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">queryByState</span><span class="p">(</span><span class="s1">'rejected'</span><span class="p">);</span>
+<span class="c1">// rejected messages</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">results</span><span class="p">);</span>
+</code></pre>
+<p><code>queryByState(state): Promise&lt;IJioQueryResults&gt;</code></p>
+
+<p>Retrieve the messages in a certain &quot;processing&quot; state. By default, when a message is not yet synchronized or processed, the state is <code>not_processed</code>.</p>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>state</td>
+<td><a href="#api-reference-validationstates">ValidationStates</a></td>
+<td>State of the message</td>
 </tr>
 </tbody></table>
 <h2 id='api-reference-state'>state</h2><pre class="highlight javascript tab-javascript--browser"><code><span class="nx">cr</span><span class="p">.</span><span class="nx">post</span><span class="p">({...})</span>
@@ -748,7 +793,7 @@ $ ajv validate -s node_modules/@clearroad/api/definitions/road-account-message.j
 <span class="kr">const</span> <span class="nx">state</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">state</span><span class="p">(</span><span class="nx">reference</span><span class="p">);</span>
 <span class="c1">// state = 'processed'</span>
 </code></pre>
-<p><code>state(reference)</code></p>
+<p><code>state(reference): Promise&lt;ValidationStates&gt;</code></p>
 
 <p>Check for the processing state of the message.
 Allow some time after <a href="#api-reference-sync">synchronizing</a> before checking for the state.</p>
@@ -756,11 +801,13 @@ Allow some time after <a href="#api-reference-sync">synchronizing</a> before che
 <table><thead>
 <tr>
 <th>Property</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>reference</td>
+<td><code>string</code></td>
 <td>Reference of the message</td>
 </tr>
 </tbody></table>
@@ -770,18 +817,20 @@ Allow some time after <a href="#api-reference-sync">synchronizing</a> before che
 </code></pre><pre class="highlight javascript tab-javascript--browser-es6"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="s1">'reference'</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript tab-javascript--node"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReport</span><span class="p">(</span><span class="s1">'reference'</span><span class="p">);</span>
 </code></pre>
-<p><code>getReport(reference)</code></p>
+<p><code>getReport(reference): Promise&lt;Object&gt;</code></p>
 
 <p>Retrieve <a href="https://api.clearroadlab.io/docs/#requesting-a-report">the report</a> with the given report <code>reference</code>. If you only have the <code>reference</code> of the report request, please use <a href="#api-reference-getreportfromrequest">getReportFromRequest</a> instead.</p>
 
 <table><thead>
 <tr>
 <th>Property</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>reference</td>
+<td><code>string</code></td>
 <td>Reference of the report</td>
 </tr>
 </tbody></table>
@@ -791,17 +840,87 @@ Allow some time after <a href="#api-reference-sync">synchronizing</a> before che
 </code></pre><pre class="highlight javascript tab-javascript--browser-es6"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReportFromRequest</span><span class="p">(</span><span class="s1">'reference'</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript tab-javascript--node"><code><span class="kr">const</span> <span class="nx">report</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">cr</span><span class="p">.</span><span class="nx">getReportFromRequest</span><span class="p">(</span><span class="s1">'reference'</span><span class="p">);</span>
 </code></pre>
-<p><code>getReportFromRequest(reference)</code></p>
+<p><code>getReportFromRequest(reference): Promise&lt;Object&gt;</code></p>
 
 <table><thead>
 <tr>
 <th>Property</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>reference</td>
+<td><code>string</code></td>
 <td>Reference of the report request</td>
+</tr>
+</tbody></table>
+<h2 id='api-reference-portaltypes'>PortalTypes</h2>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>BillingPeriodMessage</td>
+<td><code>Billing Period Message</code></td>
+</tr>
+<tr>
+<td>File</td>
+<td><code>File</code></td>
+</tr>
+<tr>
+<td>RoadAccount</td>
+<td><code>Road Account</code></td>
+</tr>
+<tr>
+<td>RoadAccountMessage</td>
+<td><code>Road Account Message</code></td>
+</tr>
+<tr>
+<td>RoadEvent</td>
+<td><code>Road Event</code></td>
+</tr>
+<tr>
+<td>RoadEventMessage</td>
+<td><code>Road Event Message</code></td>
+</tr>
+<tr>
+<td>RoadMessage</td>
+<td><code>Road Message</code></td>
+</tr>
+<tr>
+<td>RoadReportRequest</td>
+<td><code>Road Report Request</code></td>
+</tr>
+<tr>
+<td>RoadTransaction</td>
+<td><code>Road Transaction</code></td>
+</tr>
+</tbody></table>
+<h2 id='api-reference-validationstates'>ValidationStates</h2>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Processed</td>
+<td><code>processed</code></td>
+</tr>
+<tr>
+<td>Rejected</td>
+<td><code>rejected</code></td>
+</tr>
+<tr>
+<td>Submitted</td>
+<td><code>submitted</code></td>
+</tr>
+<tr>
+<td>Unprocessed</td>
+<td><code>not_processed</code></td>
 </tr>
 </tbody></table>
 
