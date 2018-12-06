@@ -75,6 +75,9 @@ export enum GroupingReferences {
 
 export const querySourceReference = 'source_reference';
 export const queryDestinationReference = 'destination_reference';
+const queryModificationDate = 'modification_date';
+
+const maxSyncObjects = 1234567890;
 
 /**
  * ClearRoad will create 4 storages during synchronization, reprensented each by a name.
@@ -108,6 +111,10 @@ export interface IClearRoadOptions {
    * ```
    */
   minDate?: Date|number|string;
+  /**
+   * How many objects can be synchronized at a time.
+   */
+  maxSyncObjects?: number;
   /**
    * Force using a query storage around the localStorage.
    * Needed if the storage can not query data directly. See information on the storage.
@@ -310,7 +317,7 @@ export class ClearRoad {
     // only retrieve the data since xxx
     if (this.options.minDate) {
       const from = new Date(this.options.minDate);
-      return `modification_date: >= "${from.toJSON()}"`;
+      return `${queryModificationDate}: >= "${from.toJSON()}"`;
     }
     return '';
   }
@@ -421,8 +428,8 @@ export class ClearRoad {
       signature_sub_storage: signatureStorage,
       query: {
         query,
-        sort_on: [['modification_date', 'descending']],
-        limit: [0, 1234567890]
+        sort_on: [[queryModificationDate, 'descending']],
+        limit: [0, this.options.maxSyncObjects || maxSyncObjects]
       },
       check_local_modification: false, // we only create new message
       check_local_creation: true,
@@ -468,8 +475,8 @@ export class ClearRoad {
       signature_sub_storage: signatureStorage,
       query: {
         query,
-        sort_on: [['modification_date', 'descending']],
-        limit: [0, 1234567890]
+        sort_on: [[queryModificationDate, 'descending']],
+        limit: [0, this.options.maxSyncObjects || maxSyncObjects]
       },
       check_local_modification: false, // local modification will always be erased
       check_local_creation: false,
@@ -515,8 +522,8 @@ export class ClearRoad {
       signature_sub_storage: signatureStorage,
       query: {
         query,
-        sort_on: [['modification_date', 'descending']],
-        limit: [0, 200]
+        sort_on: [[queryModificationDate, 'descending']],
+        limit: [0, this.options.maxSyncObjects || maxSyncObjects]
       },
       check_local_modification: false, // local modification will always be erased
       check_local_creation: false,
@@ -575,8 +582,8 @@ export class ClearRoad {
       }),
       query: {
         query,
-        sort_on: [['modification_date', 'descending']],
-        limit: [0, 1234567890]
+        sort_on: [[queryModificationDate, 'descending']],
+        limit: [0, this.options.maxSyncObjects || maxSyncObjects]
       },
       check_local_modification: false, // local modification will always be erased
       check_local_creation: false,

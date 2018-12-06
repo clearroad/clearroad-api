@@ -65,6 +65,8 @@ export var GroupingReferences;
 })(GroupingReferences || (GroupingReferences = {}));
 export const querySourceReference = 'source_reference';
 export const queryDestinationReference = 'destination_reference';
+const queryModificationDate = 'modification_date';
+const maxSyncObjects = 1234567890;
 const jsonIdRec = (keyValueSpace, key, value, deep = 0) => {
     let res;
     if (value && typeof value.toJSON === 'function') {
@@ -167,7 +169,7 @@ export class ClearRoad {
         // only retrieve the data since xxx
         if (this.options.minDate) {
             const from = new Date(this.options.minDate);
-            return `modification_date: >= "${from.toJSON()}"`;
+            return `${queryModificationDate}: >= "${from.toJSON()}"`;
         }
         return '';
     }
@@ -272,8 +274,8 @@ export class ClearRoad {
             signature_sub_storage: signatureStorage,
             query: {
                 query,
-                sort_on: [['modification_date', 'descending']],
-                limit: [0, 1234567890]
+                sort_on: [[queryModificationDate, 'descending']],
+                limit: [0, this.options.maxSyncObjects || maxSyncObjects]
             },
             check_local_modification: false,
             check_local_creation: true,
@@ -317,8 +319,8 @@ export class ClearRoad {
             signature_sub_storage: signatureStorage,
             query: {
                 query,
-                sort_on: [['modification_date', 'descending']],
-                limit: [0, 1234567890]
+                sort_on: [[queryModificationDate, 'descending']],
+                limit: [0, this.options.maxSyncObjects || maxSyncObjects]
             },
             check_local_modification: false,
             check_local_creation: false,
@@ -362,8 +364,8 @@ export class ClearRoad {
             signature_sub_storage: signatureStorage,
             query: {
                 query,
-                sort_on: [['modification_date', 'descending']],
-                limit: [0, 200]
+                sort_on: [[queryModificationDate, 'descending']],
+                limit: [0, this.options.maxSyncObjects || maxSyncObjects]
             },
             check_local_modification: false,
             check_local_creation: false,
@@ -419,8 +421,8 @@ export class ClearRoad {
             }),
             query: {
                 query,
-                sort_on: [['modification_date', 'descending']],
-                limit: [0, 1234567890]
+                sort_on: [[queryModificationDate, 'descending']],
+                limit: [0, this.options.maxSyncObjects || maxSyncObjects]
             },
             check_local_modification: false,
             check_local_creation: false,

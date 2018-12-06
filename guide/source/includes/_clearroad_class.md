@@ -21,6 +21,7 @@ options.localStorage.accessToken | `string` | Access token of the storage (if re
 options.database | `string` | Name of the database when the objects will be stored | No
 options.useQueryStorage | `boolean` | Use if the localStorage does not support query | No
 options.minDate | <code>string&#124;number&#124;Date</code> | Messages updated before this date will not be synchronized. If not set, all messages will be synchronized. Improves speed of synchronisation for big sets | No
+options.maxSyncObjects | `number` | Maximum number of objects that will be sycnrhonized from the ClearRoad platform to the local storage. Default is `1234567890` | No
 options.debug | `boolean` | Log to console replication steps between local and remote storage | No
 
 ### Local Storage Types

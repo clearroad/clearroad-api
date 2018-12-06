@@ -72,6 +72,10 @@ export interface IClearRoadOptions {
      */
     minDate?: Date | number | string;
     /**
+     * How many objects can be synchronized at a time.
+     */
+    maxSyncObjects?: number;
+    /**
      * Force using a query storage around the localStorage.
      * Needed if the storage can not query data directly. See information on the storage.
      */

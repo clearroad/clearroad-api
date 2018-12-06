@@ -67,6 +67,8 @@ var GroupingReferences;
 })(GroupingReferences = exports.GroupingReferences || (exports.GroupingReferences = {}));
 exports.querySourceReference = 'source_reference';
 exports.queryDestinationReference = 'destination_reference';
+var queryModificationDate = 'modification_date';
+var maxSyncObjects = 1234567890;
 var jsonIdRec = function (keyValueSpace, key, value, deep) {
     if (deep === void 0) { deep = 0; }
     var res;
@@ -174,7 +176,7 @@ var ClearRoad = /** @class */ (function () {
         // only retrieve the data since xxx
         if (this.options.minDate) {
             var from = new Date(this.options.minDate);
-            return "modification_date: >= \"" + from.toJSON() + "\"";
+            return queryModificationDate + ": >= \"" + from.toJSON() + "\"";
         }
         return '';
     };
@@ -280,8 +282,8 @@ var ClearRoad = /** @class */ (function () {
             signature_sub_storage: signatureStorage,
             query: {
                 query: query,
-                sort_on: [['modification_date', 'descending']],
-                limit: [0, 1234567890]
+                sort_on: [[queryModificationDate, 'descending']],
+                limit: [0, this.options.maxSyncObjects || maxSyncObjects]
             },
             check_local_modification: false,
             check_local_creation: true,
@@ -325,8 +327,8 @@ var ClearRoad = /** @class */ (function () {
             signature_sub_storage: signatureStorage,
             query: {
                 query: query,
-                sort_on: [['modification_date', 'descending']],
-                limit: [0, 1234567890]
+                sort_on: [[queryModificationDate, 'descending']],
+                limit: [0, this.options.maxSyncObjects || maxSyncObjects]
             },
             check_local_modification: false,
             check_local_creation: false,
@@ -370,8 +372,8 @@ var ClearRoad = /** @class */ (function () {
             signature_sub_storage: signatureStorage,
             query: {
                 query: query,
-                sort_on: [['modification_date', 'descending']],
-                limit: [0, 200]
+                sort_on: [[queryModificationDate, 'descending']],
+                limit: [0, this.options.maxSyncObjects || maxSyncObjects]
             },
             check_local_modification: false,
             check_local_creation: false,
@@ -428,8 +430,8 @@ var ClearRoad = /** @class */ (function () {
             }),
             query: {
                 query: query,
-                sort_on: [['modification_date', 'descending']],
-                limit: [0, 1234567890]
+                sort_on: [[queryModificationDate, 'descending']],
+                limit: [0, this.options.maxSyncObjects || maxSyncObjects]
             },
             check_local_modification: false,
             check_local_creation: false,
