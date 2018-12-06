@@ -149,6 +149,11 @@ export interface IPostRoadMessage extends IPostData {
     };
 }
 export declare type postData = IPostRoadAccountMessage | IPostBillingPeriodMessage | IPostRoadReportRequest | IPostRoadEventMessage | IPostRoadMessage;
+/**
+ * Datetime in the ClearRoad format.
+ * @param date Date to format
+ */
+export declare const dateToISO: (date: Date) => string;
 export declare class ClearRoad {
     private url;
     private accessToken?;

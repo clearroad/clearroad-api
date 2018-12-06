@@ -261,6 +261,12 @@ const joinQueries = (queries: string[], joinType = 'AND') => queries.filter(quer
 
 const maxLogLevel = 1000;
 
+/**
+ * Datetime in the ClearRoad format.
+ * @param date Date to format
+ */
+export const dateToISO = (date: Date) => `${date.toISOString().split('.')[0]}Z`;
+
 export class ClearRoad {
   private databaseName: string;
   private localStorageType: string;

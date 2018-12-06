@@ -132,6 +132,11 @@ var joinQueries = function (queries, joinType) {
     return queries.filter(function (query) { return !!query; }).join(" " + joinType + " ");
 };
 var maxLogLevel = 1000;
+/**
+ * Datetime in the ClearRoad format.
+ * @param date Date to format
+ */
+exports.dateToISO = function (date) { return date.toISOString().split('.')[0] + "Z"; };
 var ClearRoad = /** @class */ (function () {
     /**
      * Instantiate a ClearRoad api instance.

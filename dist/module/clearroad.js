@@ -126,6 +126,11 @@ const merge = (obj1, obj2) => {
 };
 const joinQueries = (queries, joinType = 'AND') => queries.filter(query => !!query).join(` ${joinType} `);
 const maxLogLevel = 1000;
+/**
+ * Datetime in the ClearRoad format.
+ * @param date Date to format
+ */
+export const dateToISO = (date) => `${date.toISOString().split('.')[0]}Z`;
 export class ClearRoad {
     /**
      * Instantiate a ClearRoad api instance.

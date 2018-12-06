@@ -86,7 +86,6 @@ var json = {
         obu_reference: {
             type: 'string',
             description: 'An object for this on board unit will be created in the ClearRoad platform if it is nor already present.',
-            pattern: '^[0-9a-z]{24}$',
             examples: [
                 '977298026d50a5b1795c6563'
             ]
@@ -94,7 +93,6 @@ var json = {
         vehicle_reference: {
             type: 'string',
             description: 'An onject for this vehicle will be created in the ClearRoad Platform if it is not already present.',
-            pattern: '^[0-9A-Z]{17}$',
             examples: [
                 '2C1MR2295T6789740'
             ]

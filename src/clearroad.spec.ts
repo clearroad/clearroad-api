@@ -2,7 +2,9 @@
 import * as jioImport from 'jio';
 import {
   ClearRoad, PortalTypes,
-  IPostBillingPeriodMessage, IPostRoadMessage, IPostRoadReportRequest, IPostRoadAccountMessage, IPostRoadEventMessage, ValidationStates
+  IPostBillingPeriodMessage, IPostRoadMessage, IPostRoadReportRequest, IPostRoadAccountMessage, IPostRoadEventMessage,
+  ValidationStates,
+  dateToISO
 } from './clearroad';
 import * as definitions from './definitions';
 import { getQueue } from './queue';
@@ -16,6 +18,13 @@ class FakeJio {
   getAttachment() {}
   allAttachments() {}
 }
+
+describe('dateToISO', () => {
+  it('should remove the milliseconds of ISO date', () => {
+    const date = new Date(2018, 0, 1, 0, 0, 0);
+    expect(dateToISO(date)).toEqual('2018-01-01T00:00:00Z');
+  });
+});
 
 describe('ClearRoad', () => {
   beforeEach(() => {
