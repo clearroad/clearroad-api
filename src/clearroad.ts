@@ -2,8 +2,8 @@ const Rusha = require('rusha');
 const jIO = require('jio').jIO;
 const { all } = require('rsvp');
 
-import { portalType } from './message-types';
-import { validateDefinition } from './definitions/index';
+import { validateDefinition, PortalTypes } from './definitions/index';
+import { postData } from './definitions/interfaces';
 import { IQueue, getQueue } from './queue';
 import {
   IJioProxyStorage, IJioQueryOptions, IJioQueryResults,
@@ -14,21 +14,6 @@ import {
  * Query key for `PortalTypes`
  */
 export const queryPortalType = 'portal_type';
-
-/**
- * Each message is represented by a "portal_type" (or message category)
- */
-export enum PortalTypes {
-  BillingPeriodMessage = 'Billing Period Message',
-  File = 'File',
-  RoadAccount = 'Road Account',
-  RoadAccountMessage = 'Road Account Message',
-  RoadEvent = 'Road Event',
-  RoadEventMessage = 'Road Event Message',
-  RoadMessage = 'Road Message',
-  RoadReportRequest = 'Road Report Request',
-  RoadTransaction = 'Road Transaction'
-}
 
 const queryPortalTypes = [
   `"${PortalTypes.BillingPeriodMessage}"`,
@@ -129,72 +114,6 @@ export interface IClearRoadOptions {
 export interface IAttachmentOptions {
   format: 'text' | 'json' | 'blob' | 'data_url' | 'array_buffer';
 }
-
-export interface IPostData {
-  [queryPortalType]: portalType;
-}
-export interface IPostRoadAccountMessage extends IPostData {
-  [queryPortalType]: PortalTypes.RoadAccountMessage;
-  account_manager: string;
-  data_collector: string;
-  condition: string;
-  cert_id: string;
-  account_reference: string;
-  effective_date: string;
-  expiration_date?: string;
-  fuel_consumption: string;
-  fuel_taxable: string;
-  obu_reference?: string;
-  vehicle_reference: string;
-  product_line: string;
-}
-export interface IPostBillingPeriodMessage extends IPostData {
-  [queryPortalType]: PortalTypes.BillingPeriodMessage;
-  reference: string;
-  start_date: string;
-  stop_date: string;
-}
-export interface IPostRoadReportRequest extends IPostData {
-  [queryPortalType]: PortalTypes.RoadReportRequest;
-  report_type: string;
-  billing_period_reference: string;
-  request_date: string;
-  request?: string;
-}
-export interface IPostRoadEventMessage extends IPostData {
-  [queryPortalType]: PortalTypes.RoadEventMessage;
-  request: {
-    vehicle_reference: string;
-    obu_reference: string;
-    event_details: Array<{
-      type: number;
-      date: string;
-    }>;
-  };
-}
-export interface IPostRoadMessage extends IPostData {
-  [queryPortalType]: PortalTypes.RoadMessage;
-  request: {
-    description: string;
-    vehicle_reference: string;
-    obu_reference: string;
-    type: string;
-    transaction_date: string;
-    mileage_details: Array<{
-      fuel_price?: number;
-      fuel_quantity: number;
-      miles_price?: number;
-      miles_quantity: number;
-      rule_id: number;
-      sub_rule_id: number;
-    }>;
-  };
-}
-export type postData = IPostRoadAccountMessage |
-  IPostBillingPeriodMessage |
-  IPostRoadReportRequest |
-  IPostRoadEventMessage |
-  IPostRoadMessage;
 
 const jsonIdRec = (keyValueSpace: string, key: string | number, value: any, deep = 0) => {
   let res;

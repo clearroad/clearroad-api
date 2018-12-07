@@ -13,7 +13,6 @@ var json = {
     },
     $schema: 'http://json-schema.org/draft-07/schema#',
     required: [
-        'account_manager',
         'data_collector',
         'condition',
         'cert_id',
@@ -28,7 +27,7 @@ var json = {
     properties: {
         account_manager: {
             type: 'string',
-            description: 'The reference should be of an account manager that already exists in ClearRoad Platform.',
+            description: 'The reference of an account manager that already exists in ClearRoad Platform.',
             examples: [
                 'testamref'
             ]

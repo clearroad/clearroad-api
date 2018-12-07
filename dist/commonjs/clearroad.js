@@ -10,27 +10,12 @@ var storage_1 = require("./storage");
  * Query key for `PortalTypes`
  */
 exports.queryPortalType = 'portal_type';
-/**
- * Each message is represented by a "portal_type" (or message category)
- */
-var PortalTypes;
-(function (PortalTypes) {
-    PortalTypes["BillingPeriodMessage"] = "Billing Period Message";
-    PortalTypes["File"] = "File";
-    PortalTypes["RoadAccount"] = "Road Account";
-    PortalTypes["RoadAccountMessage"] = "Road Account Message";
-    PortalTypes["RoadEvent"] = "Road Event";
-    PortalTypes["RoadEventMessage"] = "Road Event Message";
-    PortalTypes["RoadMessage"] = "Road Message";
-    PortalTypes["RoadReportRequest"] = "Road Report Request";
-    PortalTypes["RoadTransaction"] = "Road Transaction";
-})(PortalTypes = exports.PortalTypes || (exports.PortalTypes = {}));
 var queryPortalTypes = [
-    "\"" + PortalTypes.BillingPeriodMessage + "\"",
-    "\"" + PortalTypes.RoadAccountMessage + "\"",
-    "\"" + PortalTypes.RoadEventMessage + "\"",
-    "\"" + PortalTypes.RoadMessage + "\"",
-    "\"" + PortalTypes.RoadReportRequest + "\""
+    "\"" + index_1.PortalTypes.BillingPeriodMessage + "\"",
+    "\"" + index_1.PortalTypes.RoadAccountMessage + "\"",
+    "\"" + index_1.PortalTypes.RoadEventMessage + "\"",
+    "\"" + index_1.PortalTypes.RoadMessage + "\"",
+    "\"" + index_1.PortalTypes.RoadReportRequest + "\""
 ].join(' OR ');
 /**
  * When a message is processed by the ClearRoad platform, it will create a new message with a validation state.
@@ -360,9 +345,9 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.initDirectoryStorage = function () {
         var refKey = exports.querySourceReference;
         var query = joinQueries([exports.queryPortalType + ": (" + [
-                "\"" + PortalTypes.RoadAccount + "\"",
-                "\"" + PortalTypes.RoadEvent + "\"",
-                "\"" + PortalTypes.RoadTransaction + "\""
+                "\"" + index_1.PortalTypes.RoadAccount + "\"",
+                "\"" + index_1.PortalTypes.RoadEvent + "\"",
+                "\"" + index_1.PortalTypes.RoadTransaction + "\""
             ].join(' OR ') + ")", this.queryMinDate()]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-directory-signatures");
         var localStorage = this.localSubStorage(refKey);
@@ -406,7 +391,7 @@ var ClearRoad = /** @class */ (function () {
         var _a, _b, _c, _d;
         var refKey = 'reference';
         var query = joinQueries([
-            exports.queryPortalType + ": (\"" + PortalTypes.File + "\")",
+            exports.queryPortalType + ": (\"" + index_1.PortalTypes.File + "\")",
             this.queryMinDate()
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-files-signatures");
@@ -488,19 +473,19 @@ var ClearRoad = /** @class */ (function () {
         index_1.validateDefinition(data[exports.queryPortalType], data);
         var options = merge({}, data);
         switch (data[exports.queryPortalType]) {
-            case PortalTypes.RoadAccountMessage:
+            case index_1.PortalTypes.RoadAccountMessage:
                 options.parent_relative_url = 'road_account_message_module';
                 break;
-            case PortalTypes.RoadEventMessage:
+            case index_1.PortalTypes.RoadEventMessage:
                 options.parent_relative_url = 'road_event_message_module';
                 break;
-            case PortalTypes.RoadMessage:
+            case index_1.PortalTypes.RoadMessage:
                 options.parent_relative_url = 'road_message_module';
                 break;
-            case PortalTypes.BillingPeriodMessage:
+            case index_1.PortalTypes.BillingPeriodMessage:
                 options.parent_relative_url = 'billing_period_message_module';
                 break;
-            case PortalTypes.RoadReportRequest:
+            case index_1.PortalTypes.RoadReportRequest:
                 options.parent_relative_url = 'road_report_request_module';
                 break;
         }
@@ -630,7 +615,7 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.getReportFromRequest = function (sourceReference) {
         var _this = this;
         return this.allDocs({
-            query: exports.queryPortalType + ": \"" + PortalTypes.File + "\" AND " + exports.querySourceReference + ": \"" + sourceReference + "\"",
+            query: exports.queryPortalType + ": \"" + index_1.PortalTypes.File + "\" AND " + exports.querySourceReference + ": \"" + sourceReference + "\"",
             select_list: ['reference']
         }).push(function (result) {
             var report = result.data.rows[0];

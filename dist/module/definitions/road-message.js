@@ -36,7 +36,6 @@ const json = {
                 vehicle_reference: {
                     description: 'The Vehicle Identification Number of the vehicle for which the message is reported.',
                     type: 'string',
-                    pattern: '^[0-9A-Z]{17}$',
                     examples: [
                         '1GTG6BE38F1262119'
                     ]
@@ -44,7 +43,6 @@ const json = {
                 obu_reference: {
                     type: 'string',
                     description: 'The On Board Unit reference of the device for which the message is reported',
-                    pattern: '^[0-9a-z]{24}$',
                     examples: [
                         '977298026d50a5b1795c6563'
                     ]

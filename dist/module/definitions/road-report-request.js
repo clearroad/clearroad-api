@@ -5,7 +5,7 @@ const json = {
             pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}T ?[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{4})?$',
             type: 'string',
             examples: [
-                '2018-04-01T00:00:00Z'
+                '2017-07-18T00:00:00Z'
             ]
         }
     },
@@ -40,7 +40,10 @@ const json = {
         },
         request: {
             type: 'string',
-            description: 'Used to give specific parameters to report if needed. This filed could be left empty for an AccountBalance report.'
+            description: 'Used to give specific parameters to report if needed. This filed could be left empty for an AccountBalance report.',
+            examples: [
+                ''
+            ]
         },
         portal_type: {
             type: 'string',

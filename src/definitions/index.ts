@@ -48,6 +48,25 @@ export interface IDefinition extends IDefinitionObject {
   $schema: string;
 }
 
+/**
+ * Each message is represented by a "portal_type" (or message category)
+ */
+export enum PortalTypes {
+  BillingPeriodMessage = 'Billing Period Message',
+  File = 'File',
+  RoadAccount = 'Road Account',
+  RoadAccountMessage = 'Road Account Message',
+  RoadEvent = 'Road Event',
+  RoadEventMessage = 'Road Event Message',
+  RoadMessage = 'Road Message',
+  RoadReportRequest = 'Road Report Request',
+  RoadTransaction = 'Road Transaction'
+}
+
+export interface IPostData {
+  portal_type: portalType;
+}
+
 import { definitions } from './definitions';
 
 export const validateDefinition = (type: portalType, data: any) => {

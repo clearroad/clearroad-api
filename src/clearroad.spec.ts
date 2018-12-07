@@ -1,11 +1,8 @@
 /* tslint:disable: no-console */
 import * as jioImport from 'jio';
-import {
-  ClearRoad, PortalTypes,
-  IPostBillingPeriodMessage, IPostRoadMessage, IPostRoadReportRequest, IPostRoadAccountMessage, IPostRoadEventMessage,
-  ValidationStates,
-  dateToISO
-} from './clearroad';
+import { ClearRoad, ValidationStates, dateToISO } from './clearroad';
+import { postData } from './definitions/interfaces';
+import { PortalTypes } from './definitions';
 import * as definitions from './definitions';
 import { getQueue } from './queue';
 
@@ -260,7 +257,7 @@ describe('ClearRoad', () => {
 
     describe(PortalTypes.RoadAccountMessage, () => {
       it('should put a message', async () => {
-        const options: IPostRoadAccountMessage = {
+        const options: postData = {
           portal_type: PortalTypes.RoadAccountMessage,
           account_manager: 'testamref',
           data_collector: 'testmpref',
@@ -282,7 +279,7 @@ describe('ClearRoad', () => {
 
     describe(PortalTypes.RoadEventMessage, () => {
       it('should put a message', async () => {
-        const options: IPostRoadEventMessage = {
+        const options: postData = {
           portal_type: PortalTypes.RoadEventMessage,
           request: {
             vehicle_reference: '1GTG6BE38F1262119',
@@ -305,7 +302,7 @@ describe('ClearRoad', () => {
 
     describe(PortalTypes.RoadMessage, () => {
       it('should put a message', async () => {
-        const options: IPostRoadMessage = {
+        const options: postData = {
           portal_type: PortalTypes.RoadMessage,
           request: {
             description: 'Mileage data',
@@ -337,7 +334,7 @@ describe('ClearRoad', () => {
 
     describe(PortalTypes.BillingPeriodMessage, () => {
       it('should put a message', async () => {
-        const options: IPostBillingPeriodMessage = {
+        const options: postData = {
           portal_type: PortalTypes.BillingPeriodMessage,
           reference: '2018Q1',
           start_date: '2018-01-01T00:00:00Z',
@@ -351,7 +348,7 @@ describe('ClearRoad', () => {
 
     describe(PortalTypes.RoadReportRequest, () => {
       it('should put a message', async () => {
-        const options: IPostRoadReportRequest = {
+        const options: postData = {
           portal_type: PortalTypes.RoadReportRequest,
           report_type: 'AccountBalance',
           billing_period_reference: '2018Q1',
