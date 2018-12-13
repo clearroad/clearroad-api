@@ -1,4 +1,5 @@
-import { IDefinition, PortalTypes, IPostData } from './index';
+import { IDefinition, IPostData } from './index';
+import { PortalTypes } from '../message-types';
 const json: IDefinition = {
   type: 'object',
   definitions: {

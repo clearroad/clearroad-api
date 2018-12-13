@@ -2,7 +2,7 @@
 import * as jioImport from 'jio';
 import { ClearRoad, ValidationStates, dateToISO } from './clearroad';
 import { postData } from './definitions/interfaces';
-import { PortalTypes } from './definitions';
+import { PortalTypes } from './message-types';
 import * as definitions from './definitions';
 import { getQueue } from './queue';
 

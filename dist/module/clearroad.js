@@ -1,7 +1,8 @@
 const Rusha = require('rusha');
 const jIO = require('jio').jIO;
 const { all } = require('rsvp');
-import { validateDefinition, PortalTypes } from './definitions/index';
+import { validateDefinition } from './definitions/index';
+import { PortalTypes } from './message-types';
 import { getQueue } from './queue';
 import { defaultAttachmentName } from './storage';
 /**

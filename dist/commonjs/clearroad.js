@@ -4,6 +4,7 @@ var Rusha = require('rusha');
 var jIO = require('jio').jIO;
 var all = require('rsvp').all;
 var index_1 = require("./definitions/index");
+var message_types_1 = require("./message-types");
 var queue_1 = require("./queue");
 var storage_1 = require("./storage");
 /**
@@ -11,11 +12,11 @@ var storage_1 = require("./storage");
  */
 exports.queryPortalType = 'portal_type';
 var queryPortalTypes = [
-    "\"" + index_1.PortalTypes.BillingPeriodMessage + "\"",
-    "\"" + index_1.PortalTypes.RoadAccountMessage + "\"",
-    "\"" + index_1.PortalTypes.RoadEventMessage + "\"",
-    "\"" + index_1.PortalTypes.RoadMessage + "\"",
-    "\"" + index_1.PortalTypes.RoadReportRequest + "\""
+    "\"" + message_types_1.PortalTypes.BillingPeriodMessage + "\"",
+    "\"" + message_types_1.PortalTypes.RoadAccountMessage + "\"",
+    "\"" + message_types_1.PortalTypes.RoadEventMessage + "\"",
+    "\"" + message_types_1.PortalTypes.RoadMessage + "\"",
+    "\"" + message_types_1.PortalTypes.RoadReportRequest + "\""
 ].join(' OR ');
 /**
  * When a message is processed by the ClearRoad platform, it will create a new message with a validation state.
@@ -345,9 +346,9 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.initDirectoryStorage = function () {
         var refKey = exports.querySourceReference;
         var query = joinQueries([exports.queryPortalType + ": (" + [
-                "\"" + index_1.PortalTypes.RoadAccount + "\"",
-                "\"" + index_1.PortalTypes.RoadEvent + "\"",
-                "\"" + index_1.PortalTypes.RoadTransaction + "\""
+                "\"" + message_types_1.PortalTypes.RoadAccount + "\"",
+                "\"" + message_types_1.PortalTypes.RoadEvent + "\"",
+                "\"" + message_types_1.PortalTypes.RoadTransaction + "\""
             ].join(' OR ') + ")", this.queryMinDate()]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-directory-signatures");
         var localStorage = this.localSubStorage(refKey);
@@ -391,7 +392,7 @@ var ClearRoad = /** @class */ (function () {
         var _a, _b, _c, _d;
         var refKey = 'reference';
         var query = joinQueries([
-            exports.queryPortalType + ": (\"" + index_1.PortalTypes.File + "\")",
+            exports.queryPortalType + ": (\"" + message_types_1.PortalTypes.File + "\")",
             this.queryMinDate()
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-files-signatures");
@@ -473,19 +474,19 @@ var ClearRoad = /** @class */ (function () {
         index_1.validateDefinition(data[exports.queryPortalType], data);
         var options = merge({}, data);
         switch (data[exports.queryPortalType]) {
-            case index_1.PortalTypes.RoadAccountMessage:
+            case message_types_1.PortalTypes.RoadAccountMessage:
                 options.parent_relative_url = 'road_account_message_module';
                 break;
-            case index_1.PortalTypes.RoadEventMessage:
+            case message_types_1.PortalTypes.RoadEventMessage:
                 options.parent_relative_url = 'road_event_message_module';
                 break;
-            case index_1.PortalTypes.RoadMessage:
+            case message_types_1.PortalTypes.RoadMessage:
                 options.parent_relative_url = 'road_message_module';
                 break;
-            case index_1.PortalTypes.BillingPeriodMessage:
+            case message_types_1.PortalTypes.BillingPeriodMessage:
                 options.parent_relative_url = 'billing_period_message_module';
                 break;
-            case index_1.PortalTypes.RoadReportRequest:
+            case message_types_1.PortalTypes.RoadReportRequest:
                 options.parent_relative_url = 'road_report_request_module';
                 break;
         }
@@ -615,7 +616,7 @@ var ClearRoad = /** @class */ (function () {
     ClearRoad.prototype.getReportFromRequest = function (sourceReference) {
         var _this = this;
         return this.allDocs({
-            query: exports.queryPortalType + ": \"" + index_1.PortalTypes.File + "\" AND " + exports.querySourceReference + ": \"" + sourceReference + "\"",
+            query: exports.queryPortalType + ": \"" + message_types_1.PortalTypes.File + "\" AND " + exports.querySourceReference + ": \"" + sourceReference + "\"",
             select_list: ['reference']
         }).push(function (result) {
             var report = result.data.rows[0];

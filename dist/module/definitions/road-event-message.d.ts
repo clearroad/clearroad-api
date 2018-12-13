@@ -1,4 +1,5 @@
-import { IDefinition, PortalTypes, IPostData } from './index';
+import { IDefinition, IPostData } from './index';
+import { PortalTypes } from '../message-types';
 declare const json: IDefinition;
 export default json;
 export interface IPostRoadEventMessage extends IPostData {

@@ -85,7 +85,8 @@ const writeDefinition = async (type) => {
   const jsonString = JSON.stringify(value, null, 2);
   const portalType = definitionInterfaceName(type);
   const properties = definitionProperties(value, value, 1);
-  const content = `import { IDefinition, PortalTypes, IPostData } from './index';
+  const content = `import { IDefinition, IPostData } from './index';
+import { PortalTypes } from '../message-types';
 const json: IDefinition = ${jsonString.replace(/"/g, "'")};
 export default json;
 export interface IPost${portalType} extends IPostData {

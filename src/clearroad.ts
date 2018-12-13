@@ -2,8 +2,9 @@ const Rusha = require('rusha');
 const jIO = require('jio').jIO;
 const { all } = require('rsvp');
 
-import { validateDefinition, PortalTypes } from './definitions/index';
+import { validateDefinition } from './definitions/index';
 import { postData } from './definitions/interfaces';
+import { PortalTypes } from './message-types';
 import { IQueue, getQueue } from './queue';
 import {
   IJioProxyStorage, IJioQueryOptions, IJioQueryResults,
