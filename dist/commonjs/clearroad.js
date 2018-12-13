@@ -11,13 +11,17 @@ var storage_1 = require("./storage");
  * Query key for `PortalTypes`
  */
 exports.queryPortalType = 'portal_type';
-var queryPortalTypes = [
-    "\"" + message_types_1.PortalTypes.BillingPeriodMessage + "\"",
-    "\"" + message_types_1.PortalTypes.RoadAccountMessage + "\"",
-    "\"" + message_types_1.PortalTypes.RoadEventMessage + "\"",
-    "\"" + message_types_1.PortalTypes.RoadMessage + "\"",
-    "\"" + message_types_1.PortalTypes.RoadReportRequest + "\""
-].join(' OR ');
+var defaultMessagePortalTypes = [
+    message_types_1.PortalTypes.BillingPeriodMessage,
+    message_types_1.PortalTypes.RoadEventMessage,
+    message_types_1.PortalTypes.RoadMessage,
+    message_types_1.PortalTypes.RoadReportRequest
+];
+var defaultMessagePortalType = message_types_1.PortalTypes.RoadAccountMessage;
+var defaultDirectoryPortalType = message_types_1.PortalTypes.RoadAccount;
+var queryPortalTypes = function (types) {
+    return types.map(function (type) { return "\"" + type + "\""; }).join(' OR ');
+};
 /**
  * When a message is processed by the ClearRoad platform, it will create a new message with a validation state.
  * When the message has not been sent to the platform yet, the state is "not_processed".
@@ -136,6 +140,7 @@ var ClearRoad = /** @class */ (function () {
         this.accessToken = accessToken;
         this.options = options;
         this.useLocalStorage = false;
+        this.filterPortalTypes = Object.keys(message_types_1.PortalTypes).map(function (k) { return message_types_1.PortalTypes[k]; });
         if (!options.localStorage || !options.localStorage.type) {
             options.localStorage = {
                 type: 'indexeddb'
@@ -155,6 +160,9 @@ var ClearRoad = /** @class */ (function () {
             this.useLocalStorage = true;
         }
         this.databaseName = options.localStorage.database || 'clearroad';
+        if (options.syncPortalTypes) {
+            this.filterPortalTypes = options.syncPortalTypes;
+        }
         this.initMessagesStorage();
         this.initIngestionReportStorage();
         this.initDirectoryStorage();
@@ -254,9 +262,13 @@ var ClearRoad = /** @class */ (function () {
      * @internal
      */
     ClearRoad.prototype.initMessagesStorage = function () {
+        var _this = this;
         var refKey = exports.querySourceReference;
+        var portalTypes = defaultMessagePortalTypes.filter(function (type) { return _this.filterPortalTypes.indexOf(type) !== -1; });
+        // add default one
+        portalTypes.push(defaultMessagePortalType);
         var query = joinQueries([
-            exports.queryPortalType + ": (" + queryPortalTypes + ")",
+            exports.queryPortalType + ": (" + queryPortalTypes(portalTypes) + ")",
             exports.queryGroupingReference + ": \"" + GroupingReferences.Data + "\"",
             this.queryMinDate()
         ]);
@@ -299,9 +311,13 @@ var ClearRoad = /** @class */ (function () {
      * @internal
      */
     ClearRoad.prototype.initIngestionReportStorage = function () {
+        var _this = this;
         var refKey = exports.queryDestinationReference;
+        var portalTypes = defaultMessagePortalTypes.filter(function (type) { return _this.filterPortalTypes.indexOf(type) !== -1; });
+        // add default one
+        portalTypes.push(defaultMessagePortalType);
         var query = joinQueries([
-            exports.queryPortalType + ": (" + queryPortalTypes + ")",
+            exports.queryPortalType + ": (" + queryPortalTypes(portalTypes) + ")",
             "validation_state: (" + queryValidationStates + ")",
             this.queryMinDate()
         ]);
@@ -344,12 +360,18 @@ var ClearRoad = /** @class */ (function () {
      * @internal
      */
     ClearRoad.prototype.initDirectoryStorage = function () {
+        var _this = this;
         var refKey = exports.querySourceReference;
-        var query = joinQueries([exports.queryPortalType + ": (" + [
-                "\"" + message_types_1.PortalTypes.RoadAccount + "\"",
-                "\"" + message_types_1.PortalTypes.RoadEvent + "\"",
-                "\"" + message_types_1.PortalTypes.RoadTransaction + "\""
-            ].join(' OR ') + ")", this.queryMinDate()]);
+        var portalTypes = [
+            message_types_1.PortalTypes.RoadEvent,
+            message_types_1.PortalTypes.RoadTransaction
+        ].filter(function (type) { return _this.filterPortalTypes.indexOf(type) !== -1; });
+        // add default one
+        portalTypes.push(defaultDirectoryPortalType);
+        var query = joinQueries([
+            exports.queryPortalType + ": (" + queryPortalTypes(portalTypes) + ")",
+            this.queryMinDate()
+        ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-directory-signatures");
         var localStorage = this.localSubStorage(refKey);
         this.directoryStorage = jIO.createJIO({

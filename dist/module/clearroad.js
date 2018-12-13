@@ -9,13 +9,17 @@ import { defaultAttachmentName } from './storage';
  * Query key for `PortalTypes`
  */
 export const queryPortalType = 'portal_type';
-const queryPortalTypes = [
-    `"${PortalTypes.BillingPeriodMessage}"`,
-    `"${PortalTypes.RoadAccountMessage}"`,
-    `"${PortalTypes.RoadEventMessage}"`,
-    `"${PortalTypes.RoadMessage}"`,
-    `"${PortalTypes.RoadReportRequest}"`
-].join(' OR ');
+const defaultMessagePortalTypes = [
+    PortalTypes.BillingPeriodMessage,
+    PortalTypes.RoadEventMessage,
+    PortalTypes.RoadMessage,
+    PortalTypes.RoadReportRequest
+];
+const defaultMessagePortalType = PortalTypes.RoadAccountMessage;
+const defaultDirectoryPortalType = PortalTypes.RoadAccount;
+const queryPortalTypes = (types) => {
+    return types.map(type => `"${type}"`).join(' OR ');
+};
 /**
  * When a message is processed by the ClearRoad platform, it will create a new message with a validation state.
  * When the message has not been sent to the platform yet, the state is "not_processed".
@@ -129,6 +133,7 @@ export class ClearRoad {
         this.accessToken = accessToken;
         this.options = options;
         this.useLocalStorage = false;
+        this.filterPortalTypes = Object.keys(PortalTypes).map(k => PortalTypes[k]);
         if (!options.localStorage || !options.localStorage.type) {
             options.localStorage = {
                 type: 'indexeddb'
@@ -148,6 +153,9 @@ export class ClearRoad {
             this.useLocalStorage = true;
         }
         this.databaseName = options.localStorage.database || 'clearroad';
+        if (options.syncPortalTypes) {
+            this.filterPortalTypes = options.syncPortalTypes;
+        }
         this.initMessagesStorage();
         this.initIngestionReportStorage();
         this.initDirectoryStorage();
@@ -247,8 +255,11 @@ export class ClearRoad {
      */
     initMessagesStorage() {
         const refKey = querySourceReference;
+        const portalTypes = defaultMessagePortalTypes.filter(type => this.filterPortalTypes.indexOf(type) !== -1);
+        // add default one
+        portalTypes.push(defaultMessagePortalType);
         const query = joinQueries([
-            `${queryPortalType}: (${queryPortalTypes})`,
+            `${queryPortalType}: (${queryPortalTypes(portalTypes)})`,
             `${queryGroupingReference}: "${GroupingReferences.Data}"`,
             this.queryMinDate()
         ]);
@@ -292,8 +303,11 @@ export class ClearRoad {
      */
     initIngestionReportStorage() {
         const refKey = queryDestinationReference;
+        const portalTypes = defaultMessagePortalTypes.filter(type => this.filterPortalTypes.indexOf(type) !== -1);
+        // add default one
+        portalTypes.push(defaultMessagePortalType);
         const query = joinQueries([
-            `${queryPortalType}: (${queryPortalTypes})`,
+            `${queryPortalType}: (${queryPortalTypes(portalTypes)})`,
             `validation_state: (${queryValidationStates})`,
             this.queryMinDate()
         ]);
@@ -337,11 +351,16 @@ export class ClearRoad {
      */
     initDirectoryStorage() {
         const refKey = querySourceReference;
-        const query = joinQueries([`${queryPortalType}: (${[
-                `"${PortalTypes.RoadAccount}"`,
-                `"${PortalTypes.RoadEvent}"`,
-                `"${PortalTypes.RoadTransaction}"`
-            ].join(' OR ')})`, this.queryMinDate()]);
+        const portalTypes = [
+            PortalTypes.RoadEvent,
+            PortalTypes.RoadTransaction
+        ].filter(type => this.filterPortalTypes.indexOf(type) !== -1);
+        // add default one
+        portalTypes.push(defaultDirectoryPortalType);
+        const query = joinQueries([
+            `${queryPortalType}: (${queryPortalTypes(portalTypes)})`,
+            this.queryMinDate()
+        ]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signatures`);
         const localStorage = this.localSubStorage(refKey);
         this.directoryStorage = jIO.createJIO({

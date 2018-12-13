@@ -16,13 +16,18 @@ import {
  */
 export const queryPortalType = 'portal_type';
 
-const queryPortalTypes = [
-  `"${PortalTypes.BillingPeriodMessage}"`,
-  `"${PortalTypes.RoadAccountMessage}"`,
-  `"${PortalTypes.RoadEventMessage}"`,
-  `"${PortalTypes.RoadMessage}"`,
-  `"${PortalTypes.RoadReportRequest}"`
-].join(' OR ');
+const defaultMessagePortalTypes = [
+  PortalTypes.BillingPeriodMessage,
+  PortalTypes.RoadEventMessage,
+  PortalTypes.RoadMessage,
+  PortalTypes.RoadReportRequest
+];
+const defaultMessagePortalType = PortalTypes.RoadAccountMessage;
+const defaultDirectoryPortalType = PortalTypes.RoadAccount;
+
+const queryPortalTypes = (types: PortalTypes[]) => {
+  return types.map(type => `"${type}"`).join(' OR ');
+};
 
 /**
  * When a message is processed by the ClearRoad platform, it will create a new message with a validation state.
@@ -97,6 +102,12 @@ export interface IClearRoadOptions {
    * ```
    */
   minDate?: Date|number|string;
+  /**
+   * Defines which types of messages to synchronize.
+   * If not set, all messages will be synchronized.
+   * Improves speed of synchronisation for big sets.
+   */
+  syncPortalTypes?: PortalTypes[];
   /**
    * How many objects can be synchronized at a time.
    */
@@ -195,6 +206,7 @@ export class ClearRoad {
   private directoryStorage: IJioProxyStorage;
   private reportStorage: IJioProxyStorage;
   private useLocalStorage = false;
+  private filterPortalTypes: PortalTypes[] = Object.keys(PortalTypes).map(k => PortalTypes[k]);
 
   /**
    * Instantiate a ClearRoad api instance.
@@ -229,6 +241,10 @@ export class ClearRoad {
     }
 
     this.databaseName = options.localStorage!.database || 'clearroad';
+
+    if (options.syncPortalTypes) {
+      this.filterPortalTypes = options.syncPortalTypes;
+    }
 
     this.initMessagesStorage();
     this.initIngestionReportStorage();
@@ -335,8 +351,11 @@ export class ClearRoad {
    */
   private initMessagesStorage() {
     const refKey = querySourceReference;
+    const portalTypes = defaultMessagePortalTypes.filter(type => this.filterPortalTypes.indexOf(type) !== -1);
+    // add default one
+    portalTypes.push(defaultMessagePortalType);
     const query = joinQueries([
-      `${queryPortalType}: (${queryPortalTypes})`,
+      `${queryPortalType}: (${queryPortalTypes(portalTypes)})`,
       `${queryGroupingReference}: "${GroupingReferences.Data}"`,
       this.queryMinDate()
     ]);
@@ -382,8 +401,11 @@ export class ClearRoad {
    */
   private initIngestionReportStorage() {
     const refKey = queryDestinationReference;
+    const portalTypes = defaultMessagePortalTypes.filter(type => this.filterPortalTypes.indexOf(type) !== -1);
+    // add default one
+    portalTypes.push(defaultMessagePortalType);
     const query = joinQueries([
-      `${queryPortalType}: (${queryPortalTypes})`,
+      `${queryPortalType}: (${queryPortalTypes(portalTypes)})`,
       `validation_state: (${queryValidationStates})`,
       this.queryMinDate()
     ]);
@@ -429,11 +451,16 @@ export class ClearRoad {
    */
   private initDirectoryStorage() {
     const refKey = querySourceReference;
-    const query = joinQueries([`${queryPortalType}: (${[
-      `"${PortalTypes.RoadAccount}"`,
-      `"${PortalTypes.RoadEvent}"`,
-      `"${PortalTypes.RoadTransaction}"`
-    ].join(' OR ')})`, this.queryMinDate()]);
+    const portalTypes = [
+      PortalTypes.RoadEvent,
+      PortalTypes.RoadTransaction
+    ].filter(type => this.filterPortalTypes.indexOf(type) !== -1);
+    // add default one
+    portalTypes.push(defaultDirectoryPortalType);
+    const query = joinQueries([
+      `${queryPortalType}: (${queryPortalTypes(portalTypes)})`,
+      this.queryMinDate()
+    ]);
     const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signatures`);
     const localStorage = this.localSubStorage(refKey);
 

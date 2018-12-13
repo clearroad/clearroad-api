@@ -1,4 +1,5 @@
 import { postData } from './definitions/interfaces';
+import { PortalTypes } from './message-types';
 import { IQueue } from './queue';
 import { IJioQueryOptions, IJioQueryResults } from './storage';
 /**
@@ -58,6 +59,11 @@ export interface IClearRoadOptions {
      */
     minDate?: Date | number | string;
     /**
+     * Defines which types of messages to synchronize.
+     * Improves speed of synchronisation for big sets.
+     */
+    syncPortalTypes?: PortalTypes[];
+    /**
      * How many objects can be synchronized at a time.
      */
     maxSyncObjects?: number;
@@ -90,6 +96,7 @@ export declare class ClearRoad {
     private directoryStorage;
     private reportStorage;
     private useLocalStorage;
+    private filterPortalTypes;
     /**
      * Instantiate a ClearRoad api instance.
      * @param url ClearRoad API url
