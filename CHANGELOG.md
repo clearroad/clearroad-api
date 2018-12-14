@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.7.0"></a>
+# [2.7.0](https://github.com/clearroad/clearroad-api/compare/v2.6.0...v2.7.0) (2018-12-14)
+
+
+### Bug Fixes
+
+* **clearroad:** export PortalTypes ([31b1fe5](https://github.com/clearroad/clearroad-api/commit/31b1fe5))
+* **definitions:** remove wrong patterns on road account message ([feb4da8](https://github.com/clearroad/clearroad-api/commit/feb4da8))
+
+
+### Features
+
+* **clearroad:** add maxSyncedObjects option ([aaa511a](https://github.com/clearroad/clearroad-api/commit/aaa511a))
+* **clearroad:** add option to filter portal types for sync ([531bdd4](https://github.com/clearroad/clearroad-api/commit/531bdd4))
+
+
+
 <a name="2.6.0"></a>
 # [2.6.0](https://github.com/clearroad/clearroad-api/compare/v2.5.0...v2.6.0) (2018-12-06)
 
