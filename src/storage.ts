@@ -1,8 +1,7 @@
 import { IQueue } from './queue';
 
 /**
- * If the storage only support one attachment type,
- * use this one.
+ * If the storage only support one attachment type, use this one.
  */
 export const defaultAttachmentName = 'data';
 
@@ -10,8 +9,7 @@ export type JioQuerySortProperty = [string, 'ascending' | 'descending'];
 
 export interface IJioQueryOptions {
   /**
-   * Search with a query.
-   * Refer to the jIO documentation in the jIO Query Engine section for details.
+   * Search with a query. Refer to the jIO documentation in the jIO Query Engine section for details.
    * @see https://jio.nexedi.com/
    */
   query: string;
@@ -21,38 +19,51 @@ export interface IJioQueryOptions {
    */
   limit?: [number, number];
   /**
-   * List of fields to sort on, each specifying the order with ascending/descending.
-   * @example [['date', 'ascending'], ['id', 'descending]]
+   * List of fields to sort on, each specifying the order with ascending/descending. Example: `[['date', 'ascending'], ['id', 'descending]]`
    */
   sort_on?: JioQuerySortProperty[];
   /**
-   * When provided, the response has a value containing the values of these keys for each document.
+   * When provided, the response has a `value` containing the values of these keys for each document.
    * @example ['id', 'date']
    */
   select_list?: string[];
   /**
-   * When true, the response has a doc containing the full metadata for each document.
+   * When `true`, the response has a `doc` containing the full metadata for each document.
    */
   include_docs?: boolean;
 }
 
 export interface IJioQueryResultRow {
+  /**
+   * Document id
+   */
   id: string;
+  /**
+   * Original document value.
+   */
   doc?: any;
+  /**
+   * Filtered properties of the document.
+   */
   value?: any;
 }
 
+export interface IJioQueryResultsData {
+  /**
+   * List of [result row](#api-reference-clearroad-interfaces-ijioqueryresultrow).
+   */
+  rows: IJioQueryResultRow[];
+  /**
+   * The total number of results.
+   */
+  total_rows: number;
+}
+
 export interface IJioQueryResults {
-  data: {
-    /**
-     * Contains the result
-     */
-    rows: IJioQueryResultRow[];
-    /**
-     * The total number of results
-     */
-    total_rows: number;
-  };
+  /**
+   * The result [data](#api-reference-clearroad-interfaces-ijioqueryresultsdata).
+   */
+  data: IJioQueryResultsData;
 }
 
 export interface IJioStorage {

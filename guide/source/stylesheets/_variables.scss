@@ -96,6 +96,10 @@ $phone-width: $tablet-width - $nav-width !default; // min width before reverting
 
 // OTHER
 ////////////////////
+$sections-border-color: #ccc !default;
+$sections-border-style: solid !default;
+$sections-border-width: 1px !default;
+$sections-border: $sections-border-width $sections-border-style $sections-border-color;
 $nav-footer-border-color: #666 !default;
 $search-box-border-color: #666 !default;
 

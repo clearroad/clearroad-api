@@ -10,7 +10,8 @@ includes:
   - overview
   - getting_started
   - concepts
-  - clearroad_class
+  - api_reference
+  - generated/ClearRoad/README
 
 search: true
 ---

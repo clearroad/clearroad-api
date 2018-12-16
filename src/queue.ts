@@ -14,7 +14,7 @@ export interface IQueueLike<T> extends PromiseLike<T> {
 
 export interface IQueue<T> extends Promise<T> {
   /**
-   * Attaches callbacks for the resolution and/or rejection of the Promise.
+   * Similar to `Promise` but can be cancelled.
    * @param onfulfilled The callback to execute when the Promise is resolved.
    * @param onrejected The callback to execute when the Promise is rejected.
    * @returns A Promise for the completion of which ever callback is executed.
