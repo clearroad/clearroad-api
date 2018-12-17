@@ -54,5 +54,6 @@ end
 set :port, 4567
 
 helpers do
+  require './lib/doc_version.rb'
   require './lib/toc_data.rb'
 end

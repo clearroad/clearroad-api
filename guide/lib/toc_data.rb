@@ -9,13 +9,13 @@ def toc_data(page_content)
     headers.push({
       id: header.attribute('id').to_s,
       content: header.children,
-      title: header.children.to_s.gsub(/<[^>]*>/, ''),
+      title: header.children[0].to_s.gsub(/<[^>]*>/, ''),
       level: header.name[1].to_i,
       children: []
     })
   end
 
-  [4, 3,2].each do |header_level|
+  [4,3,2].each do |header_level|
     header_to_nest = nil
     headers = headers.reject do |header|
       if header[:level] == header_level
