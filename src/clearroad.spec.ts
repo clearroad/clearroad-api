@@ -251,8 +251,22 @@ describe('ClearRoad', () => {
 
     it('should validate message', async () => {
       spyOn(definitions, 'validateDefinition');
-      await cr.post({} as any);
+      await cr.post({
+        portal_type: PortalTypes.RoadAccountMessage
+      } as any);
       expect(definitions.validateDefinition).toHaveBeenCalled();
+    });
+
+    describe('missing portal_type', () => {
+      it('should throw an error', async () => {
+        try {
+          await cr.post({} as any);
+          expect(true).toBeFalsy();
+        }
+        catch (err) {
+          expect(err).toEqual(new Error('portal_type: "undefined" not found'));
+        }
+      });
     });
 
     describe(PortalTypes.RoadAccountMessage, () => {

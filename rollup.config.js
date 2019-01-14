@@ -9,7 +9,8 @@ const cloneDeep = require('lodash.clonedeep');
 
 const main = 'src/clearroad.ts';
 const typescriptOptions = {
-  typescript: require('typescript')
+  typescript: require('typescript'),
+  importHelpers: true
 };
 const libs = ['jIO', 'RSVP', 'Rusha', 'Ajv'].join(', ');
 

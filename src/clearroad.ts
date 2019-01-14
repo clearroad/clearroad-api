@@ -158,6 +158,7 @@ export interface IAttachmentOptions {
   format: 'text' | 'json' | 'blob' | 'data_url' | 'array_buffer';
 }
 
+/* tslint:disable:cyclomatic-complexity */
 const jsonIdRec = (keyValueSpace: string, key: string | number, value: any, deep = 0) => {
   let res;
   if (value && typeof value.toJSON === 'function') {
@@ -199,24 +200,10 @@ const jsonIdRec = (keyValueSpace: string, key: string | number, value: any, deep
   }
   return JSON.stringify(value);
 };
+/* tslint:enable:cyclomatic-complexity */
 
 const jsonId = (value: any) => {
   return jsonIdRec('', '', value);
-};
-
-const merge = (obj1, obj2) => {
-  const obj3 = {};
-  for (const attrname in obj1) {
-    if (obj1.hasOwnProperty(attrname)) {
-      obj3[attrname] = obj1[attrname];
-    }
-  }
-  for (const attrname in obj2) {
-    if (obj2.hasOwnProperty(attrname)) {
-      obj3[attrname] = obj2[attrname];
-    }
-  }
-  return obj3;
 };
 
 const joinQueries = (queries: string[], joinType = 'AND') => queries.filter(query => !!query).join(` ${joinType} `);
@@ -228,6 +215,33 @@ const maxLogLevel = 1000;
  * @param date Date to format
  */
 export const dateToISO = (date: Date) => `${date.toISOString().split('.')[0]}Z`;
+
+const requireOptionsLocalStorage = (options: IClearRoadOptions) => {
+  if (!options.localStorage || !options.localStorage.type) {
+    options.localStorage = {
+      type: 'indexeddb'
+    };
+  }
+};
+
+/* tslint:disable:cyclomatic-complexity */
+const messageRelativeUrl = (portalType: PortalTypes) => {
+  switch (portalType) {
+    case PortalTypes.RoadAccountMessage:
+      return 'road_account_message_module';
+    case PortalTypes.RoadEventMessage:
+      return 'road_event_message_module';
+    case PortalTypes.RoadMessage:
+      return 'road_message_module';
+    case PortalTypes.BillingPeriodMessage:
+      return 'billing_period_message_module';
+    case PortalTypes.RoadReportRequest:
+      return 'road_report_request_module';
+    default:
+      throw new Error('Unsupported message type');
+  }
+};
+/* tslint:enable:cyclomatic-complexity */
 
 /**
  * @description
@@ -277,20 +291,16 @@ export class ClearRoad {
     private accessToken?: string,
     private options: IClearRoadOptions = {}
   ) {
-    if (!options.localStorage || !options.localStorage.type) {
-      options.localStorage = {
-        type: 'indexeddb'
-      };
-    }
+    requireOptionsLocalStorage(options);
 
-    this.localStorageType = options.localStorage.type;
+    this.localStorageType = options.localStorage!.type;
 
     if (this.localStorageType === 'dropbox' || this.localStorageType === 'gdrive') {
       options.localStorage = {
         type: 'drivetojiomapping',
         sub_storage: {
           type: this.localStorageType,
-          access_token: options.localStorage.accessToken
+          access_token: options.localStorage!.accessToken
         }
       } as any;
     }
@@ -329,7 +339,7 @@ export class ClearRoad {
     if (this.options.useQueryStorage) {
       return {
         type: 'query',
-        sub_storage: merge({}, this.options.localStorage!)
+        sub_storage: {...this.options.localStorage!}
       };
     }
 
@@ -340,7 +350,7 @@ export class ClearRoad {
           type: 'mapping',
           sub_storage: {
             type: 'query',
-            sub_storage: merge({}, this.options.localStorage!)
+            sub_storage: {...this.options.localStorage!}
           },
           mapping_dict: {
             [queryPortalType]: ['equalSubProperty', key]
@@ -362,7 +372,7 @@ export class ClearRoad {
           }
         };
       default:
-        return merge({}, this.options.localStorage!);
+        return {...this.options.localStorage!};
     }
   }
 
@@ -373,9 +383,7 @@ export class ClearRoad {
     if (this.options.useQueryStorage) {
       return {
         type: 'query',
-        sub_storage: merge(this.options.localStorage!, {
-          database: db
-        })
+        sub_storage: {...this.options.localStorage!, ...{database: db}}
       };
     }
 
@@ -398,9 +406,7 @@ export class ClearRoad {
           }
         };
       default:
-        return merge(this.options.localStorage!, {
-          database: db
-        });
+        return {...this.options.localStorage!, ...{database: db}};
     }
   }
 
@@ -568,7 +574,7 @@ export class ClearRoad {
     const signatureStorage = this.signatureSubStorage(`${this.databaseName}-files-signatures`);
     const localStorage = this.localSubStorage(refKey);
 
-    const mappingStorageWithEnclosure = merge(localStorage, {
+    const mappingStorageWithEnclosure = {...localStorage, ...{
       attachment_list: [defaultAttachmentName],
       attachment: {
         [defaultAttachmentName]: {
@@ -576,7 +582,7 @@ export class ClearRoad {
           put: {uri_template: 'enclosure'}
         }
       }
-    });
+    }};
 
     this.reportStorage = jIO.createJIO({
       report_level: maxLogLevel,
@@ -586,11 +592,11 @@ export class ClearRoad {
       use_remote_post: false,
       conflict_handling: 1,
       signature_hash_key: querySourceReference,
-      signature_sub_storage: this.useLocalStorage ? signatureStorage : merge(mappingStorageWithEnclosure, {
+      signature_sub_storage: this.useLocalStorage ? signatureStorage : {...mappingStorageWithEnclosure, ...{
         mapping_dict: {
           [queryPortalType]: ['equalSubProperty', querySourceReference]
         }
-      }),
+      }},
       query: {
         query,
         sort_on: [[queryModificationDate, 'descending']],
@@ -608,11 +614,11 @@ export class ClearRoad {
       check_local_attachment_creation: false,
       check_local_attachment_modification: false,
       check_local_attachment_deletion: false,
-      local_sub_storage: this.useLocalStorage ? localStorage : merge(mappingStorageWithEnclosure, {
+      local_sub_storage: this.useLocalStorage ? localStorage : {...mappingStorageWithEnclosure, ...{
         mapping_dict: {
           [queryPortalType]: ['equalSubProperty', refKey]
         }
-      }),
+      }},
       remote_sub_storage: {
         type: 'mapping',
         id: ['equalSubProperty', refKey],
@@ -678,27 +684,11 @@ export class ClearRoad {
    * ```
    */
   post(data: postData) {
-    validateDefinition(data[queryPortalType], data);
+    const portalType = data[queryPortalType];
+    validateDefinition(portalType, data);
 
-    const options: any = merge({}, data);
-
-    switch (data[queryPortalType]) {
-      case PortalTypes.RoadAccountMessage:
-        options.parent_relative_url = 'road_account_message_module';
-        break;
-      case PortalTypes.RoadEventMessage:
-        options.parent_relative_url = 'road_event_message_module';
-        break;
-      case PortalTypes.RoadMessage:
-        options.parent_relative_url = 'road_message_module';
-        break;
-      case PortalTypes.BillingPeriodMessage:
-        options.parent_relative_url = 'billing_period_message_module';
-        break;
-      case PortalTypes.RoadReportRequest:
-        options.parent_relative_url = 'road_report_request_module';
-        break;
-    }
+    const options: any = {...data};
+    options.parent_relative_url = messageRelativeUrl(portalType);
 
     // jIO only support string values
     if ('request' in data) {

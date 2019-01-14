@@ -3,6 +3,7 @@
   "rules": {
     "arrow-parens": false,
     "ban-types": false,
+    "cyclomatic-complexity": [true, 5],
     "quotemark": [
       true, "single", "avoid-escape", "avoid-template"
     ],

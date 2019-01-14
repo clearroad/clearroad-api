@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var Rusha = require('rusha');
 var jIO = require('jio').jIO;
@@ -88,6 +99,7 @@ var LocalStorageTypes;
      */
     LocalStorageTypes["gdrive"] = "gdrive";
 })(LocalStorageTypes = exports.LocalStorageTypes || (exports.LocalStorageTypes = {}));
+/* tslint:disable:cyclomatic-complexity */
 var jsonIdRec = function (keyValueSpace, key, value, deep) {
     if (deep === void 0) { deep = 0; }
     var res;
@@ -129,22 +141,9 @@ var jsonIdRec = function (keyValueSpace, key, value, deep) {
     }
     return JSON.stringify(value);
 };
+/* tslint:enable:cyclomatic-complexity */
 var jsonId = function (value) {
     return jsonIdRec('', '', value);
-};
-var merge = function (obj1, obj2) {
-    var obj3 = {};
-    for (var attrname in obj1) {
-        if (obj1.hasOwnProperty(attrname)) {
-            obj3[attrname] = obj1[attrname];
-        }
-    }
-    for (var attrname in obj2) {
-        if (obj2.hasOwnProperty(attrname)) {
-            obj3[attrname] = obj2[attrname];
-        }
-    }
-    return obj3;
 };
 var joinQueries = function (queries, joinType) {
     if (joinType === void 0) { joinType = 'AND'; }
@@ -156,6 +155,31 @@ var maxLogLevel = 1000;
  * @param date Date to format
  */
 exports.dateToISO = function (date) { return date.toISOString().split('.')[0] + "Z"; };
+var requireOptionsLocalStorage = function (options) {
+    if (!options.localStorage || !options.localStorage.type) {
+        options.localStorage = {
+            type: 'indexeddb'
+        };
+    }
+};
+/* tslint:disable:cyclomatic-complexity */
+var messageRelativeUrl = function (portalType) {
+    switch (portalType) {
+        case message_types_1.PortalTypes.RoadAccountMessage:
+            return 'road_account_message_module';
+        case message_types_1.PortalTypes.RoadEventMessage:
+            return 'road_event_message_module';
+        case message_types_1.PortalTypes.RoadMessage:
+            return 'road_message_module';
+        case message_types_1.PortalTypes.BillingPeriodMessage:
+            return 'billing_period_message_module';
+        case message_types_1.PortalTypes.RoadReportRequest:
+            return 'road_report_request_module';
+        default:
+            throw new Error('Unsupported message type');
+    }
+};
+/* tslint:enable:cyclomatic-complexity */
 /**
  * @description
  * The `ClearRoad` class contains a subset of functions from the underlying [jIO.js](https://jio.nexedi.com/) library, which uses [RSVP.js](https://lab.nexedi.com/nexedi/rsvp.js) to chain functions like `Promises`.
@@ -197,11 +221,7 @@ var ClearRoad = /** @class */ (function () {
         this.options = options;
         this.useLocalStorage = false;
         this.filterPortalTypes = Object.keys(message_types_1.PortalTypes).map(function (k) { return message_types_1.PortalTypes[k]; });
-        if (!options.localStorage || !options.localStorage.type) {
-            options.localStorage = {
-                type: 'indexeddb'
-            };
-        }
+        requireOptionsLocalStorage(options);
         this.localStorageType = options.localStorage.type;
         if (this.localStorageType === 'dropbox' || this.localStorageType === 'gdrive') {
             options.localStorage = {
@@ -243,7 +263,7 @@ var ClearRoad = /** @class */ (function () {
         if (this.options.useQueryStorage) {
             return {
                 type: 'query',
-                sub_storage: merge({}, this.options.localStorage)
+                sub_storage: __assign({}, this.options.localStorage)
             };
         }
         switch (this.localStorageType) {
@@ -253,7 +273,7 @@ var ClearRoad = /** @class */ (function () {
                     type: 'mapping',
                     sub_storage: {
                         type: 'query',
-                        sub_storage: merge({}, this.options.localStorage)
+                        sub_storage: __assign({}, this.options.localStorage)
                     },
                     mapping_dict: (_a = {},
                         _a[exports.queryPortalType] = ['equalSubProperty', key],
@@ -275,7 +295,7 @@ var ClearRoad = /** @class */ (function () {
                     }
                 };
             default:
-                return merge({}, this.options.localStorage);
+                return __assign({}, this.options.localStorage);
         }
     };
     /**
@@ -285,9 +305,7 @@ var ClearRoad = /** @class */ (function () {
         if (this.options.useQueryStorage) {
             return {
                 type: 'query',
-                sub_storage: merge(this.options.localStorage, {
-                    database: db
-                })
+                sub_storage: __assign({}, this.options.localStorage, { database: db })
             };
         }
         switch (this.localStorageType) {
@@ -309,9 +327,7 @@ var ClearRoad = /** @class */ (function () {
                     }
                 };
             default:
-                return merge(this.options.localStorage, {
-                    database: db
-                });
+                return __assign({}, this.options.localStorage, { database: db });
         }
     };
     /**
@@ -475,7 +491,7 @@ var ClearRoad = /** @class */ (function () {
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-files-signatures");
         var localStorage = this.localSubStorage(refKey);
-        var mappingStorageWithEnclosure = merge(localStorage, {
+        var mappingStorageWithEnclosure = __assign({}, localStorage, {
             attachment_list: [storage_1.defaultAttachmentName],
             attachment: (_a = {},
                 _a[storage_1.defaultAttachmentName] = {
@@ -492,7 +508,7 @@ var ClearRoad = /** @class */ (function () {
             use_remote_post: false,
             conflict_handling: 1,
             signature_hash_key: exports.querySourceReference,
-            signature_sub_storage: this.useLocalStorage ? signatureStorage : merge(mappingStorageWithEnclosure, {
+            signature_sub_storage: this.useLocalStorage ? signatureStorage : __assign({}, mappingStorageWithEnclosure, {
                 mapping_dict: (_b = {},
                     _b[exports.queryPortalType] = ['equalSubProperty', exports.querySourceReference],
                     _b)
@@ -514,7 +530,7 @@ var ClearRoad = /** @class */ (function () {
             check_local_attachment_creation: false,
             check_local_attachment_modification: false,
             check_local_attachment_deletion: false,
-            local_sub_storage: this.useLocalStorage ? localStorage : merge(mappingStorageWithEnclosure, {
+            local_sub_storage: this.useLocalStorage ? localStorage : __assign({}, mappingStorageWithEnclosure, {
                 mapping_dict: (_c = {},
                     _c[exports.queryPortalType] = ['equalSubProperty', refKey],
                     _c)
@@ -584,25 +600,10 @@ var ClearRoad = /** @class */ (function () {
      */
     ClearRoad.prototype.post = function (data) {
         var _this = this;
-        index_1.validateDefinition(data[exports.queryPortalType], data);
-        var options = merge({}, data);
-        switch (data[exports.queryPortalType]) {
-            case message_types_1.PortalTypes.RoadAccountMessage:
-                options.parent_relative_url = 'road_account_message_module';
-                break;
-            case message_types_1.PortalTypes.RoadEventMessage:
-                options.parent_relative_url = 'road_event_message_module';
-                break;
-            case message_types_1.PortalTypes.RoadMessage:
-                options.parent_relative_url = 'road_message_module';
-                break;
-            case message_types_1.PortalTypes.BillingPeriodMessage:
-                options.parent_relative_url = 'billing_period_message_module';
-                break;
-            case message_types_1.PortalTypes.RoadReportRequest:
-                options.parent_relative_url = 'road_report_request_module';
-                break;
-        }
+        var portalType = data[exports.queryPortalType];
+        index_1.validateDefinition(portalType, data);
+        var options = __assign({}, data);
+        options.parent_relative_url = messageRelativeUrl(portalType);
         // jIO only support string values
         if ('request' in data) {
             options.request = JSON.stringify(data.request);
