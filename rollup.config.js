@@ -5,6 +5,7 @@ import commonJS from 'rollup-plugin-commonjs';
 import hypothetical from 'rollup-plugin-hypothetical';
 import buble from 'rollup-plugin-buble';
 import { uglify } from 'rollup-plugin-uglify';
+import cleanup from 'rollup-plugin-cleanup';
 const cloneDeep = require('lodash.clonedeep');
 
 const main = 'src/clearroad.ts';
@@ -46,7 +47,11 @@ const iife = {
         "var Ajv = require('ajv');": ''
       }
     }),
-    buble()
+    buble(),
+    cleanup({
+      comments: 'none',
+      extensions: ['js', 'jsx', 'ts', 'tsx']
+    })
   ]
 };
 
