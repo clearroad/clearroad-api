@@ -33,7 +33,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "ajv": "^6.5.4",
-    "jio": "git+https://lab.nexedi.com/mebibou/jio.git#node",
+    "jio": "git+https://lab.nexedi.com/mebibou/jio.git#node-fix",
     "jsonschema": "^1.2.4",
     "rsvp": "git+https://lab.nexedi.com/nexedi/rsvp.js.git",
     "rusha": "0.8.2"

@@ -60,7 +60,7 @@ const run = async () => {
       path: 'node_modules/rsvp/dist/rsvp-2.0.4.js'
     }, {
       name: 'jio.js',
-      path: 'node_modules/jio/dist/jio.js'
+      path: 'node_modules/jio/dist/jio-latest.js'
     }];
     await Promise.all(files.map(file => {
       return updloadFile(path.resolve(file.path), `lib/${file.name}`);
