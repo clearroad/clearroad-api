@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.0.0"></a>
+# [3.0.0](https://github.com/clearroad/clearroad-api/compare/v2.7.0...v3.0.0) (2019-01-23)
+
+
+### Bug Fixes
+
+* guide/Gemfile & guide/Gemfile.lock to reduce vulnerabilities ([182f19d](https://github.com/clearroad/clearroad-api/commit/182f19d))
+* **jio:** update branch for release ([1eb9ac7](https://github.com/clearroad/clearroad-api/commit/1eb9ac7))
+
+
+### BREAKING CHANGES
+
+* **jio:** version 2.x outdated
+
+
+
 <a name="2.7.0"></a>
 # [2.7.0](https://github.com/clearroad/clearroad-api/compare/v2.6.0...v2.7.0) (2018-12-14)
 
