@@ -11,7 +11,7 @@
 
 
 <aside class="notice">
-  This documentation has been generated for the version <code>3.0.2</code>
+  This documentation has been generated for the version <code>3.0.1</code>
 </aside>
 
 
