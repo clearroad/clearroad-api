@@ -51,6 +51,13 @@ const run = async () => {
       return updloadFile(path.resolve(directory, file), `api/${path.basename(file)}`);
     }));
 
+    console.log('Uploading lib folder...');
+    directory = './lib';
+    files = jsFile(fs.readdirSync(path.resolve(directory)));
+    await Promise.all(files.map(file => {
+      updloadFile(path.resolve(directory, file), `lib/${path.basename(file)}`);
+    }));
+
     console.log('Uploading libraries...');
     files = [{
       name: 'ajv.js',
@@ -58,9 +65,6 @@ const run = async () => {
     }, {
       name: 'rsvp.js',
       path: 'node_modules/rsvp/dist/rsvp-2.0.4.js'
-    }, {
-      name: 'jio.js',
-      path: 'node_modules/jio/dist/jio-latest.js'
     }];
     await Promise.all(files.map(file => {
       return updloadFile(path.resolve(file.path), `lib/${file.name}`);

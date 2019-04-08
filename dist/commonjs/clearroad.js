@@ -491,15 +491,12 @@ var ClearRoad = /** @class */ (function () {
         ]);
         var signatureStorage = this.signatureSubStorage(this.databaseName + "-files-signatures");
         var localStorage = this.localSubStorage(refKey);
-        var mappingStorageWithEnclosure = __assign({}, localStorage, {
-            attachment_list: [storage_1.defaultAttachmentName],
-            attachment: (_a = {},
+        var mappingStorageWithEnclosure = __assign({}, localStorage, { attachment_list: [storage_1.defaultAttachmentName], attachment: (_a = {},
                 _a[storage_1.defaultAttachmentName] = {
                     get: { uri_template: 'enclosure' },
                     put: { uri_template: 'enclosure' }
                 },
-                _a)
-        });
+                _a) });
         this.reportStorage = jIO.createJIO({
             report_level: maxLogLevel,
             debug: this.options.debug,
@@ -508,11 +505,9 @@ var ClearRoad = /** @class */ (function () {
             use_remote_post: false,
             conflict_handling: 1,
             signature_hash_key: exports.querySourceReference,
-            signature_sub_storage: this.useLocalStorage ? signatureStorage : __assign({}, mappingStorageWithEnclosure, {
-                mapping_dict: (_b = {},
+            signature_sub_storage: this.useLocalStorage ? signatureStorage : __assign({}, mappingStorageWithEnclosure, { mapping_dict: (_b = {},
                     _b[exports.queryPortalType] = ['equalSubProperty', exports.querySourceReference],
-                    _b)
-            }),
+                    _b) }),
             query: {
                 query: query,
                 sort_on: [[queryModificationDate, 'descending']],
@@ -530,11 +525,9 @@ var ClearRoad = /** @class */ (function () {
             check_local_attachment_creation: false,
             check_local_attachment_modification: false,
             check_local_attachment_deletion: false,
-            local_sub_storage: this.useLocalStorage ? localStorage : __assign({}, mappingStorageWithEnclosure, {
-                mapping_dict: (_c = {},
+            local_sub_storage: this.useLocalStorage ? localStorage : __assign({}, mappingStorageWithEnclosure, { mapping_dict: (_c = {},
                     _c[exports.queryPortalType] = ['equalSubProperty', refKey],
-                    _c)
-            }),
+                    _c) }),
             remote_sub_storage: {
                 type: 'mapping',
                 id: ['equalSubProperty', refKey],

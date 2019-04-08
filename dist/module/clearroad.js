@@ -1,5 +1,5 @@
 const Rusha = require('rusha');
-const jIO = require('jio').jIO;
+const { jIO } = require('jio');
 const { all } = require('rsvp');
 import { validateDefinition } from './definitions/index';
 import { PortalTypes } from './message-types';
@@ -468,15 +468,12 @@ export class ClearRoad {
         ]);
         const signatureStorage = this.signatureSubStorage(`${this.databaseName}-files-signatures`);
         const localStorage = this.localSubStorage(refKey);
-        const mappingStorageWithEnclosure = Object.assign({}, localStorage, {
-            attachment_list: [defaultAttachmentName],
-            attachment: {
+        const mappingStorageWithEnclosure = Object.assign({}, localStorage, { attachment_list: [defaultAttachmentName], attachment: {
                 [defaultAttachmentName]: {
                     get: { uri_template: 'enclosure' },
                     put: { uri_template: 'enclosure' }
                 }
-            }
-        });
+            } });
         this.reportStorage = jIO.createJIO({
             report_level: maxLogLevel,
             debug: this.options.debug,
@@ -485,11 +482,9 @@ export class ClearRoad {
             use_remote_post: false,
             conflict_handling: 1,
             signature_hash_key: querySourceReference,
-            signature_sub_storage: this.useLocalStorage ? signatureStorage : Object.assign({}, mappingStorageWithEnclosure, {
-                mapping_dict: {
+            signature_sub_storage: this.useLocalStorage ? signatureStorage : Object.assign({}, mappingStorageWithEnclosure, { mapping_dict: {
                     [queryPortalType]: ['equalSubProperty', querySourceReference]
-                }
-            }),
+                } }),
             query: {
                 query,
                 sort_on: [[queryModificationDate, 'descending']],
@@ -507,11 +502,9 @@ export class ClearRoad {
             check_local_attachment_creation: false,
             check_local_attachment_modification: false,
             check_local_attachment_deletion: false,
-            local_sub_storage: this.useLocalStorage ? localStorage : Object.assign({}, mappingStorageWithEnclosure, {
-                mapping_dict: {
+            local_sub_storage: this.useLocalStorage ? localStorage : Object.assign({}, mappingStorageWithEnclosure, { mapping_dict: {
                     [queryPortalType]: ['equalSubProperty', refKey]
-                }
-            }),
+                } }),
             remote_sub_storage: {
                 type: 'mapping',
                 id: ['equalSubProperty', refKey],

@@ -1,5 +1,5 @@
 /* tslint:disable: no-console */
-import * as jioImport from 'jio';
+import { jIO } from 'jio';
 import { ClearRoad, ValidationStates, dateToISO } from './clearroad';
 import { postData } from './definitions/interfaces';
 import { PortalTypes } from './message-types';
@@ -25,7 +25,7 @@ describe('dateToISO', () => {
 
 describe('ClearRoad', () => {
   beforeEach(() => {
-    spyOn(jioImport.jIO, 'createJIO').and.returnValue(new FakeJio());
+    spyOn(jIO, 'createJIO').and.returnValue(new FakeJio());
   });
 
   describe('constructor', () => {
@@ -516,7 +516,7 @@ describe('ClearRoad', () => {
 
     beforeEach(() => {
       cr = new ClearRoad(url);
-      spyOn(jioImport.jIO.util, 'readBlobAsText').and.returnValue({
+      spyOn(jIO.util, 'readBlobAsText').and.returnValue({
         target: {result: '{}'}
       });
       allAttachmentsSpy = spyOn((cr as any).reportStorage, 'allAttachments').and.returnValue({});
