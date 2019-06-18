@@ -269,6 +269,36 @@ describe('ClearRoad', () => {
       });
     });
 
+    describe(PortalTypes.BillingPeriodMessage, () => {
+      it('should put a message', async () => {
+        const options: postData = {
+          portal_type: PortalTypes.BillingPeriodMessage,
+          reference: '2018Q1',
+          start_date: '2018-01-01T00:00:00Z',
+          stop_date: '2018-04-01T00:00:00Z'
+        };
+        const data: any = await cr.post(options);
+        expect(data.parent_relative_url).toEqual('billing_period_message_module');
+        expect(putSpy).toHaveBeenCalled();
+      });
+    });
+
+    describe(PortalTypes.OdometerReadingMessage, () => {
+      it('should put a message', async () => {
+        const options: postData = {
+          portal_type: PortalTypes.OdometerReadingMessage,
+          account_manager: 'testamref',
+          data_collector: 'testmpref',
+          vehicle_reference: '2018Q1',
+          odometer_reading: 200,
+          effective_date: '2018-01-01T00:00:00Z'
+        };
+        const data: any = await cr.post(options);
+        expect(data.parent_relative_url).toEqual('odometer_reading_message_module');
+        expect(putSpy).toHaveBeenCalled();
+      });
+    });
+
     describe(PortalTypes.RoadAccountMessage, () => {
       it('should put a message', async () => {
         const options: postData = {
@@ -342,20 +372,6 @@ describe('ClearRoad', () => {
         const data: any = await cr.post(options);
         expect(data.parent_relative_url).toEqual('road_message_module');
         expect(typeof data.request).toEqual('string');
-        expect(putSpy).toHaveBeenCalled();
-      });
-    });
-
-    describe(PortalTypes.BillingPeriodMessage, () => {
-      it('should put a message', async () => {
-        const options: postData = {
-          portal_type: PortalTypes.BillingPeriodMessage,
-          reference: '2018Q1',
-          start_date: '2018-01-01T00:00:00Z',
-          stop_date: '2018-04-01T00:00:00Z'
-        };
-        const data: any = await cr.post(options);
-        expect(data.parent_relative_url).toEqual('billing_period_message_module');
         expect(putSpy).toHaveBeenCalled();
       });
     });

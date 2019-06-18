@@ -1,11 +1,13 @@
 const request = require('request-promise-native');
-const fs = require('fs');
+const { writeFileSync, readFileSync } = require('fs');
 
+const SKIP_FETCH = process.env.SKIP_FETCH == 'true';
 const baseUrl = process.env.BASE_URL || 'https://erp5.clearroadev.xyz';
 const url = baseUrl + '/portal_types/${type}/getTextContent';
 
 const definitions = [
   'Billing Period Message',
+  'Odometer Reading Message',
   'Road Account Message',
   'Road Event Message',
   'Road Message',
@@ -21,6 +23,9 @@ const definitionVariable = type => {
 };
 
 const getDefinition = async type => {
+  if (SKIP_FETCH) {
+    return JSON.parse(readFileSync(`definitions/${definitionFilename(type)}.json`, 'UTF-8'));
+  }
   const uri = url.replace('${type}', encodeURIComponent(type));
   console.log(`Fetching definition: ${uri}`);
   return await request({
@@ -94,8 +99,8 @@ export interface IPost${portalType} extends IPostData {
 ${properties}
 }
 `;
-  fs.writeFileSync(`src/definitions/${definitionFilename(type)}.ts`, content);
-  fs.writeFileSync(`definitions/${definitionFilename(type)}.json`, jsonString);
+  writeFileSync(`src/definitions/${definitionFilename(type)}.ts`, content);
+  writeFileSync(`definitions/${definitionFilename(type)}.json`, jsonString);
 };
 
 const writeDefinitionIndex = () => {
@@ -115,7 +120,7 @@ export const definitions: {
 };
 `;
 
-  fs.writeFileSync('src/definitions/definitions.ts', content);
+  writeFileSync('src/definitions/definitions.ts', content);
 };
 
 const writeInterfaces = () => {
@@ -129,7 +134,7 @@ export type postData = ${definitions.map(type => {
 }).join(' |\n  ')};
 `;
 
-  fs.writeFileSync('src/definitions/interfaces.ts', content);
+  writeFileSync('src/definitions/interfaces.ts', content);
 };
 
 const run = async () => {

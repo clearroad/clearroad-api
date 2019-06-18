@@ -7,6 +7,8 @@ var PortalTypes;
 (function (PortalTypes) {
     PortalTypes["BillingPeriodMessage"] = "Billing Period Message";
     PortalTypes["File"] = "File";
+    PortalTypes["OdometerReading"] = "Odometer Reading";
+    PortalTypes["OdometerReadingMessage"] = "Odometer Reading Message";
     PortalTypes["RoadAccount"] = "Road Account";
     PortalTypes["RoadAccountMessage"] = "Road Account Message";
     PortalTypes["RoadEvent"] = "Road Event";

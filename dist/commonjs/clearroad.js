@@ -24,6 +24,7 @@ var storage_1 = require("./storage");
 exports.queryPortalType = 'portal_type';
 var defaultMessagePortalTypes = [
     message_types_1.PortalTypes.BillingPeriodMessage,
+    message_types_1.PortalTypes.OdometerReadingMessage,
     message_types_1.PortalTypes.RoadEventMessage,
     message_types_1.PortalTypes.RoadMessage,
     message_types_1.PortalTypes.RoadReportRequest
@@ -165,14 +166,16 @@ var requireOptionsLocalStorage = function (options) {
 /* tslint:disable:cyclomatic-complexity */
 var messageRelativeUrl = function (portalType) {
     switch (portalType) {
+        case message_types_1.PortalTypes.BillingPeriodMessage:
+            return 'billing_period_message_module';
+        case message_types_1.PortalTypes.OdometerReadingMessage:
+            return 'odometer_reading_message_module';
         case message_types_1.PortalTypes.RoadAccountMessage:
             return 'road_account_message_module';
         case message_types_1.PortalTypes.RoadEventMessage:
             return 'road_event_message_module';
         case message_types_1.PortalTypes.RoadMessage:
             return 'road_message_module';
-        case message_types_1.PortalTypes.BillingPeriodMessage:
-            return 'billing_period_message_module';
         case message_types_1.PortalTypes.RoadReportRequest:
             return 'road_report_request_module';
         default:

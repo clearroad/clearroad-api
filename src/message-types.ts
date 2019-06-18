@@ -4,6 +4,8 @@
 export enum PortalTypes {
   BillingPeriodMessage = 'Billing Period Message',
   File = 'File',
+  OdometerReading = 'Odometer Reading',
+  OdometerReadingMessage = 'Odometer Reading Message',
   RoadAccount = 'Road Account',
   RoadAccountMessage = 'Road Account Message',
   RoadEvent = 'Road Event',
@@ -14,6 +16,7 @@ export enum PortalTypes {
 }
 
 export type portalType = 'Billing Period Message' |
+  'Odometer Reading Message' |
   'Road Account Message' |
   'Road Event Message' |
   'Road Message' |

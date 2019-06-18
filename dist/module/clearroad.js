@@ -11,6 +11,7 @@ import { defaultAttachmentName } from './storage';
 export const queryPortalType = 'portal_type';
 const defaultMessagePortalTypes = [
     PortalTypes.BillingPeriodMessage,
+    PortalTypes.OdometerReadingMessage,
     PortalTypes.RoadEventMessage,
     PortalTypes.RoadMessage,
     PortalTypes.RoadReportRequest
@@ -148,14 +149,16 @@ const requireOptionsLocalStorage = (options) => {
 /* tslint:disable:cyclomatic-complexity */
 const messageRelativeUrl = (portalType) => {
     switch (portalType) {
+        case PortalTypes.BillingPeriodMessage:
+            return 'billing_period_message_module';
+        case PortalTypes.OdometerReadingMessage:
+            return 'odometer_reading_message_module';
         case PortalTypes.RoadAccountMessage:
             return 'road_account_message_module';
         case PortalTypes.RoadEventMessage:
             return 'road_event_message_module';
         case PortalTypes.RoadMessage:
             return 'road_message_module';
-        case PortalTypes.BillingPeriodMessage:
-            return 'billing_period_message_module';
         case PortalTypes.RoadReportRequest:
             return 'road_report_request_module';
         default:
