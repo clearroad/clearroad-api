@@ -12,6 +12,7 @@ commitlint.config.js
 CONTRIBUTING.md
 build-definitions.js
 deploy.js
+gulpfile.js
 karma.conf.*
 rollup.config.js
 tsconfig*
