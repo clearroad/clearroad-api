@@ -1,6 +1,6 @@
 <h2 id='clearroad'>ClearRoad</h2>
 <aside class="notice">
-  This documentation has been generated for the version <code>3.0.2</code>
+  This documentation has been generated for the version <code>3.1.0</code>
 </aside>
 
 <p>The <code>ClearRoad</code> class contains a subset of functions from the underlying <a href="https://jio.nexedi.com/">jIO.js</a> library, which uses <a href="https://lab.nexedi.com/nexedi/rsvp.js">RSVP.js</a> to chain functions like <code>Promises</code>.
@@ -383,6 +383,16 @@ If you only have the <code>reference</code> of the report request, please use <a
 <tr>
 <td>File</td>
 <td><code>&#39;File&#39;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>OdometerReading</td>
+<td><code>&#39;Odometer Reading&#39;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>OdometerReadingMessage</td>
+<td><code>&#39;Odometer Reading Message&#39;</code></td>
 <td></td>
 </tr>
 <tr>
