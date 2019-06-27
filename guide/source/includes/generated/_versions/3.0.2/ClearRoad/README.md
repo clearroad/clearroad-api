@@ -11,7 +11,7 @@
 
 
 <aside class="notice">
-  This documentation has been generated for the version <code>3.1.0</code>
+  This documentation has been generated for the version <code>3.0.2</code>
 </aside>
 
 
@@ -388,8 +388,6 @@ Key | Value | Description
 --------- | ----------- | -----------
 BillingPeriodMessage | `'Billing Period Message'` | 
 File | `'File'` | 
-OdometerReading | `'Odometer Reading'` | 
-OdometerReadingMessage | `'Odometer Reading Message'` | 
 RoadAccount | `'Road Account'` | 
 RoadAccountMessage | `'Road Account Message'` | 
 RoadEvent | `'Road Event'` | 
