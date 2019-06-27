@@ -6,7 +6,7 @@
   "module": "dist/module/index.js",
   "typings": "dist/module/index.d.ts",
   "scripts": {
-    "build": "rimraf dist && rollup -c && npm run build:modules && npm run build:docs",
+    "build": "rimraf dist && rollup -c && npm run build:modules",
     "build:modules": "tsc -p tsconfig.commonjs.json && tsc -p tsconfig.build.json",
     "build:definitions": "node build-definitions.js; npm run lint:fix",
     "build:docs": "gulp docs",
@@ -16,9 +16,18 @@
     "test": "rimraf coverage && karma start karma.conf.ts",
     "test:watch": "karma start karma.conf.ts --no-single-run",
     "start": "http-server -o --cors",
-    "release": "standard-version",
-    "postrelease": "git push origin master --follow-tags",
-    "commitmsg": "commitlint -e $GIT_PARAMS"
+    "release": "standard-version -a",
+    "postrelease": "git push origin master --follow-tags"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "standard-version": {
+    "scripts": {
+      "postchangelog": "npm run build:docs && git add guide"
+    }
   },
   "keywords": [
     "clearroad",
@@ -53,7 +62,7 @@
     "fs-extra-promise": "^1.0.1",
     "gulp": "^4.0.0",
     "http-server": "^0.11.1",
-    "husky": "^0.14.3",
+    "husky": "^2.4.1",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "^3.0.0",
