@@ -417,7 +417,8 @@ export class ClearRoad {
         const refKey = querySourceReference;
         const portalTypes = [
             PortalTypes.RoadEvent,
-            PortalTypes.RoadTransaction
+            PortalTypes.RoadTransaction,
+            PortalTypes.OdometerReading
         ].filter(type => this.filterPortalTypes.indexOf(type) !== -1);
         // add default one
         portalTypes.push(defaultDirectoryPortalType);

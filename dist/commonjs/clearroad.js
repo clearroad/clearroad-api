@@ -439,7 +439,8 @@ var ClearRoad = /** @class */ (function () {
         var refKey = exports.querySourceReference;
         var portalTypes = [
             message_types_1.PortalTypes.RoadEvent,
-            message_types_1.PortalTypes.RoadTransaction
+            message_types_1.PortalTypes.RoadTransaction,
+            message_types_1.PortalTypes.OdometerReading
         ].filter(function (type) { return _this.filterPortalTypes.indexOf(type) !== -1; });
         // add default one
         portalTypes.push(defaultDirectoryPortalType);
