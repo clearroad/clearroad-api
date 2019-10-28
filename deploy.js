@@ -1,5 +1,4 @@
-const fs = require('fs');
-const path = require('path');
+const s3 = require('s3');
 
 if (!process.env.CI) {
   try {
@@ -9,47 +8,55 @@ if (!process.env.CI) {
   catch (err) {}
 }
 
-const container = process.env.TARGET === 'master' ? 'prod' : 'dev';
-const azure = require('azure-storage');
-const blobService = azure.createBlobService();
+const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+const Bucket = process.env.AWS_BUCKET;
+const Prefix = process.env.TARGET === 'master' ? 'prod' : 'staging';
 
-const jsFile = files => files.filter(file => path.extname(file) === '.js');
+const client = s3.createClient({
+  maxAsyncS3: 20,     // this is the default
+  s3RetryCount: 3,    // this is the default
+  s3RetryDelay: 1000, // this is the default
+  multipartUploadThreshold: 20971520, // this is the default (20 MB)
+  multipartUploadSize: 15728640, // this is the default (15 MB)
+  s3Options: {
+    accessKeyId,
+    secretAccessKey
+  },
+});
 
-const createContainer = () => {
+const uploadDir = (localDir, destDir) => {
   return new Promise((resolve, reject) => {
-    blobService.createContainerIfNotExists(container, {
-      publicAccessLevel: 'blob'
-    }, (error, result) => {
-      if (!error) {
-        return resolve(result);
+    const uploader = client.uploadDir({
+      localDir,
+      s3Params: {
+        Bucket,
+        Prefix: `${Prefix}/${destDir || ''}`
       }
-      return reject(error);
     });
+    uploader.on('error', reject);
+    uploader.on('end', resolve);
   });
 };
 
-const updloadFile = (file, filename) => {
+const uploadFile = (localFile, destFile) => {
   return new Promise((resolve, reject) => {
-    console.log(`\t- ${filename} from ${file}`);
-    blobService.createBlockBlobFromLocalFile(container, filename, file, (error, result) => {
-      if (!error) {
-        return resolve(result);
+    const uploader = client.uploadFile({
+      localFile,
+      s3Params: {
+        Bucket,
+        Key: `${Prefix}/${destFile || ''}`
       }
-      return reject(error);
     });
+    uploader.on('error', reject);
+    uploader.on('end', resolve);
   });
 };
 
 const run = async () => {
   try {
-    await createContainer();
-
     console.log('Uploading dist folder...');
-    let directory = './dist/iife';
-    let files = jsFile(fs.readdirSync(path.resolve(directory)));
-    await Promise.all(files.map(file => {
-      return updloadFile(path.resolve(directory, file), `api/${path.basename(file)}`);
-    }));
+    await uploadDir('dist/iife', 'api');
 
     console.log('Uploading libraries...');
     files = [{
@@ -63,7 +70,7 @@ const run = async () => {
       path: 'node_modules/jio/dist/jio-latest.js'
     }];
     await Promise.all(files.map(file => {
-      return updloadFile(path.resolve(file.path), `lib/${file.name}`);
+      return uploadFile(file.path, `lib/${file.name}`);
     }));
 
     process.exit(0);

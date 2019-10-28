@@ -24,7 +24,7 @@ deploy:
   script:
     - npm install
     - npm run build
-    - TARGET=$CI_COMMIT_REF_NAME npm run deploy
+    - TARGET=$CI_COMMIT_REF_NAME AWS_BUCKET=cdn.clearroadlab.io npm run deploy
   only:
     - master
     - develop

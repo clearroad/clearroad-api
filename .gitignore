@@ -1,5 +1,6 @@
 node_modules/
 .env
+.nvmrc
 *.DS_Store
 dist/iife/
 coverage/
