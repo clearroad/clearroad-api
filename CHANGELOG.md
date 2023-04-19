@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.3.0"></a>
+# [3.3.0](https://github.com/clearroad/clearroad-api/compare/v3.1.0...v3.3.0) (2023-04-19)
+
+
+### Bug Fixes
+
+* **clearroad:** add missing retrieval of OdometerReading ([75e6624](https://github.com/clearroad/clearroad-api/commit/75e6624))
+
+
+### Features
+
+* **Portal Types:** add Road Mileage Message type ([6dc50b2](https://github.com/clearroad/clearroad-api/commit/6dc50b2))
+
+
+
 <a name="3.2.0"></a>
 # [3.2.0](https://github.com/clearroad/clearroad-api/compare/v3.1.0...v3.2.0) (2023-04-19)
 
