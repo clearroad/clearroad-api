@@ -12,6 +12,7 @@ export declare enum PortalTypes {
     RoadEventMessage = "Road Event Message",
     RoadMessage = "Road Message",
     RoadReportRequest = "Road Report Request",
-    RoadTransaction = "Road Transaction"
+    RoadTransaction = "Road Transaction",
+    RoadMileageMessage = "Road Mileage Message"
 }
-export declare type portalType = 'Billing Period Message' | 'Odometer Reading Message' | 'Road Account Message' | 'Road Event Message' | 'Road Message' | 'Road Report Request';
+export declare type portalType = 'Billing Period Message' | 'Odometer Reading Message' | 'Road Account Message' | 'Road Event Message' | 'Road Message' | 'Road Report Request' | 'Road Mileage Message';

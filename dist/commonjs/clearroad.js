@@ -27,7 +27,8 @@ var defaultMessagePortalTypes = [
     message_types_1.PortalTypes.OdometerReadingMessage,
     message_types_1.PortalTypes.RoadEventMessage,
     message_types_1.PortalTypes.RoadMessage,
-    message_types_1.PortalTypes.RoadReportRequest
+    message_types_1.PortalTypes.RoadReportRequest,
+    message_types_1.PortalTypes.RoadMileageMessage
 ];
 var defaultMessagePortalType = message_types_1.PortalTypes.RoadAccountMessage;
 var defaultDirectoryPortalType = message_types_1.PortalTypes.RoadAccount;
@@ -178,6 +179,8 @@ var messageRelativeUrl = function (portalType) {
             return 'road_message_module';
         case message_types_1.PortalTypes.RoadReportRequest:
             return 'road_report_request_module';
+        case message_types_1.PortalTypes.RoadMileageMessage:
+            return 'road_mileage_message_module';
         default:
             throw new Error('Unsupported message type');
     }

@@ -16,4 +16,5 @@ var PortalTypes;
     PortalTypes["RoadMessage"] = "Road Message";
     PortalTypes["RoadReportRequest"] = "Road Report Request";
     PortalTypes["RoadTransaction"] = "Road Transaction";
+    PortalTypes["RoadMileageMessage"] = "Road Mileage Message";
 })(PortalTypes = exports.PortalTypes || (exports.PortalTypes = {}));

@@ -12,5 +12,6 @@ exports.definitions = {
     'Road Account Message': road_account_message_1.default,
     'Road Event Message': road_event_message_1.default,
     'Road Message': road_message_1.default,
-    'Road Report Request': road_report_request_1.default
+    'Road Report Request': road_report_request_1.default,
+    'Road Mileage Message': road_report_request_1.default
 };

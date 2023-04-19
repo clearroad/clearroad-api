@@ -10,6 +10,7 @@ export const definitions = {
     'Road Account Message': roadAccountMessage,
     'Road Event Message': roadEventMessage,
     'Road Message': roadMessage,
-    'Road Report Request': roadReportRequest
+    'Road Report Request': roadReportRequest,
+    'Road Mileage Message': roadReportRequest
 };
 //# sourceMappingURL=definitions.js.map
