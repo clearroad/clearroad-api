@@ -21,7 +21,8 @@ const defaultMessagePortalTypes = [
   PortalTypes.OdometerReadingMessage,
   PortalTypes.RoadEventMessage,
   PortalTypes.RoadMessage,
-  PortalTypes.RoadReportRequest
+  PortalTypes.RoadReportRequest,
+  PortalTypes.RoadMileageMessage
 ];
 const defaultMessagePortalType = PortalTypes.RoadAccountMessage;
 const defaultDirectoryPortalType = PortalTypes.RoadAccount;
@@ -240,6 +241,8 @@ const messageRelativeUrl = (portalType: PortalTypes) => {
       return 'road_message_module';
     case PortalTypes.RoadReportRequest:
       return 'road_report_request_module';
+    case PortalTypes.RoadMileageMessage:
+      return 'road_mileage_message_module';
     default:
       throw new Error('Unsupported message type');
   }
