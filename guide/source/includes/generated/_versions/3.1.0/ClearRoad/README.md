@@ -11,7 +11,7 @@
 
 
 <aside class="notice">
-  This documentation has been generated for the version <code>3.2.0</code>
+  This documentation has been generated for the version <code>3.1.0</code>
 </aside>
 
 
@@ -397,7 +397,6 @@ RoadEventMessage | `'Road Event Message'` |
 RoadMessage | `'Road Message'` | 
 RoadReportRequest | `'Road Report Request'` | 
 RoadTransaction | `'Road Transaction'` | 
-RoadMileageMessage | `'Road Mileage Message'` | 
 
 
 #### ValidationStates
