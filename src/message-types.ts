@@ -12,7 +12,8 @@ export enum PortalTypes {
   RoadEventMessage = 'Road Event Message',
   RoadMessage = 'Road Message',
   RoadReportRequest = 'Road Report Request',
-  RoadTransaction = 'Road Transaction'
+  RoadTransaction = 'Road Transaction',
+  RoadMileageMessage = 'Road Mileage Message'
 }
 
 export type portalType = 'Billing Period Message' |
@@ -20,4 +21,5 @@ export type portalType = 'Billing Period Message' |
   'Road Account Message' |
   'Road Event Message' |
   'Road Message' |
-  'Road Report Request';
+  'Road Report Request' |
+  'Road Mileage Message';
