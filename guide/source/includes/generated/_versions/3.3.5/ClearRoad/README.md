@@ -11,7 +11,7 @@
 
 
 <aside class="notice">
-  This documentation has been generated for the version <code>3.3.6</code>
+  This documentation has been generated for the version <code>3.3.5</code>
 </aside>
 
 
@@ -381,6 +381,25 @@ gdrive | `'gdrive'` | Storage data in a google drive account. Need `accessToken`
 #### PortalTypes
 
 
+Each message is represented by a "portal_type" (or message category)
+
+
+Key | Value | Description
+--------- | ----------- | -----------
+BillingPeriodMessage | `'Billing Period Message'` | 
+File | `'File'` | 
+OdometerReading | `'Odometer Reading'` | 
+OdometerReadingMessage | `'Odometer Reading Message'` | 
+RoadAccount | `'Road Account'` | 
+RoadAccountMessage | `'Road Account Message'` | 
+RoadEvent | `'Road Event'` | 
+RoadEventMessage | `'Road Event Message'` | 
+RoadMessage | `'Road Message'` | 
+RoadReportRequest | `'Road Report Request'` | 
+RoadTransaction | `'Road Transaction'` | 
+RoadMileageMessage | `'Road Mileage Message'` | 
+
+
 #### ValidationStates
 
 
@@ -426,40 +445,6 @@ syncPortalTypes | <code>PortalTypes[]</code> | View [PortalTypes](#api-reference
 maxSyncObjects | <code>number</code> | Maximum number of objects that will be sycnrhonized from the ClearRoad platform to the local storage. Default is `1234567890`. | Yes
 useQueryStorage | <code>boolean</code> | Force using a query storage around the localStorage. Needed if the storage can not query data directly. See information on the storage. | Yes
 debug | <code>boolean</code> | Log to console replication steps between local and remote storage. | Yes
-
-
-#### IClearRoadOptionsLocalStorage
-
-
-
-Property | Type | Description | Optional
---------- | ----------- | ----------- | -----------
-type | <code>LocalStorageTypes&#124;string</code> | Type of the storage. View [LocalStorageTypes](#api-reference-clearroad-enums-localstoragetypes). | No
-accessToken | <code>string</code> | Access token to authenticate on the ClearRoad API (if necessary). | Yes
-database | <code>string</code> | Name of the database when the objects will be stored. | Yes
-
-
-#### IJioQueryOptions
-
-
-#### IJioQueryResults
-
-
-#### IJioQueryResultsData
-
-
-#### IJioQueryResultRow
-
-
-#### IQueue
-
-
-
-
-
-
-
- and remote storage. | Yes
 
 
 #### IClearRoadOptionsLocalStorage
