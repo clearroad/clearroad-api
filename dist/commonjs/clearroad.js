@@ -350,7 +350,7 @@ var ClearRoad = /** @class */ (function () {
             exports.queryGroupingReference + ": \"" + GroupingReferences.Data + "\"",
             this.queryMinDate()
         ]);
-        var signatureStorage = this.signatureSubStorage(this.databaseName + "-messages-signatures");
+        var signatureStorage = this.signatureSubStorage(this.databaseName + "-messages-signs");
         var localStorage = this.localSubStorage(refKey);
         this.messagesStorage = jIO.createJIO({
             report_level: maxLogLevel,
@@ -399,7 +399,7 @@ var ClearRoad = /** @class */ (function () {
             "validation_state: (" + queryValidationStates + ")",
             this.queryMinDate()
         ]);
-        var signatureStorage = this.signatureSubStorage(this.databaseName + "-ingestion-signatures");
+        var signatureStorage = this.signatureSubStorage(this.databaseName + "-ingestion-signs");
         var localStorage = this.localSubStorage(refKey);
         this.ingestionReportStorage = jIO.createJIO({
             report_level: maxLogLevel,
@@ -451,7 +451,7 @@ var ClearRoad = /** @class */ (function () {
             exports.queryPortalType + ": (" + queryPortalTypes(portalTypes) + ")",
             this.queryMinDate()
         ]);
-        var signatureStorage = this.signatureSubStorage(this.databaseName + "-directory-signatures");
+        var signatureStorage = this.signatureSubStorage(this.databaseName + "-directory-signs");
         var localStorage = this.localSubStorage(refKey);
         this.directoryStorage = jIO.createJIO({
             report_level: maxLogLevel,
@@ -496,7 +496,7 @@ var ClearRoad = /** @class */ (function () {
             exports.queryPortalType + ": (\"" + message_types_1.PortalTypes.File + "\")",
             this.queryMinDate()
         ]);
-        var signatureStorage = this.signatureSubStorage(this.databaseName + "-files-signatures");
+        var signatureStorage = this.signatureSubStorage(this.databaseName + "-files-signs");
         var localStorage = this.localSubStorage(refKey);
         var mappingStorageWithEnclosure = __assign({}, localStorage, { attachment_list: [storage_1.defaultAttachmentName], attachment: (_a = {},
                 _a[storage_1.defaultAttachmentName] = {

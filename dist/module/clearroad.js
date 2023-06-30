@@ -330,7 +330,7 @@ export class ClearRoad {
             `${queryGroupingReference}: "${GroupingReferences.Data}"`,
             this.queryMinDate()
         ]);
-        const signatureStorage = this.signatureSubStorage(`${this.databaseName}-messages-signatures`);
+        const signatureStorage = this.signatureSubStorage(`${this.databaseName}-messages-signs`);
         const localStorage = this.localSubStorage(refKey);
         this.messagesStorage = jIO.createJIO({
             report_level: maxLogLevel,
@@ -378,7 +378,7 @@ export class ClearRoad {
             `validation_state: (${queryValidationStates})`,
             this.queryMinDate()
         ]);
-        const signatureStorage = this.signatureSubStorage(`${this.databaseName}-ingestion-signatures`);
+        const signatureStorage = this.signatureSubStorage(`${this.databaseName}-ingestion-signs`);
         const localStorage = this.localSubStorage(refKey);
         this.ingestionReportStorage = jIO.createJIO({
             report_level: maxLogLevel,
@@ -429,7 +429,7 @@ export class ClearRoad {
             `${queryPortalType}: (${queryPortalTypes(portalTypes)})`,
             this.queryMinDate()
         ]);
-        const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signatures`);
+        const signatureStorage = this.signatureSubStorage(`${this.databaseName}-directory-signs`);
         const localStorage = this.localSubStorage(refKey);
         this.directoryStorage = jIO.createJIO({
             report_level: maxLogLevel,
@@ -473,7 +473,7 @@ export class ClearRoad {
             `${queryPortalType}: ("${PortalTypes.File}")`,
             this.queryMinDate()
         ]);
-        const signatureStorage = this.signatureSubStorage(`${this.databaseName}-files-signatures`);
+        const signatureStorage = this.signatureSubStorage(`${this.databaseName}-files-signs`);
         const localStorage = this.localSubStorage(refKey);
         const mappingStorageWithEnclosure = Object.assign({}, localStorage, { attachment_list: [defaultAttachmentName], attachment: {
                 [defaultAttachmentName]: {
