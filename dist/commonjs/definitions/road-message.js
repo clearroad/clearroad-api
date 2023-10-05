@@ -57,7 +57,13 @@ var json = {
                         'CRE',
                         'FEE',
                         'INV',
-                        'MRP'
+                        'MRP',
+                        'AWD',
+                        'EPA',
+                        'IWV',
+                        'OTH',
+                        'RCM',
+                        'RRP'
                     ],
                     examples: [
                         'MRP'

@@ -57,7 +57,13 @@ const json: IDefinition = {
             'CRE',
             'FEE',
             'INV',
-            'MRP'
+            'MRP',
+            'AWD',
+            'EPA',
+            'IWV',
+            'OTH',
+            'RCM',
+            'RRP'
           ],
           examples: [
             'MRP'
