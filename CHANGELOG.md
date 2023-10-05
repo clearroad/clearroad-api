@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.4.0"></a>
+# [3.4.0](https://github.com/clearroad/clearroad-api/compare/v3.3.6...v3.4.0) (2023-10-05)
+
+
+### Features
+
+* **road messages:** add new message types ([8bb28fc](https://github.com/clearroad/clearroad-api/commit/8bb28fc))
+
+
+
 <a name="3.3.6"></a>
 ## [3.3.6](https://github.com/clearroad/clearroad-api/compare/v3.3.5...v3.3.6) (2023-06-30)
 
