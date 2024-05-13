@@ -1026,4 +1026,22 @@ export class ClearRoad {
       .push(attachment => jIO.util.readBlobAsText(attachment[defaultAttachmentName]))
       .push(report => report.target.result ? JSON.parse(report.target.result) : {});
   }
+
+  isConnected() {
+    return new Promise((resolve, _reject) => {
+      this.reportStorage.allDocs({
+        query: 'limit: 1',
+      }).then(response => {
+        if (response && response.data && response.data.rows && response.data.rows.length > 0) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      }).catch(error => {
+        // Error handling if the query fails
+        console.error('Connection check failed:', error);
+        resolve(false);
+      });
+    });
+  }
 }
