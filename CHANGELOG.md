@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.3.8"></a>
+## [3.3.8](https://github.com/clearroad/clearroad-api/compare/v3.3.7...v3.3.8) (2024-05-15)
+
+
+
 <a name="3.3.7"></a>
 ## [3.3.7](https://github.com/clearroad/clearroad-api/compare/v3.3.6...v3.3.7) (2024-05-15)
 
