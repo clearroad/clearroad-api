@@ -405,4 +405,5 @@ export declare class ClearRoad {
      * ```
      */
     getReport(reference: string): IQueue<any>;
+    isConnected(): Promise<{}>;
 }
