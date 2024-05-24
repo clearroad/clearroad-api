@@ -1030,7 +1030,8 @@ export class ClearRoad {
   isConnected() {
     return new Promise((resolve, _reject) => {
       this.reportStorage.allDocs({
-        query: 'limit: 1',
+        query: '',
+        limit: [0, 1]
       }).then(response => {
         if (response && response.data && response.data.rows && response.data.rows.length > 0) {
           resolve(true);
@@ -1038,7 +1039,7 @@ export class ClearRoad {
           resolve(false);
         }
       }).catch(error => {
-        // Error handling if the query fails
+        // tslint:disable-next-line:no-console
         console.error('Connection check failed:', error);
         resolve(false);
       });
