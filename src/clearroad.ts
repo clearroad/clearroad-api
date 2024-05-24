@@ -1027,22 +1027,12 @@ export class ClearRoad {
       .push(report => report.target.result ? JSON.parse(report.target.result) : {});
   }
 
-  isConnected() {
-    return new Promise((resolve, _reject) => {
-      this.reportStorage.allDocs({
-        query: '',
-        limit: [0, 1]
-      }).then(response => {
-        if (response && response.data && response.data.rows && response.data.rows.length > 0) {
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      }).catch(error => {
-        // tslint:disable-next-line:no-console
-        console.error('Connection check failed:', error);
-        resolve(false);
-      });
+  async isConnected() {
+    const result = await this.allDocs({
+      query: '',
+      limit: [0, 1]
     });
+
+    return result && result.data && result.data.rows && result.data.rows.length > 0;
   }
 }

@@ -1,3 +1,11 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 const Rusha = require('rusha');
 const { jIO } = require('jio');
 const { all } = require('rsvp');
@@ -898,21 +906,17 @@ export class ClearRoad {
             .push(report => report.target.result ? JSON.parse(report.target.result) : {});
     }
     isConnected() {
-        return new Promise((resolve, _reject) => {
-            this.reportStorage.allDocs({
-                query: 'limit: 1',
-            }).then(response => {
-                if (response && response.data && response.data.rows && response.data.rows.length > 0) {
-                    resolve(true);
-                }
-                else {
-                    resolve(false);
-                }
-            }).catch(error => {
-                // Error handling if the query fails
-                console.error('Connection check failed:', error);
-                resolve(false);
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield this.allDocs({
+                query: '',
+                limit: [0, 1]
             });
+            if (result && result.data && result.data.rows && result.data.rows.length > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
         });
     }
 }
