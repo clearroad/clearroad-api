@@ -907,14 +907,14 @@ export class ClearRoad {
     }
     isConnected() {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.allDocs({
-                query: '',
-                limit: [0, 1]
-            });
-            if (result && result.data && result.data.rows && result.data.rows.length > 0) {
-                return true;
+            try {
+                const result = yield this.allDocs({
+                    query: '',
+                    limit: [0, 1]
+                });
+                return result && result.data && result.data.rows && result.data.rows.length > 0;
             }
-            else {
+            catch (e) {
                 return false;
             }
         });

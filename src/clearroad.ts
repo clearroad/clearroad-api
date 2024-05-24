@@ -1028,11 +1028,14 @@ export class ClearRoad {
   }
 
   async isConnected() {
-    const result = await this.allDocs({
-      query: '',
-      limit: [0, 1]
-    });
-
-    return result && result.data && result.data.rows && result.data.rows.length > 0;
+    try {
+      const result = await this.allDocs({
+        query: '',
+        limit: [0, 1]
+      });
+      return result && result.data && result.data.rows && result.data.rows.length > 0;
+    } catch ( e ) {
+      return false;
+    }
   }
 }

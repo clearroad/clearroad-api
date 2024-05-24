@@ -966,22 +966,22 @@ var ClearRoad = /** @class */ (function () {
     };
     ClearRoad.prototype.isConnected = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var result;
+            var result, e_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.allDocs({
-                            query: '',
-                            limit: [0, 1]
-                        })];
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.allDocs({
+                                query: '',
+                                limit: [0, 1]
+                            })];
                     case 1:
                         result = _a.sent();
-                        if (result && result.data && result.data.rows && result.data.rows.length > 0) {
-                            return [2 /*return*/, true];
-                        }
-                        else {
-                            return [2 /*return*/, false];
-                        }
-                        return [2 /*return*/];
+                        return [2 /*return*/, result && result.data && result.data.rows && result.data.rows.length > 0];
+                    case 2:
+                        e_1 = _a.sent();
+                        return [2 /*return*/, false];
+                    case 3: return [2 /*return*/];
                 }
             });
         });
