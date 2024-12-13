@@ -70,7 +70,7 @@
     "karma-jasmine": "~1.1.1",
     "karma-jasmine-html-reporter": "^0.2.2",
     "karma-typescript": "^3.0.13",
-    "karma-typescript-es6-transform": "^1.0.4",
+    "karma-typescript-es6-transform": "^5.5.3",
     "lodash": "^4.17.11",
     "lodash.clonedeep": "^4.5.0",
     "request": "^2.88.0",
