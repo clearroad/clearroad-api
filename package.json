@@ -41,7 +41,7 @@
   "author": "Guillaume Royer <guillaume.royer@clearroad.io>",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "ajv": "^6.5.4",
+    "ajv": "^6.12.3",
     "jio": "git+https://lab.nexedi.com/mebibou/jio.git#node-fix",
     "jsonschema": "^1.2.4",
     "rsvp": "git+https://lab.nexedi.com/nexedi/rsvp.js.git",
